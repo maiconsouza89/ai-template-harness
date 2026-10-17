@@ -13,6 +13,7 @@ roda o mesmo alvo (`.github/workflows/ci.yml`), então o que passa local passa l
 | `check-shell` | `scripts/check-shell.sh` | `sh -n` em todos os scripts e hooks; `shellcheck -s sh` (pula localmente se ausente; falha na CI) |
 | `check-actions` | `scripts/check-actions.sh` | Workflows com actionlint (pula localmente se ausente; falha na CI) e toda action fixada por SHA completo com comentário de versão |
 | `check-secrets` | `scripts/check-secrets.sh` | Segredos no histórico do Git com gitleaks (pula localmente se ausente; falha na CI) |
+| `check-adr` | `scripts/check-adr.sh` | `docs/ADR` com o `audit.py` da skill adr-writer: nomes, front-matter, camadas, cadeias de supersede; regenera `index.md` e falha se ele estava desatualizado (pula localmente sem python3; falha na CI) |
 | `lint`, `test` | `scripts/contract.sh` | Alvos do contrato; rodam `scripts/lint.sh` e `test.sh` se existirem, senão avisam e passam |
 
 Cada alvo também roda sozinho: `make check-hooks`.

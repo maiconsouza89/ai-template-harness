@@ -1,7 +1,7 @@
 # Contribuindo
 
 Obrigado por contribuir. Este guia resume o fluxo de trabalho. A fundamentação de cada regra
-está em [`docs/STANDARDS.md`](docs/STANDARDS.md) e em [`docs/decisions/`](docs/decisions/).
+está em [`docs/STANDARDS.md`](docs/STANDARDS.md) e em [`docs/ADR/`](docs/ADR/).
 
 ## Configuração inicial
 
@@ -71,7 +71,7 @@ chore!: exige commits assinados
 - [SemVer 2.0.0](https://semver.org/lang/pt-BR/). Primeira versão `0.1.0`. Enquanto `0.y.z`,
   `feat` e breaking change sobem MINOR e `fix` sobe PATCH.
 - A tag `vX.Y.Z` é a fonte da verdade da versão; `.release-please-manifest.json` guarda a última lançada.
-- A release é automática ([ADR 0004](docs/decisions/0004-release-automatica-com-release-please.md)):
+- A release é automática ([ADR 0004](docs/ADR/0004-release-automatica-com-release-please.md)):
   a cada merge em `main`, o release-please abre ou atualiza o PR `chore(release): vX.Y.Z` com a
   versão e o `CHANGELOG.md` calculados dos commits. Quando os checks passam, o PR é mesclado
   sozinho, criando a tag e a GitHub Release.
@@ -82,5 +82,6 @@ chore!: exige commits assinados
 
 ## Decisões
 
-Decisões de arquitetura e de processo são registradas em `docs/decisions/`; formato e template em
-[`docs/decisions/README.md`](docs/decisions/README.md).
+Decisões de arquitetura e de processo são registradas em `docs/ADR/`; regras, template e ciclo de
+status em [`docs/ADR/README.md`](docs/ADR/README.md). Depois de criar ou mudar um ADR, rode
+`make check-adr` e inclua o `index.md` regenerado no commit.

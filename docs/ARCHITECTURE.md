@@ -1,7 +1,7 @@
 # Arquitetura do repositório
 
 Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (ver
-`decisions/0003`); diretórios de código entram no projeto gerado a partir dele.
+`ADR/0003`); diretórios de código entram no projeto gerado a partir dele.
 
 ## Mapa
 
@@ -12,7 +12,7 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 ├── Makefile               Superfície única de comandos: make setup, make check.
 ├── README.md              Para pessoas: o que é e como usar o template.
 ├── CONTRIBUTING.md        Fluxo de trabalho, commits, PRs, versões.
-├── CHANGELOG.md           Gerado pelo release-please; não editar (decisions/0004).
+├── CHANGELOG.md           Gerado pelo release-please; não editar (ADR/0004).
 ├── release-please-config.json, .release-please-manifest.json   Configuração da release.
 ├── LICENSE                MIT.
 ├── .editorconfig          UTF-8, LF, indentação.
@@ -33,7 +33,8 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
     ├── SETUP.md           Preparar o ambiente.
     ├── STANDARDS.md       Cada padrão, onde vive, fonte oficial e configuração do GitHub.
     ├── TESTING.md         O que make check valida.
-    └── decisions/         ADRs (MADR), um por decisão; README.md tem o template.
+    └── ADR/               ADRs com front-matter e camada (layers.md); README.md tem as regras,
+                           template.md o modelo, index.md é gerado por make check-adr.
 ```
 
 ## Onde colocar o quê
@@ -45,8 +46,8 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 | Preferência pessoal | `CLAUDE.local.md` (ignorado) | Não polui o repositório |
 | Comando que pessoa ou agente executa | Alvo no `Makefile` chamando `scripts/*.sh` | Uma porta de entrada, lógica testável em sh |
 | Verificação automática | `scripts/check-*.sh` e alvo `check-*` | `make check` agrega tudo; a CI roda o mesmo |
-| Implementação de lint, format, test, build da stack | `scripts/<alvo>.sh` no projeto gerado | O contrato do `Makefile` não muda; ver `decisions/0003` |
-| Decisão de padrão ou arquitetura | `docs/decisions/NNNN-*.md` | Histórico com alternativas descartadas |
+| Implementação de lint, format, test, build da stack | `scripts/<alvo>.sh` no projeto gerado | O contrato do `Makefile` não muda; ver `ADR/0003` |
+| Decisão de padrão ou arquitetura | `docs/ADR/NNNN-*.md` | Histórico com alternativas descartadas; camada no front-matter |
 | Explicação longa, com fontes | `docs/*.md` | `AGENTS.md` aponta, não repete |
 | Arquivo de comunidade (`CONTRIBUTING`, `SECURITY`, `CODE_OF_CONDUCT`) | Raiz | Reconhecido pelo GitHub; `LICENSE` só é detectado na raiz |
 
@@ -58,4 +59,4 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
   possível, um `check-*` que a aplica.
 - **Agnóstico por contrato.** Nada no template depende de linguagem. O `Makefile` fixa a interface
   (`lint`, `format`, `test`, `build`); o projeto gerado implementa `scripts/<alvo>.sh` e registra
-  um ADR (`decisions/0003`).
+  um ADR (`ADR/0003`).
