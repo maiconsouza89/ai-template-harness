@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.2.0...v0.3.0) (2026-10-17)
+
+
+### Adicionado
+
+* **adr:** migra decisões para docs/ADR no formato da skill adr-writer ([#16](https://github.com/maiconsouza89/ai-template-harness/issues/16)) ([7a9867c](https://github.com/maiconsouza89/ai-template-harness/commit/7a9867cdf1296c53626b87f54dbc15eafd17e095))
+
 ## [0.2.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.1.1...v0.2.0) (2026-10-17)
 
 
