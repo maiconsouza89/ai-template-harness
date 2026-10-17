@@ -20,7 +20,7 @@ check-branch: ## Valida o nome do branch (<tipo>/<descricao>)
 	@sh scripts/checks/check-branch.sh
 
 check-hooks: ## Testa o hook commit-msg com cabeçalhos válidos e inválidos
-	@sh scripts/checks/test-commit-msg.sh
+	@sh scripts/tests/test-commit-msg.sh
 
 check-eol: ## Garante que nenhum arquivo versionado tem CRLF
 	@sh scripts/checks/check-eol.sh

@@ -28,7 +28,8 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 │   ├── setup.sh           Ativa os hooks versionados (make setup).
 │   ├── contract.sh        Despacha lint/format/test/build para scripts/<alvo>.sh se existir.
 │   │                      O projeto gerado adiciona lint.sh, format.sh, test.sh, build.sh aqui.
-│   ├── checks/            Verificações de make check (check-*.sh e test-commit-msg.sh).
+│   ├── checks/            Verificações de make check (check-*.sh).
+│   ├── tests/             Testes do próprio template (test-commit-msg.sh testa o hook).
 │   └── templates/         Pós-"Use this template": bootstrap-github.sh e reset-template.sh.
 └── docs/
     ├── ARCHITECTURE.md    Este arquivo.

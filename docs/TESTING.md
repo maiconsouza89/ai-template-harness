@@ -8,7 +8,7 @@ roda o mesmo alvo (`.github/workflows/ci.yml`), então o que passa local passa l
 | Alvo | Script | Verifica |
 | --- | --- | --- |
 | `check-branch` | `scripts/checks/check-branch.sh` | Nome do branch no formato `<tipo>/<descricao>` com os tipos do commit; `main`, branch do release-please e PRs de fork isentos |
-| `check-hooks` | `scripts/checks/test-commit-msg.sh` | Hook `commit-msg` com cabeçalhos válidos e inválidos (acentos, limite de 72 caracteres, tipos, escopo, ponto final, segunda linha) |
+| `check-hooks` | `scripts/tests/test-commit-msg.sh` | Hook `commit-msg` com cabeçalhos válidos e inválidos (acentos, limite de 72 caracteres, tipos, escopo, ponto final, segunda linha) |
 | `check-eol` | `scripts/checks/check-eol.sh` | Nenhum arquivo versionado com CRLF ou fim de linha misto (`git ls-files --eol`) |
 | `check-shell` | `scripts/checks/check-shell.sh` | `sh -n` em todos os scripts e hooks; `shellcheck -s sh` (pula localmente se ausente; falha na CI) |
 | `check-actions` | `scripts/checks/check-actions.sh` | Workflows com actionlint (pula localmente se ausente; falha na CI) e toda action fixada por SHA completo com comentário de versão |
@@ -56,5 +56,5 @@ ADR. Enquanto o script não existe, o alvo avisa e passa.
 
 ## Ao mudar o hook `commit-msg`
 
-Acrescente o caso em `scripts/checks/test-commit-msg.sh` antes de mudar o hook: um aceito e um rejeitado
+Acrescente o caso em `scripts/tests/test-commit-msg.sh` antes de mudar o hook: um aceito e um rejeitado
 para cada regra nova.
