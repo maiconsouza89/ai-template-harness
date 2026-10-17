@@ -47,6 +47,9 @@ executa o mesmo `make check` (ver `docs/TESTING.md`).
 - Mudança que cria ou altera um padrão do repositório exige um ADR novo em `docs/decisions/`
   (formato em `docs/01-fundacao-git-e-padroes.md` §4.7) e uma linha em `CHANGELOG.md` sob
   `[Unreleased]`, quando afetar quem usa o template.
+- Não edite `CHANGELOG.md`, `version.txt` nem `.release-please-manifest.json`: são gerados pelo
+  release-please a partir dos commits (`docs/decisions/0004`). A descrição do commit é a
+  entrada do changelog, então escreva-a para quem usa o template.
 - Documentação em português. Código, nomes de arquivo, tipos e escopos de commit em inglês.
 - Texto em UTF-8 com fim de linha LF (`.editorconfig` e `.gitattributes`). Shell em POSIX `sh`,
   sem bashismos.

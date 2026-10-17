@@ -12,13 +12,16 @@ Estrutura atual e regra de onde colocar cada coisa. Stack ainda não definida (v
 ├── Makefile               Superfície única de comandos: make setup, make check.
 ├── README.md              Para pessoas: o que é e como usar o template.
 ├── CONTRIBUTING.md        Fluxo de trabalho, commits, PRs, versões.
-├── CHANGELOG.md           Keep a Changelog; [Unreleased] no topo.
+├── CHANGELOG.md           Gerado pelo release-please; não editar (decisions/0004).
+├── version.txt            Versão atual, gerado; a tag vX.Y.Z é a fonte da verdade.
+├── release-please-config.json, .release-please-manifest.json   Configuração da release.
 ├── LICENSE                MIT.
 ├── .editorconfig          UTF-8, LF, indentação.
 ├── .gitattributes         Fim de linha por tipo de arquivo; vence o core.autocrlf.
 ├── .gitignore             Só o comum a qualquer stack.
 ├── .githooks/             Hooks versionados (commit-msg). Ativados por make setup.
-├── .github/workflows/     CI: ci.yml (make check, gitleaks) e pr-title.yml (título do PR).
+├── .github/workflows/     ci.yml (make check, gitleaks), pr-title.yml (título do PR),
+│                          release.yml (release-please + auto-merge).
 ├── .vscode/               settings.json e extensions.json compartilhados.
 ├── scripts/               Lógica dos alvos do Makefile, em POSIX sh. check-*.sh verificam;
 │                          contract.sh despacha lint/format/test/build para <alvo>.sh se existir.
