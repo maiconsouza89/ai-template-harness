@@ -4,7 +4,7 @@
 SHELL := /bin/sh
 .DEFAULT_GOAL := help
 
-.PHONY: help setup check check-hooks check-eol check-shell check-actions check-secrets check-contract \
+.PHONY: help setup check check-branch check-hooks check-eol check-shell check-actions check-secrets check-contract \
 	lint format test build
 
 help: ## Lista os alvos disponíveis
@@ -13,8 +13,11 @@ help: ## Lista os alvos disponíveis
 setup: ## Ativa os hooks versionados (uma vez após o clone)
 	@sh scripts/setup.sh
 
-check: check-hooks check-eol check-shell check-actions check-secrets check-contract lint test ## Roda todas as verificações
+check: check-branch check-hooks check-eol check-shell check-actions check-secrets check-contract lint test ## Roda todas as verificações
 	@echo "ok: todas as verificações passaram"
+
+check-branch: ## Valida o nome do branch (<tipo>/<descricao>)
+	@sh scripts/check-branch.sh
 
 check-hooks: ## Testa o hook commit-msg com cabeçalhos válidos e inválidos
 	@sh scripts/test-commit-msg.sh

@@ -302,8 +302,9 @@ Removed. Demais tipos ficam de fora, salvo impacto para o usuário.
 
 Os seis passos da documentação do GitHub:
 
-1. Criar um branch a partir de `main`, com nome curto e descritivo: `add-commit-msg-hook`,
-   `fix-crlf-powershell`.
+1. Criar um branch a partir de `main` no formato `<tipo>/<descricao-com-hifens>`, com os mesmos
+   tipos do commit: `feat/hook-commit-msg`, `fix/crlf-powershell`. O GitHub sugere nomes curtos
+   e descritivos; o prefixo de tipo alinha o branch ao commit e ao título do PR.
 2. Fazer commits convencionais no branch.
 3. Abrir o pull request com título em Conventional Commits.
 4. Responder à revisão.

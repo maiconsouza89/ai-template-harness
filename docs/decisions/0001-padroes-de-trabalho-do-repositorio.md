@@ -11,7 +11,7 @@ e verificáveis por máquina sempre que possível. Fundamentação e fontes em
 
 | Tema | Escolhida | Alternativas consideradas |
 | --- | --- | --- |
-| Modelo de branches | GitHub Flow | Git Flow, trunk-based com flags |
+| Modelo de branches | GitHub Flow, branches `<tipo>/<descricao>` com os tipos do commit | Git Flow, trunk-based com flags; nomes livres |
 | Merge de PR | Squash | Rebase, merge commit |
 | Commits | Conventional Commits 1.0.0, tipos em inglês, descrição em português | Descrição em inglês; formato livre |
 | Versionamento | SemVer 2.0.0, tag anotada `vX.Y.Z` | CalVer |

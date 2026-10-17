@@ -7,6 +7,7 @@ roda o mesmo alvo (`.github/workflows/ci.yml`), então o que passa local passa l
 
 | Alvo | Script | Verifica |
 | --- | --- | --- |
+| `check-branch` | `scripts/check-branch.sh` | Nome do branch no formato `<tipo>/<descricao>` com os tipos do commit; `main` isento |
 | `check-hooks` | `scripts/test-commit-msg.sh` | Hook `commit-msg` com 22 cabeçalhos válidos e inválidos (acentos, limite de 72 caracteres, tipos, escopo, ponto final, segunda linha) |
 | `check-eol` | `scripts/check-eol.sh` | Nenhum arquivo versionado com CRLF ou fim de linha misto (`git ls-files --eol`) |
 | `check-shell` | `scripts/check-shell.sh` | `sh -n` em todos os scripts e hooks; `shellcheck -s sh` se instalado |

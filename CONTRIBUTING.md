@@ -19,8 +19,9 @@ commit e de abrir um PR (detalhes em [`docs/TESTING.md`](docs/TESTING.md)). Ambi
 
 ## Fluxo de trabalho (GitHub Flow)
 
-1. Crie um branch a partir de `main`, com nome curto e descritivo: `add-commit-msg-hook`,
-   `fix-crlf-powershell`.
+1. Crie um branch a partir de `main` no formato `<tipo>/<descricao-com-hifens>`, com os mesmos
+   tipos do commit: `feat/hook-commit-msg`, `fix/crlf-powershell`, `docs/traduz-adrs`.
+   `make check-branch` valida o nome.
 2. Faça commits convencionais no branch (ver abaixo), com `make check` passando.
 3. Abra o pull request com título no formato Conventional Commits. Com squash merge, o título
    do PR vira o cabeçalho do commit em `main`.

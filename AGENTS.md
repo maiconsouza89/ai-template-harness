@@ -36,7 +36,8 @@ executa o mesmo `make check` (ver `docs/TESTING.md`).
 
 ## Regras de trabalho
 
-- Trabalhe em um branch a partir de `main`. `main` só recebe mudanças por pull request com
+- Trabalhe em um branch a partir de `main`, nomeado `<tipo>/<descricao-com-hifens>` com os
+  mesmos tipos do commit (`feat/hook-commit-msg`, `docs/traduz-adrs`). `main` só recebe mudanças por pull request com
   squash. Nunca faça push direto em `main`.
 - Commits no formato Conventional Commits: tipos em inglês (`feat`, `fix`, `docs`...), descrição
   em português, minúsculas, até 72 caracteres, sem ponto final. O hook `commit-msg` rejeita o
