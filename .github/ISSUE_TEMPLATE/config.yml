@@ -1,5 +1,1 @@
 blank_issues_enabled: false
-contact_links:
-  - name: Dúvida sobre o template
-    url: https://github.com/maiconsouza89/ai-template-harness/discussions
-    about: Perguntas e ideias que ainda não são um bug nem uma funcionalidade definida.

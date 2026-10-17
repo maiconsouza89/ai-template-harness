@@ -7,15 +7,28 @@ verificação automática. O que não está no repositório não existe para o a
 ## Como usar
 
 1. No GitHub, clique em **Use this template** e crie o seu repositório.
-2. Clone e ative os hooks versionados (passo único por clone):
+2. Clone, ative os hooks e confira que tudo passa:
 
    ```sh
    make setup
    make check
    ```
 
-3. Leia o [guia de contribuição](CONTRIBUTING.md) e os padrões em [`docs/`](docs/).
-   Agentes de código começam por [`AGENTS.md`](AGENTS.md).
+3. Aplique o que "Use this template" não copia e zere o que ele copia demais:
+
+   ```sh
+   sh scripts/bootstrap-github.sh   # PRs só por squash, auto-merge, ruleset de main com os checks
+   sh scripts/reset-template.sh     # remove o CHANGELOG do template e zera a versão
+   ```
+
+   O bootstrap avisa se falta o secret `RELEASE_PLEASE_TOKEN` e diz como criá-lo. Detalhes em
+   [`docs/STANDARDS.md`](docs/STANDARDS.md#configuração-do-github).
+
+4. Substitua este README pelo do seu projeto, implemente `scripts/lint.sh`, `format.sh`,
+   `test.sh` e `build.sh` para a sua stack e registre a escolha em um ADR
+   ([`docs/decisions/README.md`](docs/decisions/README.md)).
+5. Leia o [guia de contribuição](CONTRIBUTING.md). Agentes de código começam por
+   [`AGENTS.md`](AGENTS.md).
 
 ## O que está incluído
 

@@ -38,5 +38,6 @@ jobs:
       - name: make check
         env:
           CI: "true"
+          PR_FROM_FORK: ${{ github.event.pull_request.head.repo.fork }}
         run: make check
 

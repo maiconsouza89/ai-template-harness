@@ -27,7 +27,8 @@ verificação automática (`make check`).
 
 ## Configuração do GitHub
 
-Nada disto vem junto com "Use this template"; precisa ser aplicado em cada repositório gerado.
+Nada disto vem junto com "Use this template". `scripts/bootstrap-github.sh` aplica os itens 1, 2 e 4
+via `gh`; o 3 é manual (o script avisa); o 5 só vale para o template.
 
 1. **Pull requests**: só *squash merging*, título e corpo do PR como mensagem, *Allow auto-merge*,
    *Automatically delete head branches*.

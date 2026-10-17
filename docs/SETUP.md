@@ -18,8 +18,8 @@ No Windows, use WSL ou Git Bash (ambos trazem `sh`; `make` vem via WSL, Chocolat
 ## Passos
 
 ```sh
-git clone git@github.com:maiconsouza89/ai-template-harness.git
-cd ai-template-harness
+git clone git@github.com:<owner>/<repo>.git
+cd <repo>
 make setup    # aponta core.hooksPath para .githooks/
 make check    # confirma que tudo passa
 ```
