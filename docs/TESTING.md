@@ -12,7 +12,7 @@ roda o mesmo alvo (`.github/workflows/ci.yml`), então o que passa local passa l
 | `check-eol` | `scripts/check-eol.sh` | Nenhum arquivo versionado com CRLF ou fim de linha misto (`git ls-files --eol`) |
 | `check-shell` | `scripts/check-shell.sh` | `sh -n` em todos os scripts e hooks; `shellcheck -s sh` se instalado |
 | `check-actions` | `scripts/check-actions.sh` | Workflows do GitHub Actions com actionlint (pula localmente se ausente; falha na CI) |
-| `check-secrets` | `scripts/check-secrets.sh` | Segredos nos arquivos versionados com gitleaks (pula localmente se ausente; falha na CI) |
+| `check-secrets` | `scripts/check-secrets.sh` | Segredos no diretório de trabalho com gitleaks (pula localmente se ausente; falha na CI) |
 | `check-contract` | `scripts/check-contract.sh` | Lista alvos do contrato sem `scripts/<alvo>.sh`. Informativo, nunca falha |
 | `lint`, `test` | `scripts/contract.sh` | Alvos do contrato; rodam `scripts/lint.sh` e `test.sh` se existirem, senão avisam e passam |
 
@@ -23,7 +23,7 @@ O ruleset de `main` exige três checks verdes antes do merge:
 | Check | Workflow | O que faz |
 | --- | --- | --- |
 | `check` | `ci.yml` | `make check` em Ubuntu com shellcheck, actionlint e gitleaks instalados |
-| `secrets` | `ci.yml` | `gitleaks/gitleaks-action` no histórico completo, com comentário no PR |
+| `secrets` | `ci.yml` | `gitleaks/gitleaks-action` no histórico completo |
 | `pr-title` | `pr-title.yml` | Título do PR no padrão do hook `commit-msg` |
 
 ## Release

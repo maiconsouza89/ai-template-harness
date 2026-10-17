@@ -15,7 +15,7 @@ Cada decisão traz a fonte oficial. O que não está aqui fica para os próximos
 | Branch padrão | `main` | git-init |
 | Modelo de branches | GitHub Flow: branch curto a partir de `main`, PR, revisão, merge por squash, branch apagado | GitHub Docs (GitHub flow) |
 | Commits | Conventional Commits 1.0.0, tipos do `config-conventional` em inglês, descrição em português, cabeçalho ≤ 72 caracteres | conventionalcommits.org, commitlint, cbea.ms |
-| Versionamento | SemVer 2.0.0, início em `0.1.0`, tag anotada `vX.Y.Z` como fonte da verdade | semver.org, Pro Git |
+| Versionamento | SemVer 2.0.0, início em `0.1.0`, tag `vX.Y.Z` (criada pela GitHub Release) como fonte da verdade | semver.org, Pro Git |
 | Changelog | Seções do Keep a Changelog em `CHANGELOG.md`, gerado pelo release-please | keepachangelog.com, release-please |
 | Texto | LF e UTF-8 via `.gitattributes` e `.editorconfig` | gitattributes, editorconfig.org |
 | Validação local | Hook `commit-msg` em `sh` puro, versionado em `.githooks/` | githooks |
@@ -137,83 +137,28 @@ tmp/
 
 ### 4.4 `.githooks/commit-msg`
 
-POSIX `sh`, sem dependências. Testado com 22 cabeçalhos válidos e inválidos. Precisa de `chmod +x`.
-Adaptado para descrição em português: `LC_ALL=C.UTF-8` para acentos no regex, tamanho medido em
-caracteres com `wc -m` (não em bytes), e o primeiro caractere da descrição pode ser acentuado,
-mas não maiúsculo ASCII.
+POSIX `sh`, sem dependências, em `.githooks/commit-msg` (fonte única; não copiado aqui para não
+divergir). Testado por `scripts/test-commit-msg.sh` com cabeçalhos válidos e inválidos. Adaptado
+para descrição em português: trabalha com `LC_ALL=C`, aceita caracteres acentuados e conta o
+tamanho em caracteres UTF-8 sem depender de locale instalada; o primeiro caractere da descrição
+não pode ser maiúsculo ASCII.
 
 Alternativas consideradas e registradas no ADR 0001: pre-commit com `conventional-pre-commit`,
-lefthook, commitlint com husky, cocogitto, validação só na CI. A escolha pode mudar quando a
-stack for definida; `scripts/setup.sh` continua sendo a porta de entrada.
-
-```sh
-#!/bin/sh
-# Valida o cabeçalho da mensagem segundo Conventional Commits 1.0.0.
-# Ativado por `git config core.hooksPath .githooks` (ver scripts/setup.sh).
-# Tipos e escopos em inglês; descrição em português.
-
-export LC_ALL=C.UTF-8
-
-msg_file="$1"
-header=$(sed -n '1p' "$msg_file")
-
-case "$header" in
-  "Merge "*|"fixup! "*|"squash! "*|"Revert "*) exit 0 ;;
-esac
-
-types='build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test'
-pattern="^($types)(\([a-z0-9._/-]+\))?!?: [^A-Z[:space:]].*[^.[:space:]]$"
-
-fail() {
-  printf '%s\n' "commit-msg: cabeçalho inválido:" "  $header" "" "$1" "" \
-    "Formato: <tipo>[(escopo)][!]: <descrição>" \
-    "Tipos:   $types" \
-    "Regras:  descrição em minúsculas, no imperativo, sem ponto final, até 72 caracteres" \
-    "Exemplo: feat(hooks): valida cabeçalho do commit" >&2
-  exit 1
-}
-
-length=$(printf '%s' "$header" | wc -m | tr -d ' ')
-[ "$length" -le 72 ] || fail "O cabeçalho tem $length caracteres (máximo 72)."
-printf '%s\n' "$header" | grep -Eq "$pattern" || fail "O cabeçalho não segue o padrão Conventional Commits."
-
-second=$(sed -n '2p' "$msg_file")
-[ -z "$second" ] || fail "A segunda linha deve estar em branco (separa cabeçalho e corpo)."
-
-exit 0
-```
+lefthook, commitlint com husky, cocogitto, validação só na CI.
 
 ### 4.5 `scripts/setup.sh`
 
-Hooks ficam em `.git/hooks`, fora do clone. Este script aponta o Git para a pasta versionada. É o
-único passo manual após clonar.
-
-```sh
-#!/bin/sh
-set -eu
-cd "$(git rev-parse --show-toplevel)"
-git config core.hooksPath .githooks
-chmod +x .githooks/*
-echo "ok: hooks ativados"
-```
+Hooks ficam em `.git/hooks`, fora do clone. O script aponta `core.hooksPath` para a pasta
+versionada. É o único passo manual após clonar (`make setup`).
 
 ### 4.6 `README.md`, `LICENSE`, `CONTRIBUTING.md`, `CHANGELOG.md`
 
 | Arquivo | Conteúdo mínimo |
 | --- | --- |
-| `README.md` | O que é o template, como usar ("Use this template"), rodar `scripts/setup.sh`, link para `CONTRIBUTING.md` |
+| `README.md` | O que é o template, como usar ("Use this template"), rodar `make setup`, link para `CONTRIBUTING.md` |
 | `LICENSE` | Texto integral da licença (premissa: MIT). Na raiz, nome em caixa alta, para o GitHub detectar |
 | `CONTRIBUTING.md` | Fluxo GitHub Flow (§5.3), formato de commit (§5.1), como rodar o setup. O GitHub mostra o link ao abrir PRs |
-| `CHANGELOG.md` | Esqueleto abaixo |
-
-```markdown
-# Changelog
-
-Formato: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-Versionamento: [SemVer](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-```
+| `CHANGELOG.md` | Não é escrito à mão: o release-please o gera a cada release (ADR 0004) |
 
 ### 4.7 `docs/decisions/`
 

@@ -1,7 +1,7 @@
 # Arquitetura do repositório
 
-Estrutura atual e regra de onde colocar cada coisa. Stack ainda não definida (ver
-`decisions/0001`); diretórios de código entram no passo 3.
+Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (ver
+`decisions/0003`); diretórios de código entram no projeto gerado a partir dele.
 
 ## Mapa
 

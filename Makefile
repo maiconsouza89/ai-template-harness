@@ -8,7 +8,7 @@ SHELL := /bin/sh
 	lint format test build
 
 help: ## Lista os alvos disponíveis
-	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-14s %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*## "}; {printf "  %-14s %s\n", $$1, $$2}'
 
 setup: ## Ativa os hooks versionados (uma vez após o clone)
 	@sh scripts/setup.sh
@@ -31,7 +31,7 @@ check-shell: ## Valida a sintaxe dos scripts sh (e shellcheck, se instalado)
 check-actions: ## Valida os workflows do GitHub Actions (actionlint)
 	@sh scripts/check-actions.sh
 
-check-secrets: ## Procura segredos nos arquivos versionados (gitleaks)
+check-secrets: ## Procura segredos no diretório de trabalho (gitleaks)
 	@sh scripts/check-secrets.sh
 
 check-contract: ## Lista os alvos do contrato ainda não implementados (informativo)

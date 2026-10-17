@@ -45,8 +45,7 @@ executa o mesmo `make check` (ver `docs/TESTING.md`).
 - Rode `make check` antes de cada commit e de abrir o PR. Se uma verificação falhar, corrija a
   causa; não desative a verificação.
 - Mudança que cria ou altera um padrão do repositório exige um ADR novo em `docs/decisions/`
-  (formato em `docs/01-fundacao-git-e-padroes.md` §4.7) e uma linha em `CHANGELOG.md` sob
-  `[Unreleased]`, quando afetar quem usa o template.
+  (formato em `docs/01-fundacao-git-e-padroes.md` §4.7).
 - Não edite `CHANGELOG.md` nem `.release-please-manifest.json`: são gerados pelo
   release-please a partir dos commits (`docs/decisions/0004`). A descrição do commit é a
   entrada do changelog, então escreva-a para quem usa o template.
@@ -58,11 +57,11 @@ executa o mesmo `make check` (ver `docs/TESTING.md`).
   ADR. Não adicione ferramentas de stack ao template em si.
 - Workflows em `.github/workflows/` usam actions fixadas por SHA completo com comentário da
   versão. Ao atualizar, troque o SHA e o comentário juntos.
-- Não crie `CLAUDE.local.md` nem arquivos pessoais versionados. Segredos nunca entram no
+- Não versione arquivos pessoais; `CLAUDE.local.md` já está no `.gitignore`. Segredos nunca entram no
   repositório (`.gitignore` cobre `.env*` e `*.pem`).
 
 ## Ao terminar uma tarefa
 
 1. `make check` passa.
-2. Documentos afetados atualizados (`docs/`, `CONTRIBUTING.md`, `CHANGELOG.md`).
+2. Documentos afetados atualizados (`docs/`, `CONTRIBUTING.md`, `README.md`, `AGENTS.md`).
 3. PR aberto com título convencional e descrição do quê e do porquê.
