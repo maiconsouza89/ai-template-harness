@@ -1,6 +1,5 @@
 name: Bug
 description: Algo não funciona como documentado.
-title: "fix: "
 labels: [bug]
 body:
   - type: markdown

@@ -21,17 +21,18 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 ├── .githooks/             Hooks versionados (commit-msg). Ativados por make setup.
 ├── .github/               ISSUE_TEMPLATE/ (formulários de bug e funcionalidade),
 │                          pull_request_template.md (checklist do PR) e workflows/:
-│                          ci.yml (make check, gitleaks), pr-title.yml (título do PR),
+│                          ci.yml (make check), pr-title.yml (título do PR),
 │                          release.yml (release-please + auto-merge).
-├── .vscode/               settings.json e extensions.json compartilhados.
+├── .vscode/               extensions.json: extensões recomendadas (EditorConfig).
 ├── scripts/               Lógica dos alvos do Makefile, em POSIX sh. check-*.sh verificam;
 │                          contract.sh despacha lint/format/test/build para <alvo>.sh se existir.
+│                          O projeto gerado adiciona lint.sh, format.sh, test.sh, build.sh.
 └── docs/
-    ├── 01-fundacao-git-e-padroes.md   Fundamentação dos padrões, com fontes.
-    ├── ARCHITECTURE.md                Este arquivo.
-    ├── SETUP.md                       Preparar o ambiente.
-    ├── TESTING.md                     O que make check valida.
-    └── decisions/                     ADRs (MADR), um arquivo por decisão.
+    ├── ARCHITECTURE.md    Este arquivo.
+    ├── SETUP.md           Preparar o ambiente.
+    ├── STANDARDS.md       Cada padrão, onde vive, fonte oficial e configuração do GitHub.
+    ├── TESTING.md         O que make check valida.
+    └── decisions/         ADRs (MADR), um por decisão; README.md tem o template.
 ```
 
 ## Onde colocar o quê

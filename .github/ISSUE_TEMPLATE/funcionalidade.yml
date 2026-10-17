@@ -1,6 +1,5 @@
 name: Funcionalidade
 description: Proposta de melhoria ou novo padrão para o template.
-title: "feat: "
 labels: [enhancement]
 body:
   - type: textarea

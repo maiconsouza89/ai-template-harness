@@ -8,7 +8,7 @@
 O template precisa de convenções de Git, commits, versionamento e changelog antes de qualquer
 escolha de linguagem ou pipeline. As decisões devem ser agnósticas de stack, mínimas para começar
 e verificáveis por máquina sempre que possível. Fundamentação e fontes em
-`docs/01-fundacao-git-e-padroes.md`.
+`docs/STANDARDS.md`.
 
 ## Opções consideradas
 

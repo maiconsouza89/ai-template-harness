@@ -19,18 +19,9 @@ verificação automática. O que não está no repositório não existe para o a
 
 ## O que está incluído
 
-| Arquivo | Função |
-| --- | --- |
-| `AGENTS.md`, `CLAUDE.md` | Instruções para agentes de código; `CLAUDE.md` importa `AGENTS.md` |
-| `Makefile`, `scripts/` | `make setup`, `make check`; lógica em POSIX sh |
-| `.editorconfig`, `.gitattributes` | UTF-8, LF e indentação iguais em qualquer máquina |
-| `.githooks/commit-msg` | Valida o cabeçalho do commit (Conventional Commits 1.0.0) |
-| `CONTRIBUTING.md` | Fluxo de trabalho (GitHub Flow), commits e versões |
-| `CHANGELOG.md` | Gerado pelo release-please a cada release; não editar |
-| `.github/workflows/` | CI (`make check`, segredos, título do PR) e release automática |
-| `docs/decisions/` | Registros de decisão (ADR) no formato MADR 4.0 |
-| `docs/ARCHITECTURE.md`, `SETUP.md`, `TESTING.md` | Estrutura, ambiente e verificações |
-| `docs/01-fundacao-git-e-padroes.md` | Fundamentação de cada padrão, com fontes oficiais |
+Instruções para agentes (`AGENTS.md`), `Makefile` com `make check`, hook de commit, CI agnóstica
+de stack e release automática. O mapa completo está em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md);
+cada padrão e sua fonte, em [`docs/STANDARDS.md`](docs/STANDARDS.md).
 
 ## Padrões
 

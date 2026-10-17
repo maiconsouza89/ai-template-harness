@@ -24,8 +24,7 @@ passo futuro, se houver demanda real.
 
 Detalhes:
 
-* Alvos do contrato sem `scripts/<alvo>.sh` avisam e passam; `check-contract` lista o que falta,
-  sem bloquear. Assim o template e o projeto recém-gerado têm CI verde.
+* Alvos do contrato sem `scripts/<alvo>.sh` avisam e passam, sem bloquear. Assim o template e o projeto recém-gerado têm CI verde.
 * Verificações universais adotadas agora: actionlint (valida os workflows) e gitleaks (segredos).
   editorconfig-checker e markdownlint ficam como candidatos.
 * `pr-title` valida o título do PR com `amannn/action-semantic-pull-request`, mesmas regras do
@@ -33,6 +32,8 @@ Detalhes:
 * Actions fixadas por SHA completo com comentário da versão (recomendação do GitHub e do OpenSSF).
   Sem Dependabot por enquanto: a atualização dos SHAs é manual.
 * `check`, `secrets` e `pr-title` são status checks obrigatórios no ruleset de `main`.
+  (Revisão de 2026-10-17: o job `secrets` foi absorvido por `check-secrets`, que passou a varrer o
+  histórico; restam `check` e `pr-title`.)
 
 ### Consequências
 
