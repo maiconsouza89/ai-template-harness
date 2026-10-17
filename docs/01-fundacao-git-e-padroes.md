@@ -284,8 +284,8 @@ Com squash merge, o **título do PR** vira o cabeçalho do commit em `main` e se
 - Primeira versão `0.1.0`. Enquanto `0.y.z`: `feat` e breaking change sobem MINOR; `fix` sobe PATCH.
 - A partir de `1.0.0`: breaking → MAJOR, `feat` → MINOR, `fix` → PATCH. Vai para `1.0.0` quando
   houver uso real e mudanças incompatíveis custarem para quem usa.
-- A tag `vX.Y.Z` é a fonte da verdade; `version.txt` é a cópia legível. A versão é `X.Y.Z`; o
-  `v` é só convenção de tag.
+- A tag `vX.Y.Z` é a fonte da verdade; `.release-please-manifest.json` guarda a última versão
+  lançada. A versão é `X.Y.Z`; o `v` é só convenção de tag.
 
 Release automática (ADR 0004): a cada push em `main`, o release-please abre ou atualiza o PR
 `chore(release): vX.Y.Z` com versão e `CHANGELOG.md` calculados dos commits. O PR entra em

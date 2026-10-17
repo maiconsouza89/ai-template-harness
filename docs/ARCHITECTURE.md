@@ -13,7 +13,6 @@ Estrutura atual e regra de onde colocar cada coisa. Stack ainda não definida (v
 ├── README.md              Para pessoas: o que é e como usar o template.
 ├── CONTRIBUTING.md        Fluxo de trabalho, commits, PRs, versões.
 ├── CHANGELOG.md           Gerado pelo release-please; não editar (decisions/0004).
-├── version.txt            Versão atual, gerado; a tag vX.Y.Z é a fonte da verdade.
 ├── release-please-config.json, .release-please-manifest.json   Configuração da release.
 ├── LICENSE                MIT.
 ├── .editorconfig          UTF-8, LF, indentação.

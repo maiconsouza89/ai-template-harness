@@ -26,7 +26,8 @@ verificação automática. O que não está no repositório não existe para o a
 | `.editorconfig`, `.gitattributes` | UTF-8, LF e indentação iguais em qualquer máquina |
 | `.githooks/commit-msg` | Valida o cabeçalho do commit (Conventional Commits 1.0.0) |
 | `CONTRIBUTING.md` | Fluxo de trabalho (GitHub Flow), commits e versões |
-| `CHANGELOG.md` | Keep a Changelog 1.1.0 |
+| `CHANGELOG.md` | Gerado pelo release-please a cada release; não editar |
+| `.github/workflows/` | CI (`make check`, segredos, título do PR) e release automática |
 | `docs/decisions/` | Registros de decisão (ADR) no formato MADR 4.0 |
 | `docs/ARCHITECTURE.md`, `SETUP.md`, `TESTING.md` | Estrutura, ambiente e verificações |
 | `docs/01-fundacao-git-e-padroes.md` | Fundamentação de cada padrão, com fontes oficiais |
