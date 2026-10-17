@@ -9,6 +9,7 @@ if [ -z "$branch" ]; then
 fi
 case "$branch" in
   main) echo "ok: branch main"; exit 0 ;;
+  release-please--*) echo "ok: branch do release-please"; exit 0 ;;
 esac
 types='build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test'
 if printf '%s\n' "$branch" | grep -Eq "^($types)/[a-z0-9][a-z0-9.-]*$"; then

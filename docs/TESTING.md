@@ -26,6 +26,16 @@ O ruleset de `main` exige três checks verdes antes do merge:
 | `secrets` | `ci.yml` | `gitleaks/gitleaks-action` no histórico completo, com comentário no PR |
 | `pr-title` | `pr-title.yml` | Título do PR no padrão do hook `commit-msg` |
 
+## Release
+
+`release.yml` não é um check: roda no push em `main` e abre ou atualiza o PR de release. Esse PR
+passa pelos mesmos três checks e é mesclado sozinho quando ficam verdes. Para testar a
+configuração sem criar nada:
+
+```sh
+npx release-please release-pr --repo-url=<owner>/<repo> --token="$(gh auth token)" --dry-run
+```
+
 ## Contrato de alvos
 
 `make lint`, `make format`, `make test` e `make build` existem em qualquer projeto gerado. Para

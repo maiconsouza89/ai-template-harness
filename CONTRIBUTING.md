@@ -70,18 +70,14 @@ chore!: exige commits assinados
 
 - [SemVer 2.0.0](https://semver.org/lang/pt-BR/). Primeira versão `0.1.0`. Enquanto `0.y.z`,
   `feat` e breaking change sobem MINOR e `fix` sobe PATCH.
-- A tag anotada `vX.Y.Z` é a fonte da verdade da versão.
-- Release manual:
-
-  ```sh
-  git log "$(git describe --tags --abbrev=0)"..HEAD --oneline
-  # mover [Unreleased] do CHANGELOG para [X.Y.Z] - AAAA-MM-DD; commit: chore(release): vX.Y.Z
-  git tag -a vX.Y.Z -m "vX.Y.Z"
-  git push --follow-tags
-  ```
-
-- Mapeamento para o `CHANGELOG.md` ([Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/)):
-  `feat` → Added, `fix` → Fixed, `perf` → Changed, breaking que remove → Removed.
+- A tag `vX.Y.Z` é a fonte da verdade da versão; `version.txt` é a cópia legível.
+- A release é automática ([ADR 0004](docs/decisions/0004-release-automatica-com-release-please.md)):
+  a cada merge em `main`, o release-please abre ou atualiza o PR `chore(release): vX.Y.Z` com a
+  versão e o `CHANGELOG.md` calculados dos commits. Quando os checks passam, o PR é mesclado
+  sozinho, criando a tag e a GitHub Release.
+- Não edite o `CHANGELOG.md` à mão: a descrição do commit é a entrada. Seções: `feat` →
+  Adicionado, `fix` → Corrigido, `perf`, `ci`, `build` → Alterado, `revert` → Revertido.
+- Para segurar uma release, não mescle o PR de release; ele continua sendo atualizado.
 
 ## Decisões
 

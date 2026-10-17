@@ -16,7 +16,7 @@ Cada decisão traz a fonte oficial. O que não está aqui fica para os próximos
 | Modelo de branches | GitHub Flow: branch curto a partir de `main`, PR, revisão, merge por squash, branch apagado | GitHub Docs (GitHub flow) |
 | Commits | Conventional Commits 1.0.0, tipos do `config-conventional` em inglês, descrição em português, cabeçalho ≤ 72 caracteres | conventionalcommits.org, commitlint, cbea.ms |
 | Versionamento | SemVer 2.0.0, início em `0.1.0`, tag anotada `vX.Y.Z` como fonte da verdade | semver.org, Pro Git |
-| Changelog | Keep a Changelog 1.1.0 em `CHANGELOG.md` | keepachangelog.com |
+| Changelog | Seções do Keep a Changelog em `CHANGELOG.md`, gerado pelo release-please | keepachangelog.com, release-please |
 | Texto | LF e UTF-8 via `.gitattributes` e `.editorconfig` | gitattributes, editorconfig.org |
 | Validação local | Hook `commit-msg` em `sh` puro, versionado em `.githooks/` | githooks |
 | Decisões | ADRs no formato MADR 4.0 em `docs/decisions/` | adr.github.io/madr |
@@ -66,7 +66,7 @@ Já feito neste repositório: branch `main`, remoto `maiconsouza89/ai-template-h
 ├── .githooks/commit-msg
 ├── .gitignore
 ├── .vscode/settings.json, extensions.json
-├── CHANGELOG.md
+├── CHANGELOG.md                (gerado; ver ADR 0004)
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── README.md
@@ -284,19 +284,16 @@ Com squash merge, o **título do PR** vira o cabeçalho do commit em `main` e se
 - Primeira versão `0.1.0`. Enquanto `0.y.z`: `feat` e breaking change sobem MINOR; `fix` sobe PATCH.
 - A partir de `1.0.0`: breaking → MAJOR, `feat` → MINOR, `fix` → PATCH. Vai para `1.0.0` quando
   houver uso real e mudanças incompatíveis custarem para quem usa.
-- A tag anotada `vX.Y.Z` é a fonte da verdade. A versão é `X.Y.Z`; o `v` é só convenção de tag.
+- A tag `vX.Y.Z` é a fonte da verdade; `version.txt` é a cópia legível. A versão é `X.Y.Z`; o
+  `v` é só convenção de tag.
 
-Release manual:
+Release automática (ADR 0004): a cada push em `main`, o release-please abre ou atualiza o PR
+`chore(release): vX.Y.Z` com versão e `CHANGELOG.md` calculados dos commits. O PR entra em
+auto-merge; quando os checks passam, o GitHub mescla, cria a tag e a GitHub Release. Ninguém
+edita o `CHANGELOG.md` à mão.
 
-```sh
-git log "$(git describe --tags --abbrev=0)"..HEAD --oneline   # o que entrou
-# mover [Unreleased] do CHANGELOG para [X.Y.Z] - AAAA-MM-DD; commit: chore(release): vX.Y.Z
-git tag -a vX.Y.Z -m "vX.Y.Z"
-git push --follow-tags
-```
-
-Mapeamento para o changelog: `feat` → Added, `fix` → Fixed, `perf` → Changed, breaking que remove →
-Removed. Demais tipos ficam de fora, salvo impacto para o usuário.
+Mapeamento para o changelog: `feat` → Adicionado, `fix` → Corrigido, `perf`, `ci`, `build` →
+Alterado, `revert` → Revertido. Demais tipos ficam de fora.
 
 ### 5.3 GitHub Flow
 
@@ -346,7 +343,7 @@ Os seis passos da documentação do GitHub:
    `docs/ARCHITECTURE.md`, `SETUP.md`, `TESTING.md`.
 2. ~~**Stack e CI**~~: redefinido e feito como **CI agnóstica** (ADR 0003): `make check` e
    título do PR como status checks obrigatórios; contrato de alvos no `Makefile` em vez de stack.
-3. **Automação de release**: escolher entre `release-please`, `git-cliff` e `cocogitto`, em ADR.
+3. ~~**Automação de release**~~: feito (ADR 0004): release-please com auto-merge do PR de release.
 4. **Arquivos de comunidade adicionais** quando houver colaboradores: `CODE_OF_CONDUCT.md`,
    `SECURITY.md`, `CODEOWNERS`, templates de issue e PR.
 
