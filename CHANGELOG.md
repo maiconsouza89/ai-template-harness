@@ -10,4 +10,5 @@ Versionamento: [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Fundação do repositório: EditorConfig, atributos de texto, hook `commit-msg`, ADRs e guia de contribuição.
+- CI agnóstica: workflows `ci` (`make check`, gitleaks) e `pr-title`, contrato de alvos `lint`, `format`, `test`, `build`.
 - Harness para agentes: `AGENTS.md`, `CLAUDE.md`, `Makefile` com `make check`, e `docs/ARCHITECTURE.md`, `SETUP.md`, `TESTING.md`.

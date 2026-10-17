@@ -343,8 +343,8 @@ Os seis passos da documentação do GitHub:
 
 1. ~~**Harness base**~~: feito (ADR 0002): `AGENTS.md`, `CLAUDE.md`, `Makefile` com `make check`,
    `docs/ARCHITECTURE.md`, `SETUP.md`, `TESTING.md`.
-2. **Stack e CI**: linguagem, linters, GitHub Actions rodando `make check` e validando o título
-   do PR, como status check obrigatório.
+2. ~~**Stack e CI**~~: redefinido e feito como **CI agnóstica** (ADR 0003): `make check` e
+   título do PR como status checks obrigatórios; contrato de alvos no `Makefile` em vez de stack.
 3. **Automação de release**: escolher entre `release-please`, `git-cliff` e `cocogitto`, em ADR.
 4. **Arquivos de comunidade adicionais** quando houver colaboradores: `CODE_OF_CONDUCT.md`,
    `SECURITY.md`, `CODEOWNERS`, templates de issue e PR.

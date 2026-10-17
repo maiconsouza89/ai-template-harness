@@ -24,7 +24,7 @@ commit e de abrir um PR (detalhes em [`docs/TESTING.md`](docs/TESTING.md)). Ambi
 2. Faça commits convencionais no branch (ver abaixo), com `make check` passando.
 3. Abra o pull request com título no formato Conventional Commits. Com squash merge, o título
    do PR vira o cabeçalho do commit em `main`.
-4. Responda à revisão.
+4. Aguarde os checks obrigatórios (`check`, `secrets`, `pr-title`) e responda à revisão.
 5. Faça merge por squash. O branch é apagado automaticamente.
 
 `main` só recebe mudanças por pull request. Não há branches permanentes de `develop` ou

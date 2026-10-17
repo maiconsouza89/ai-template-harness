@@ -8,6 +8,10 @@
 | POSIX `sh` | qualquer | hooks e scripts |
 | GNU Make | ≥ 3.81 | `make setup`, `make check` |
 | shellcheck | opcional | lint dos scripts em `make check-shell`; sem ele, só a sintaxe é validada |
+| actionlint | opcional | valida os workflows em `make check-actions`; sem ele, pula com aviso |
+| gitleaks | opcional | procura segredos em `make check-secrets`; sem ele, pula com aviso |
+
+As ferramentas opcionais são obrigatórias na CI (`CI=true` faz o check falhar se faltarem).
 
 No Windows, use WSL ou Git Bash (ambos trazem `sh`; `make` vem via WSL, Chocolatey ou Scoop).
 
