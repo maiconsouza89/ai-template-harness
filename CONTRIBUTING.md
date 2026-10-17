@@ -1,7 +1,7 @@
 # Contribuindo
 
 Obrigado por contribuir. Este guia resume o fluxo de trabalho. A fundamentação de cada regra
-está em [`docs/01-fundacao-git-e-padroes.md`](docs/01-fundacao-git-e-padroes.md).
+está em [`docs/STANDARDS.md`](docs/STANDARDS.md) e em [`docs/decisions/`](docs/decisions/).
 
 ## Configuração inicial
 
@@ -25,7 +25,7 @@ commit e de abrir um PR (detalhes em [`docs/TESTING.md`](docs/TESTING.md)). Ambi
 2. Faça commits convencionais no branch (ver abaixo), com `make check` passando.
 3. Abra o pull request com título no formato Conventional Commits e preencha o template (o quê,
    por quê, checklist). Com squash merge, o título do PR vira o cabeçalho do commit em `main`.
-4. Aguarde os checks obrigatórios (`check`, `secrets`, `pr-title`) e responda à revisão.
+4. Aguarde os checks obrigatórios (lista em [`docs/TESTING.md`](docs/TESTING.md)) e responda à revisão.
 5. Faça merge por squash. O branch é apagado automaticamente.
 
 `main` só recebe mudanças por pull request. Não há branches permanentes de `develop` ou
@@ -82,5 +82,5 @@ chore!: exige commits assinados
 
 ## Decisões
 
-Decisões de arquitetura e de processo são registradas em `docs/decisions/` no formato
-[MADR 4.0](https://adr.github.io/madr/), um arquivo por decisão: `NNNN-titulo-com-hifens.md`.
+Decisões de arquitetura e de processo são registradas em `docs/decisions/`; formato e template em
+[`docs/decisions/README.md`](docs/decisions/README.md).

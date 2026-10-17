@@ -17,7 +17,7 @@ que possível, verificação automática. O que não está no repositório não 
 | Preparar o ambiente | `docs/SETUP.md` |
 | O que `make check` valida e como adicionar verificações | `docs/TESTING.md` |
 | Fluxo de trabalho, commits, PRs e versões | `CONTRIBUTING.md` |
-| Por que cada padrão existe, com fontes | `docs/01-fundacao-git-e-padroes.md` |
+| Cada padrão, onde vive e a fonte oficial | `docs/STANDARDS.md` |
 | Decisões já tomadas e alternativas descartadas | `docs/decisions/` |
 
 ## Comandos
@@ -31,21 +31,19 @@ make help    # lista os alvos
 ```
 
 Contrato de alvos, igual em qualquer stack: `make lint`, `make format`, `make test`,
-`make build`. Cada um roda `scripts/<alvo>.sh` se existir; sem o script, avisa e passa. A CI
-executa o mesmo `make check` (ver `docs/TESTING.md`).
+`make build`. Cada um roda `scripts/<alvo>.sh` se existir; sem o script, avisa e passa.
+`make check` inclui `lint` e `test`; `format` e `build` são manuais. A CI executa o mesmo
+`make check` (ver `docs/TESTING.md`).
 
 ## Regras de trabalho
 
-- Trabalhe em um branch a partir de `main`, nomeado `<tipo>/<descricao-com-hifens>` com os
-  mesmos tipos do commit (`feat/hook-commit-msg`, `docs/traduz-adrs`). `main` só recebe mudanças por pull request com
-  squash. Nunca faça push direto em `main`.
-- Commits no formato Conventional Commits: tipos em inglês (`feat`, `fix`, `docs`...), descrição
-  em português, minúsculas, até 72 caracteres, sem ponto final. O hook `commit-msg` rejeita o
-  que não segue. O título do PR segue a mesma regra.
+- Branch `<tipo>/<descricao>` a partir de `main`, commits e título do PR em Conventional Commits
+  com descrição em português; `main` só recebe PR com squash. O hook `commit-msg`, `make check`
+  e a CI validam; as regras completas estão em `CONTRIBUTING.md`.
 - Rode `make check` antes de cada commit e de abrir o PR. Se uma verificação falhar, corrija a
   causa; não desative a verificação.
 - Mudança que cria ou altera um padrão do repositório exige um ADR novo em `docs/decisions/`
-  (formato em `docs/01-fundacao-git-e-padroes.md` §4.7).
+  (formato em `docs/decisions/README.md`).
 - Não edite `CHANGELOG.md` nem `.release-please-manifest.json`: são gerados pelo
   release-please a partir dos commits (`docs/decisions/0004`). A descrição do commit é a
   entrada do changelog, então escreva-a para quem usa o template.

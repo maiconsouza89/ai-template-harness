@@ -1,4 +1,4 @@
-# CI agnóstica de stack: roda o mesmo `make check` usado localmente.
+# CI agnóstica de stack: roda o mesmo `make check` usado localmente (inclui gitleaks no histórico).
 # Actions fixadas por SHA completo (recomendação do GitHub e do OpenSSF); o comentário indica a versão.
 name: ci
 
@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # gitleaks varre o histórico completo
 
       - name: Instala actionlint
         env:
@@ -38,13 +40,3 @@ jobs:
           CI: "true"
         run: make check
 
-  secrets:
-    name: secrets
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
