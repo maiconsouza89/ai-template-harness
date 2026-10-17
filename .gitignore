@@ -1,0 +1,22 @@
+# Segredos
+.env
+.env.*
+!.env.example
+*.pem
+
+# Memória local de agentes
+CLAUDE.local.md
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Editores (settings e extensions compartilhados ficam versionados)
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Temporários
+*.log
+tmp/
