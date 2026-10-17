@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/maiconsouza89/ai-template-harness/compare/v0.1.0...v0.1.1) (2026-10-17)
+
+
+### Alterado
+
+* **release:** corrige avaliação do PR no workflow e remove release-as ([#7](https://github.com/maiconsouza89/ai-template-harness/issues/7)) ([b60b7a7](https://github.com/maiconsouza89/ai-template-harness/commit/b60b7a72e3b3c22420f7c6fd52efcb52bfa55e4b))
+
 ## 0.1.0 (2026-10-17)
 
 
