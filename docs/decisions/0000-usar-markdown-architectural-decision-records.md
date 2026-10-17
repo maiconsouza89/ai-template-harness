@@ -1,24 +1,25 @@
 # Usar Markdown Architectural Decision Records
 
-## Context and Problem Statement
+## Contexto e problema
 
 Queremos registrar as decisões de arquitetura e de processo deste repositório para que pessoas e
 agentes entendam o porquê de cada escolha. Qual formato usar?
 
-## Considered Options
+## Opções consideradas
 
 * [MADR](https://adr.github.io/madr/) 4.0, template mínimo
-* ADR de Michael Nygard (Title, Status, Context, Decision, Consequences)
+* ADR de Michael Nygard (Título, Status, Contexto, Decisão, Consequências)
 * Registrar decisões apenas em documentos narrativos em `docs/`
 
-## Decision Outcome
+## Decisão
 
-Chosen option: "MADR 4.0, template mínimo", because é um padrão conhecido por ferramentas e
+Opção escolhida: "MADR 4.0, template mínimo", porque é um padrão conhecido por ferramentas e
 agentes, obriga a listar as opções consideradas e tem um template mínimo que cabe em uma tela.
-Títulos de seção ficam em inglês (padrão MADR); o texto, em português.
+A estrutura do MADR é mantida; títulos de seção e frases fixas são escritos em português, como o
+restante da documentação.
 
-### Consequences
+### Consequências
 
-* Good, because cada decisão fica em um arquivo pequeno e versionado em `docs/decisions/`.
-* Good, because o histórico de alternativas rejeitadas evita rediscutir o mesmo tema.
-* Bad, because exige disciplina para criar um ADR a cada decisão relevante.
+* Bom, porque cada decisão fica em um arquivo pequeno e versionado em `docs/decisions/`.
+* Bom, porque o histórico de alternativas rejeitadas evita rediscutir o mesmo tema.
+* Ruim, porque exige disciplina para criar um ADR a cada decisão relevante.

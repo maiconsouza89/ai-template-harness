@@ -217,28 +217,29 @@ Versionamento: [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### 4.7 `docs/decisions/`
 
-Um arquivo por decisão, `NNNN-titulo-com-hifens.md`, template mínimo do MADR 4.0:
+Um arquivo por decisão, `NNNN-titulo-com-hifens.md`, template mínimo do MADR 4.0 com a estrutura
+original e o texto em português (títulos e frases fixas incluídos):
 
 ```markdown
 # {título curto: problema e solução}
 
-## Context and Problem Statement
+## Contexto e problema
 
 {duas a três frases}
 
-## Considered Options
+## Opções consideradas
 
 * {opção 1}
 * {opção 2}
 
-## Decision Outcome
+## Decisão
 
-Chosen option: "{opção 1}", because {justificativa}.
+Opção escolhida: "{opção 1}", porque {justificativa}.
 
-### Consequences
+### Consequências
 
-* Good, because {...}
-* Bad, because {...}
+* Bom, porque {...}
+* Ruim, porque {...}
 ```
 
 ADRs iniciais: `0000` adota MADR (o próprio MADR distribui esse ADR); `0001` registra a tabela do §1.

@@ -1,13 +1,13 @@
 # Padrões de trabalho do repositório
 
-## Context and Problem Statement
+## Contexto e problema
 
 O template precisa de convenções de Git, commits, versionamento e changelog antes de qualquer
 escolha de linguagem ou pipeline. As decisões devem ser agnósticas de stack, mínimas para começar
 e verificáveis por máquina sempre que possível. Fundamentação e fontes em
 `docs/01-fundacao-git-e-padroes.md`.
 
-## Considered Options
+## Opções consideradas
 
 | Tema | Escolhida | Alternativas consideradas |
 | --- | --- | --- |
@@ -22,9 +22,9 @@ e verificáveis por máquina sempre que possível. Fundamentação e fontes em
 | Assinatura de commits | Não configurar | Opcional via SSH; obrigatória no ruleset |
 | Idioma da documentação | pt-BR | Inglês; pt-BR agora e inglês depois |
 
-## Decision Outcome
+## Decisão
 
-Chosen option: a coluna "Escolhida" da tabela, because atende ao mínimo para começar sem impor
+Opção escolhida: a coluna "Escolhida" da tabela, porque atende ao mínimo para começar sem impor
 stack: o hook em `sh` não depende de Node nem de Python; squash mantém `main` linear com um
 commit por PR, cujo título segue Conventional Commits; MIT é a licença mais simples para um
 template; a assinatura de commits fica de fora até haver mais colaboradores; a descrição do commit
@@ -37,9 +37,9 @@ Evolução prevista:
 * Ao escolher a stack: migrar a validação local para pre-commit (repositório poliglota ou de
   infra) ou commitlint (JS/TS puro). `scripts/setup.sh` continua sendo a porta de entrada.
 
-### Consequences
+### Consequências
 
-* Good, because todas as convenções estão em arquivos versionados e o hook verifica o cabeçalho.
-* Good, because nenhuma ferramenta de stack é imposta antes do passo 3.
-* Bad, because o hook em `sh` cobre só o cabeçalho; regras mais ricas ficam para a migração.
-* Bad, because commits em português e bots em inglês (Dependabot) vão misturar idiomas no histórico.
+* Bom, porque todas as convenções estão em arquivos versionados e o hook verifica o cabeçalho.
+* Bom, porque nenhuma ferramenta de stack é imposta antes do passo 3.
+* Ruim, porque o hook em `sh` cobre só o cabeçalho; regras mais ricas ficam para a migração.
+* Ruim, porque commits em português e bots em inglês (Dependabot) vão misturar idiomas no histórico.
