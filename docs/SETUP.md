@@ -4,7 +4,7 @@
 
 | Ferramenta | Versão | Uso |
 | --- | --- | --- |
-| Git | ≥ 2.9 | `core.hooksPath` |
+| Git | ≥ 2.22 | `core.hooksPath`, `git branch --show-current` |
 | POSIX `sh` | qualquer | hooks e scripts |
 | GNU Make | ≥ 3.81 | `make setup`, `make check` |
 | shellcheck | opcional | lint dos scripts em `make check-shell`; sem ele, só a sintaxe é validada |

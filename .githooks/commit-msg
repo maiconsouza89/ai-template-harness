@@ -2,8 +2,11 @@
 # Valida o cabeçalho da mensagem segundo Conventional Commits 1.0.0.
 # Ativado por `git config core.hooksPath .githooks` (ver scripts/setup.sh).
 # Tipos e escopos em inglês; descrição em português.
+# LC_ALL=C: o regex e a contagem trabalham por byte, sem depender de uma locale UTF-8 instalada.
+# Caracteres acentuados (UTF-8) são aceitos; o tamanho conta caracteres descartando os bytes de
+# continuação (10xxxxxx).
 
-export LC_ALL=C.UTF-8
+export LC_ALL=C
 
 msg_file="$1"
 header=$(sed -n '1p' "$msg_file")
@@ -13,7 +16,7 @@ case "$header" in
 esac
 
 types='build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test'
-pattern="^($types)(\([a-z0-9._/-]+\))?!?: [^A-Z[:space:]].*[^.[:space:]]$"
+pattern="^($types)(\([a-z0-9._/-]+\))?!?: [^A-Z[:space:]](.*[^.[:space:]])?$"
 
 fail() {
   printf '%s\n' "commit-msg: cabeçalho inválido:" "  $header" "" "$1" "" \
@@ -24,7 +27,7 @@ fail() {
   exit 1
 }
 
-length=$(printf '%s' "$header" | wc -m | tr -d ' ')
+length=$(printf '%s' "$header" | tr -d '\200-\277' | wc -c | tr -d ' ')
 [ "$length" -le 72 ] || fail "O cabeçalho tem $length caracteres (máximo 72)."
 printf '%s\n' "$header" | grep -Eq "$pattern" || fail "O cabeçalho não segue o padrão Conventional Commits."
 

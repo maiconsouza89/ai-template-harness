@@ -35,7 +35,7 @@ verificação automática. O que não está no repositório não existe para o a
 ## Padrões
 
 - Commits: Conventional Commits 1.0.0, tipos em inglês, descrição em português.
-- Versões: SemVer 2.0.0, tag anotada `vX.Y.Z`.
+- Versões: SemVer 2.0.0, tag `vX.Y.Z` criada pela GitHub Release a cada merge com `feat` ou `fix`.
 - Branches: GitHub Flow, merge por squash, `main` protegido.
 
 ## Licença

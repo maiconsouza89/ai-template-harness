@@ -1,5 +1,5 @@
 #!/bin/sh
-# Procura segredos nos arquivos versionados com gitleaks.
+# Procura segredos no diretório de trabalho (inclusive arquivos não versionados) com gitleaks.
 # Sem gitleaks: pula com aviso localmente; falha na CI (CI=true).
 set -eu
 cd "$(git rev-parse --show-toplevel)"
