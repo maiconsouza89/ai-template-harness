@@ -31,8 +31,12 @@ Detalhes:
 * Tipo `simple`: atualiza `CHANGELOG.md` e `.release-please-manifest.json` (só atualizaria
   `version.txt` se o arquivo existisse; optamos por não tê-lo). A tag `vX.Y.Z` e a GitHub
   Release são criadas no merge do PR de release; a tag é a fonte da verdade.
-* Seções: `feat` → Adicionado, `fix` → Corrigido, `perf`, `ci`, `build` → Alterado,
-  `revert` → Revertido. `docs`, `chore`, `refactor`, `style`, `test` ficam ocultos.
+* Seções: `feat` → Adicionado, `fix` → Corrigido, `perf` → Alterado, `revert` → Revertido.
+  `ci`, `build`, `docs`, `chore`, `refactor`, `style`, `test` ficam ocultos. No release-please,
+  todo tipo visível no changelog conta como lançável e sobe PATCH; `ci` e `build` ficaram
+  visíveis na primeira configuração e um commit `ci` abriu a v0.1.1 indevidamente (PR #8,
+  fechado). Ocultá-los mantém a regra de `docs/01` §5.1: só `feat`, `fix`, `perf` e `revert`
+  geram versão.
 * Formato do changelog: o do release-please, com as seções do Keep a Changelog. Não há mais
   seção `[Unreleased]`: o que não foi lançado está no PR de release aberto.
 * Primeira versão: `release-as: 0.1.0` agrupou todo o histórico em `v0.1.0` (2026-10-17); a

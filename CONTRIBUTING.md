@@ -76,7 +76,8 @@ chore!: exige commits assinados
   versão e o `CHANGELOG.md` calculados dos commits. Quando os checks passam, o PR é mesclado
   sozinho, criando a tag e a GitHub Release.
 - Não edite o `CHANGELOG.md` à mão: a descrição do commit é a entrada. Seções: `feat` →
-  Adicionado, `fix` → Corrigido, `perf`, `ci`, `build` → Alterado, `revert` → Revertido.
+  Adicionado, `fix` → Corrigido, `perf` → Alterado, `revert` → Revertido. Os demais tipos não
+  aparecem nem geram versão.
 - Para segurar uma release, não mescle o PR de release; ele continua sendo atualizado.
 
 ## Decisões

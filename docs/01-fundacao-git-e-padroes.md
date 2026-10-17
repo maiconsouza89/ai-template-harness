@@ -292,8 +292,8 @@ Release automática (ADR 0004): a cada push em `main`, o release-please abre ou 
 auto-merge; quando os checks passam, o GitHub mescla, cria a tag e a GitHub Release. Ninguém
 edita o `CHANGELOG.md` à mão.
 
-Mapeamento para o changelog: `feat` → Adicionado, `fix` → Corrigido, `perf`, `ci`, `build` →
-Alterado, `revert` → Revertido. Demais tipos ficam de fora.
+Mapeamento para o changelog: `feat` → Adicionado, `fix` → Corrigido, `perf` → Alterado,
+`revert` → Revertido. Demais tipos ficam de fora e não geram versão.
 
 ### 5.3 GitHub Flow
 
