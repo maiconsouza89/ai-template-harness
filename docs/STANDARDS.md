@@ -11,7 +11,7 @@ verificação automática (`make check`).
 | Tema | Decisão | Vive em | Fonte | ADR |
 | --- | --- | --- | --- | --- |
 | Branch padrão | `main` | — | git-init | 0001 |
-| Modelo de branches | GitHub Flow; branches `<tipo>/<descricao>`; merge por squash; branch apagado | `scripts/check-branch.sh`, ruleset | GitHub Docs (GitHub flow) | 0001 |
+| Modelo de branches | GitHub Flow; branches `<tipo>/<descricao>`; merge por squash; branch apagado | `scripts/checks/check-branch.sh`, ruleset | GitHub Docs (GitHub flow) | 0001 |
 | Commits | Conventional Commits 1.0.0; tipos do `config-conventional` em inglês; descrição em português; cabeçalho ≤ 72 caracteres | `.githooks/commit-msg`, `pr-title.yml` | conventionalcommits.org, commitlint, cbea.ms | 0001 |
 | Versionamento | SemVer 2.0.0, início em `0.1.0`; tag `vX.Y.Z` criada pela GitHub Release | `release-please-config.json` | semver.org | 0001, 0004 |
 | Changelog | Gerado pelo release-please, seções do Keep a Changelog em português | `CHANGELOG.md` | keepachangelog.com, release-please | 0004 |
@@ -27,7 +27,7 @@ verificação automática (`make check`).
 
 ## Configuração do GitHub
 
-Nada disto vem junto com "Use this template". `scripts/bootstrap-github.sh` aplica os itens 1, 2 e 4
+Nada disto vem junto com "Use this template". `scripts/templates/bootstrap-github.sh` aplica os itens 1, 2 e 4
 via `gh`; o 3 é manual (o script avisa); o 5 só vale para o template.
 
 1. **Pull requests**: só *squash merging*, título e corpo do PR como mensagem, *Allow auto-merge*,

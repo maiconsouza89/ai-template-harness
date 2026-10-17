@@ -17,25 +17,25 @@ check: check-branch check-hooks check-eol check-shell check-actions check-secret
 	@echo "ok: todas as verificações passaram"
 
 check-branch: ## Valida o nome do branch (<tipo>/<descricao>)
-	@sh scripts/check-branch.sh
+	@sh scripts/checks/check-branch.sh
 
 check-hooks: ## Testa o hook commit-msg com cabeçalhos válidos e inválidos
-	@sh scripts/test-commit-msg.sh
+	@sh scripts/tests/test-commit-msg.sh
 
 check-eol: ## Garante que nenhum arquivo versionado tem CRLF
-	@sh scripts/check-eol.sh
+	@sh scripts/checks/check-eol.sh
 
 check-shell: ## Valida a sintaxe dos scripts sh (e shellcheck, se instalado)
-	@sh scripts/check-shell.sh
+	@sh scripts/checks/check-shell.sh
 
 check-actions: ## Valida os workflows do GitHub Actions (actionlint)
-	@sh scripts/check-actions.sh
+	@sh scripts/checks/check-actions.sh
 
 check-secrets: ## Procura segredos no histórico do Git (gitleaks)
-	@sh scripts/check-secrets.sh
+	@sh scripts/checks/check-secrets.sh
 
 check-adr: ## Audita os ADRs em docs/ADR e regenera o índice (adr-writer)
-	@sh scripts/check-adr.sh
+	@sh scripts/checks/check-adr.sh
 
 # Contrato de alvos, igual em qualquer stack. Cada projeto gerado implementa scripts/<alvo>.sh;
 # sem o script, contract.sh avisa e passa. check inclui lint e test; format e build são manuais.
