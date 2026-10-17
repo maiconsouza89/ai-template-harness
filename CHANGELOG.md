@@ -10,3 +10,4 @@ Versionamento: [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Fundação do repositório: EditorConfig, atributos de texto, hook `commit-msg`, ADRs e guia de contribuição.
+- Harness para agentes: `AGENTS.md`, `CLAUDE.md`, `Makefile` com `make check`, e `docs/ARCHITECTURE.md`, `SETUP.md`, `TESTING.md`.

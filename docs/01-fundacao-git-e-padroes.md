@@ -75,7 +75,7 @@ Já feito neste repositório: branch `main`, remoto `maiconsouza89/ai-template-h
 │   └── decisions/
 │       ├── 0000-usar-markdown-architectural-decision-records.md
 │       └── 0001-padroes-de-trabalho-do-repositorio.md
-└── scripts/setup.sh
+└── scripts/setup.sh           (demais scripts e o Makefile: passo 2, docs/ARCHITECTURE.md)
 ```
 
 ### 4.1 `.editorconfig`
@@ -341,9 +341,10 @@ Os seis passos da documentação do GitHub:
 
 ## 7. Próximos passos
 
-1. **Harness base**: `AGENTS.md` curto apontando para `docs/`, `CLAUDE.md` com `@AGENTS.md`,
-   `Makefile` como superfície única (`make check`).
-2. **Stack e CI**: linguagem, linters, GitHub Actions como status check obrigatório.
+1. ~~**Harness base**~~: feito (ADR 0002): `AGENTS.md`, `CLAUDE.md`, `Makefile` com `make check`,
+   `docs/ARCHITECTURE.md`, `SETUP.md`, `TESTING.md`.
+2. **Stack e CI**: linguagem, linters, GitHub Actions rodando `make check` e validando o título
+   do PR, como status check obrigatório.
 3. **Automação de release**: escolher entre `release-please`, `git-cliff` e `cocogitto`, em ADR.
 4. **Arquivos de comunidade adicionais** quando houver colaboradores: `CODE_OF_CONDUCT.md`,
    `SECURITY.md`, `CODEOWNERS`, templates de issue e PR.

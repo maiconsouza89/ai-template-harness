@@ -8,17 +8,20 @@ está em [`docs/01-fundacao-git-e-padroes.md`](docs/01-fundacao-git-e-padroes.md
 Após clonar, ative os hooks versionados uma única vez:
 
 ```sh
-sh scripts/setup.sh
+make setup
+make check
 ```
 
-Isso aponta `core.hooksPath` para `.githooks/`, onde o hook `commit-msg` valida o cabeçalho de
-cada commit.
+`make setup` aponta `core.hooksPath` para `.githooks/`, onde o hook `commit-msg` valida o
+cabeçalho de cada commit. `make check` roda todas as verificações e deve passar antes de cada
+commit e de abrir um PR (detalhes em [`docs/TESTING.md`](docs/TESTING.md)). Ambiente completo em
+[`docs/SETUP.md`](docs/SETUP.md).
 
 ## Fluxo de trabalho (GitHub Flow)
 
 1. Crie um branch a partir de `main`, com nome curto e descritivo: `add-commit-msg-hook`,
    `fix-crlf-powershell`.
-2. Faça commits convencionais no branch (ver abaixo).
+2. Faça commits convencionais no branch (ver abaixo), com `make check` passando.
 3. Abra o pull request com título no formato Conventional Commits. Com squash merge, o título
    do PR vira o cabeçalho do commit em `main`.
 4. Responda à revisão.
