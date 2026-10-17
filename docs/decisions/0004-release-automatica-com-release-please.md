@@ -28,15 +28,15 @@ cocogitto e git-cliff exigiriam um token com bypass no ruleset.
 
 Detalhes:
 
-* Tipo `simple`: atualiza `CHANGELOG.md` e `version.txt`. A tag `vX.Y.Z` e a GitHub Release
-  são criadas no merge do PR de release. `version.txt` é a cópia legível da versão; a tag
-  continua sendo a fonte da verdade.
+* Tipo `simple`: atualiza `CHANGELOG.md` e `.release-please-manifest.json` (só atualizaria
+  `version.txt` se o arquivo existisse; optamos por não tê-lo). A tag `vX.Y.Z` e a GitHub
+  Release são criadas no merge do PR de release; a tag é a fonte da verdade.
 * Seções: `feat` → Adicionado, `fix` → Corrigido, `perf`, `ci`, `build` → Alterado,
   `revert` → Revertido. `docs`, `chore`, `refactor`, `style`, `test` ficam ocultos.
 * Formato do changelog: o do release-please, com as seções do Keep a Changelog. Não há mais
   seção `[Unreleased]`: o que não foi lançado está no PR de release aberto.
-* Primeira versão: `release-as: 0.1.0` agrupa todo o histórico atual. Remover a chave após o
-  merge do primeiro PR de release.
+* Primeira versão: `release-as: 0.1.0` agrupou todo o histórico em `v0.1.0` (2026-10-17); a
+  chave foi removida em seguida, como a documentação manda.
 * Token: PRs criados com `GITHUB_TOKEN` não disparam a CI, então o auto-merge não completaria.
   O workflow usa o secret `RELEASE_PLEASE_TOKEN` (token pessoal fine-grained com Contents e
   Pull requests em leitura e escrita) e cai para `GITHUB_TOKEN` se o secret não existir; nesse
