@@ -1,7 +1,7 @@
 #!/bin/sh
 # Testa .githooks/commit-msg com cabeçalhos válidos e inválidos.
 set -u
-cd "$(git rev-parse --show-toplevel)"
+cd "$(git rev-parse --show-toplevel)" || exit 1
 hook=.githooks/commit-msg
 tmp=$(mktemp)
 trap 'rm -f "$tmp"' EXIT

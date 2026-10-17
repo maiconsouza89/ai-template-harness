@@ -1,15 +1,36 @@
 # Verificações
 
 `make check` é a única porta de entrada. Deve passar antes de cada commit e de abrir um PR. A CI
-(passo 3) vai rodar o mesmo alvo, então o que passa local passa lá.
+roda o mesmo alvo (`.github/workflows/ci.yml`), então o que passa local passa lá.
 
 ## O que roda hoje
 
 | Alvo | Script | Verifica |
 | --- | --- | --- |
+| `check-branch` | `scripts/check-branch.sh` | Nome do branch no formato `<tipo>/<descricao>` com os tipos do commit; `main` isento |
 | `check-hooks` | `scripts/test-commit-msg.sh` | Hook `commit-msg` com 22 cabeçalhos válidos e inválidos (acentos, limite de 72 caracteres, tipos, escopo, ponto final, segunda linha) |
 | `check-eol` | `scripts/check-eol.sh` | Nenhum arquivo versionado com CRLF ou fim de linha misto (`git ls-files --eol`) |
 | `check-shell` | `scripts/check-shell.sh` | `sh -n` em todos os scripts e hooks; `shellcheck -s sh` se instalado |
+| `check-actions` | `scripts/check-actions.sh` | Workflows do GitHub Actions com actionlint (pula localmente se ausente; falha na CI) |
+| `check-secrets` | `scripts/check-secrets.sh` | Segredos nos arquivos versionados com gitleaks (pula localmente se ausente; falha na CI) |
+| `check-contract` | `scripts/check-contract.sh` | Lista alvos do contrato sem `scripts/<alvo>.sh`. Informativo, nunca falha |
+| `lint`, `test` | `scripts/contract.sh` | Alvos do contrato; rodam `scripts/lint.sh` e `test.sh` se existirem, senão avisam e passam |
+
+## Status checks obrigatórios
+
+O ruleset de `main` exige três checks verdes antes do merge:
+
+| Check | Workflow | O que faz |
+| --- | --- | --- |
+| `check` | `ci.yml` | `make check` em Ubuntu com shellcheck, actionlint e gitleaks instalados |
+| `secrets` | `ci.yml` | `gitleaks/gitleaks-action` no histórico completo, com comentário no PR |
+| `pr-title` | `pr-title.yml` | Título do PR no padrão do hook `commit-msg` |
+
+## Contrato de alvos
+
+`make lint`, `make format`, `make test` e `make build` existem em qualquer projeto gerado. Para
+implementar, crie `scripts/<alvo>.sh` (POSIX sh, pode chamar a ferramenta da stack) e registre um
+ADR. `check-contract` passa a listar o que ainda falta.
 
 Cada alvo também roda sozinho: `make check-hooks`.
 

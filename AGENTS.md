@@ -30,9 +30,14 @@ make check   # roda todas as verificações; deve passar antes de abrir um PR
 make help    # lista os alvos
 ```
 
+Contrato de alvos, igual em qualquer stack: `make lint`, `make format`, `make test`,
+`make build`. Cada um roda `scripts/<alvo>.sh` se existir; sem o script, avisa e passa. A CI
+executa o mesmo `make check` (ver `docs/TESTING.md`).
+
 ## Regras de trabalho
 
-- Trabalhe em um branch a partir de `main`. `main` só recebe mudanças por pull request com
+- Trabalhe em um branch a partir de `main`, nomeado `<tipo>/<descricao-com-hifens>` com os
+  mesmos tipos do commit (`feat/hook-commit-msg`, `docs/traduz-adrs`). `main` só recebe mudanças por pull request com
   squash. Nunca faça push direto em `main`.
 - Commits no formato Conventional Commits: tipos em inglês (`feat`, `fix`, `docs`...), descrição
   em português, minúsculas, até 72 caracteres, sem ponto final. O hook `commit-msg` rejeita o
@@ -45,8 +50,11 @@ make help    # lista os alvos
 - Documentação em português. Código, nomes de arquivo, tipos e escopos de commit em inglês.
 - Texto em UTF-8 com fim de linha LF (`.editorconfig` e `.gitattributes`). Shell em POSIX `sh`,
   sem bashismos.
-- Não adicione dependências de linguagem ou ferramentas de stack: a stack ainda não foi definida
-  (ver `docs/decisions/0001`). Proponha em um ADR primeiro.
+- O template é agnóstico de stack por contrato (`docs/decisions/0003`). Ao implementar uma stack
+  em um projeto gerado, crie `scripts/lint.sh`, `format.sh`, `test.sh`, `build.sh` e registre um
+  ADR. Não adicione ferramentas de stack ao template em si.
+- Workflows em `.github/workflows/` usam actions fixadas por SHA completo com comentário da
+  versão. Ao atualizar, troque o SHA e o comentário juntos.
 - Não crie `CLAUDE.local.md` nem arquivos pessoais versionados. Segredos nunca entram no
   repositório (`.gitignore` cobre `.env*` e `*.pem`).
 

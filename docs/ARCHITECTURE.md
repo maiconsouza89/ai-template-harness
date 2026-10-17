@@ -18,8 +18,10 @@ Estrutura atual e regra de onde colocar cada coisa. Stack ainda não definida (v
 ├── .gitattributes         Fim de linha por tipo de arquivo; vence o core.autocrlf.
 ├── .gitignore             Só o comum a qualquer stack.
 ├── .githooks/             Hooks versionados (commit-msg). Ativados por make setup.
+├── .github/workflows/     CI: ci.yml (make check, gitleaks) e pr-title.yml (título do PR).
 ├── .vscode/               settings.json e extensions.json compartilhados.
-├── scripts/               Lógica dos alvos do Makefile, em POSIX sh.
+├── scripts/               Lógica dos alvos do Makefile, em POSIX sh. check-*.sh verificam;
+│                          contract.sh despacha lint/format/test/build para <alvo>.sh se existir.
 └── docs/
     ├── 01-fundacao-git-e-padroes.md   Fundamentação dos padrões, com fontes.
     ├── ARCHITECTURE.md                Este arquivo.
@@ -36,7 +38,8 @@ Estrutura atual e regra de onde colocar cada coisa. Stack ainda não definida (v
 | Instrução só do Claude Code | `CLAUDE.md` | Sem duplicar o conteúdo de `AGENTS.md` |
 | Preferência pessoal | `CLAUDE.local.md` (ignorado) | Não polui o repositório |
 | Comando que pessoa ou agente executa | Alvo no `Makefile` chamando `scripts/*.sh` | Uma porta de entrada, lógica testável em sh |
-| Verificação automática | `scripts/check-*.sh` e alvo `check-*` | `make check` agrega tudo; a CI vai rodar o mesmo |
+| Verificação automática | `scripts/check-*.sh` e alvo `check-*` | `make check` agrega tudo; a CI roda o mesmo |
+| Implementação de lint, format, test, build da stack | `scripts/<alvo>.sh` no projeto gerado | O contrato do `Makefile` não muda; ver `decisions/0003` |
 | Decisão de padrão ou arquitetura | `docs/decisions/NNNN-*.md` | Histórico com alternativas descartadas |
 | Explicação longa, com fontes | `docs/*.md` | `AGENTS.md` aponta, não repete |
 | Arquivo de comunidade (`CONTRIBUTING`, `SECURITY`, `CODE_OF_CONDUCT`) | Raiz | Reconhecido pelo GitHub; `LICENSE` só é detectado na raiz |
@@ -47,5 +50,6 @@ Estrutura atual e regra de onde colocar cada coisa. Stack ainda não definida (v
   explica por quê.
 - **Convenção vira arquivo, arquivo vira verificação.** Toda regra em `AGENTS.md` deve ter, quando
   possível, um `check-*` que a aplica.
-- **Agnóstico até o passo 3.** Nada aqui depende de linguagem. Ferramentas de stack entram com
-  ADR.
+- **Agnóstico por contrato.** Nada no template depende de linguagem. O `Makefile` fixa a interface
+  (`lint`, `format`, `test`, `build`); o projeto gerado implementa `scripts/<alvo>.sh` e registra
+  um ADR (`decisions/0003`).

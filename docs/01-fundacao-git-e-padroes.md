@@ -302,8 +302,9 @@ Removed. Demais tipos ficam de fora, salvo impacto para o usuário.
 
 Os seis passos da documentação do GitHub:
 
-1. Criar um branch a partir de `main`, com nome curto e descritivo: `add-commit-msg-hook`,
-   `fix-crlf-powershell`.
+1. Criar um branch a partir de `main` no formato `<tipo>/<descricao-com-hifens>`, com os mesmos
+   tipos do commit: `feat/hook-commit-msg`, `fix/crlf-powershell`. O GitHub sugere nomes curtos
+   e descritivos; o prefixo de tipo alinha o branch ao commit e ao título do PR.
 2. Fazer commits convencionais no branch.
 3. Abrir o pull request com título em Conventional Commits.
 4. Responder à revisão.
@@ -343,8 +344,8 @@ Os seis passos da documentação do GitHub:
 
 1. ~~**Harness base**~~: feito (ADR 0002): `AGENTS.md`, `CLAUDE.md`, `Makefile` com `make check`,
    `docs/ARCHITECTURE.md`, `SETUP.md`, `TESTING.md`.
-2. **Stack e CI**: linguagem, linters, GitHub Actions rodando `make check` e validando o título
-   do PR, como status check obrigatório.
+2. ~~**Stack e CI**~~: redefinido e feito como **CI agnóstica** (ADR 0003): `make check` e
+   título do PR como status checks obrigatórios; contrato de alvos no `Makefile` em vez de stack.
 3. **Automação de release**: escolher entre `release-please`, `git-cliff` e `cocogitto`, em ADR.
 4. **Arquivos de comunidade adicionais** quando houver colaboradores: `CODE_OF_CONDUCT.md`,
    `SECURITY.md`, `CODEOWNERS`, templates de issue e PR.
