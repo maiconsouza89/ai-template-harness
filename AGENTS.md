@@ -50,13 +50,20 @@ Contrato de alvos, igual em qualquer stack: `make lint`, `make format`, `make te
 - Documentação em português. Código, nomes de arquivo, tipos e escopos de commit em inglês.
 - Texto em UTF-8 com fim de linha LF (`.editorconfig` e `.gitattributes`). Shell em POSIX `sh`,
   sem bashismos.
-- O template é agnóstico de stack por contrato (`docs/decisions/0003`). Ao implementar uma stack
-  em um projeto gerado, crie `scripts/lint.sh`, `format.sh`, `test.sh`, `build.sh` e registre um
-  ADR. Não adicione ferramentas de stack ao template em si.
+- Stack por contrato (`docs/decisions/0003`): a stack do projeto vive em `scripts/lint.sh`,
+  `format.sh`, `test.sh` e `build.sh`, registrada em um ADR. Ao criar esses scripts, use as
+  ferramentas da stack; o `Makefile` e `AGENTS.md` não mudam.
 - Workflows em `.github/workflows/` usam actions fixadas por SHA completo com comentário da
   versão. Ao atualizar, troque o SHA e o comentário juntos.
 - Não versione arquivos pessoais; `CLAUDE.local.md` já está no `.gitignore`. Segredos nunca entram no
   repositório (`.gitignore` cobre `.env*` e `*.pem`).
+
+## Só no repositório do template
+
+Vale apenas em `ai-template-harness`, não nos projetos gerados a partir dele:
+
+- Nenhuma ferramenta ou dependência de stack entra aqui; o template continua agnóstico.
+- Toda convenção nova precisa funcionar em qualquer linguagem e vir com verificação em `make check`.
 
 ## Ao terminar uma tarefa
 

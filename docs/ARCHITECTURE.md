@@ -27,6 +27,7 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 ├── scripts/               Lógica dos alvos do Makefile, em POSIX sh. check-*.sh verificam;
 │                          contract.sh despacha lint/format/test/build para <alvo>.sh se existir.
 │                          O projeto gerado adiciona lint.sh, format.sh, test.sh, build.sh.
+│                          bootstrap-github.sh e reset-template.sh: pós-"Use this template".
 └── docs/
     ├── ARCHITECTURE.md    Este arquivo.
     ├── SETUP.md           Preparar o ambiente.

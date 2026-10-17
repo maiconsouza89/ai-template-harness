@@ -7,11 +7,11 @@ roda o mesmo alvo (`.github/workflows/ci.yml`), então o que passa local passa l
 
 | Alvo | Script | Verifica |
 | --- | --- | --- |
-| `check-branch` | `scripts/check-branch.sh` | Nome do branch no formato `<tipo>/<descricao>` com os tipos do commit; `main` isento |
+| `check-branch` | `scripts/check-branch.sh` | Nome do branch no formato `<tipo>/<descricao>` com os tipos do commit; `main`, branch do release-please e PRs de fork isentos |
 | `check-hooks` | `scripts/test-commit-msg.sh` | Hook `commit-msg` com cabeçalhos válidos e inválidos (acentos, limite de 72 caracteres, tipos, escopo, ponto final, segunda linha) |
 | `check-eol` | `scripts/check-eol.sh` | Nenhum arquivo versionado com CRLF ou fim de linha misto (`git ls-files --eol`) |
-| `check-shell` | `scripts/check-shell.sh` | `sh -n` em todos os scripts e hooks; `shellcheck -s sh` se instalado |
-| `check-actions` | `scripts/check-actions.sh` | Workflows do GitHub Actions com actionlint (pula localmente se ausente; falha na CI) |
+| `check-shell` | `scripts/check-shell.sh` | `sh -n` em todos os scripts e hooks; `shellcheck -s sh` (pula localmente se ausente; falha na CI) |
+| `check-actions` | `scripts/check-actions.sh` | Workflows com actionlint (pula localmente se ausente; falha na CI) e toda action fixada por SHA completo com comentário de versão |
 | `check-secrets` | `scripts/check-secrets.sh` | Segredos no histórico do Git com gitleaks (pula localmente se ausente; falha na CI) |
 | `lint`, `test` | `scripts/contract.sh` | Alvos do contrato; rodam `scripts/lint.sh` e `test.sh` se existirem, senão avisam e passam |
 

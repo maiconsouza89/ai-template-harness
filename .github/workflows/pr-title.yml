@@ -1,10 +1,14 @@
 # Com squash merge, o título do PR vira o cabeçalho do commit em main.
 # Mesmas regras do hook .githooks/commit-msg: tipos em inglês, descrição minúscula, sem ponto final.
+#
+# SEGURANÇA: pull_request_target roda com token privilegiado no contexto do branch base, inclusive
+# para PRs de fork. Este workflow só lê o título. Não adicione actions/checkout nem execução de
+# código do PR aqui; para isso use um workflow com pull_request.
 name: pr-title
 
 on:
   pull_request_target:
-    types: [opened, edited, reopened, synchronize]
+    types: [opened, edited, reopened]
 
 permissions:
   pull-requests: read

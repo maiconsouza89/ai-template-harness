@@ -1,7 +1,12 @@
 #!/bin/sh
 # Valida o nome do branch: <tipo>/<descricao-com-hifens>, mesmos tipos do commit.
-# main é exceção. Na CI usa GITHUB_HEAD_REF (o checkout do PR fica em HEAD destacado).
+# main é exceção. Na CI usa GITHUB_HEAD_REF (o checkout do PR fica em HEAD destacado) e pula PRs
+# de fork (PR_FROM_FORK=true), cujo nome o contribuidor externo não controla.
 set -eu
+if [ "${PR_FROM_FORK:-}" = "true" ]; then
+  echo "ok: PR de fork, nome do branch não verificado"
+  exit 0
+fi
 branch="${GITHUB_HEAD_REF:-$(git branch --show-current)}"
 if [ -z "$branch" ]; then
   echo "aviso: HEAD destacado, nome do branch não verificado"
