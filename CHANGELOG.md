@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/maiconsouza89/ai-template-harness/compare/v0.1.0...v0.1.1) (2026-10-17)
+
+
+### Corrigido
+
+* **hooks:** aceita descrição curta e dispensa locale UTF-8 no hook ([#11](https://github.com/maiconsouza89/ai-template-harness/issues/11)) ([dfd4b0b](https://github.com/maiconsouza89/ai-template-harness/commit/dfd4b0baeb0fbac42ae9af605411f29e9db0181a))
+
 ## 0.1.0 (2026-10-17)
 
 
