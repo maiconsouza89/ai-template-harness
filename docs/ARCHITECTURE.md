@@ -19,7 +19,9 @@ Estrutura atual e regra de onde colocar cada coisa. Stack ainda não definida (v
 ├── .gitattributes         Fim de linha por tipo de arquivo; vence o core.autocrlf.
 ├── .gitignore             Só o comum a qualquer stack.
 ├── .githooks/             Hooks versionados (commit-msg). Ativados por make setup.
-├── .github/workflows/     ci.yml (make check, gitleaks), pr-title.yml (título do PR),
+├── .github/               ISSUE_TEMPLATE/ (formulários de bug e funcionalidade),
+│                          pull_request_template.md (checklist do PR) e workflows/:
+│                          ci.yml (make check, gitleaks), pr-title.yml (título do PR),
 │                          release.yml (release-please + auto-merge).
 ├── .vscode/               settings.json e extensions.json compartilhados.
 ├── scripts/               Lógica dos alvos do Makefile, em POSIX sh. check-*.sh verificam;

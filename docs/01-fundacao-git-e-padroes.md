@@ -345,7 +345,7 @@ Os seis passos da documentação do GitHub:
    título do PR como status checks obrigatórios; contrato de alvos no `Makefile` em vez de stack.
 3. ~~**Automação de release**~~: feito (ADR 0004): release-please com auto-merge do PR de release.
 4. **Arquivos de comunidade adicionais** quando houver colaboradores: `CODE_OF_CONDUCT.md`,
-   `SECURITY.md`, `CODEOWNERS`, templates de issue e PR.
+   `SECURITY.md`, `CODEOWNERS`. Templates de issue e PR: feitos (`.github/`).
 
 ---
 
