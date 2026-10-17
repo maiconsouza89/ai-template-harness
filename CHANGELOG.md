@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.1.1...v0.2.0) (2026-10-17)
+
+
+### Adicionado
+
+* **template:** adiciona bootstrap do GitHub e reset pós-template ([#14](https://github.com/maiconsouza89/ai-template-harness/issues/14)) ([313d20a](https://github.com/maiconsouza89/ai-template-harness/commit/313d20a87f9d3a21e8624003a320269e349e713b))
+
 ## [0.1.1](https://github.com/maiconsouza89/ai-template-harness/compare/v0.1.0...v0.1.1) (2026-10-17)
 
 
