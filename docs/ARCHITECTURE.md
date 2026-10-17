@@ -24,10 +24,12 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 │                          ci.yml (make check), pr-title.yml (título do PR),
 │                          release.yml (release-please + auto-merge).
 ├── .vscode/               extensions.json: extensões recomendadas (EditorConfig).
-├── scripts/               Lógica dos alvos do Makefile, em POSIX sh. check-*.sh verificam;
-│                          contract.sh despacha lint/format/test/build para <alvo>.sh se existir.
-│                          O projeto gerado adiciona lint.sh, format.sh, test.sh, build.sh.
-│                          bootstrap-github.sh e reset-template.sh: pós-"Use this template".
+├── scripts/               Lógica dos alvos do Makefile, em POSIX sh.
+│   ├── setup.sh           Ativa os hooks versionados (make setup).
+│   ├── contract.sh        Despacha lint/format/test/build para scripts/<alvo>.sh se existir.
+│   │                      O projeto gerado adiciona lint.sh, format.sh, test.sh, build.sh aqui.
+│   ├── checks/            Verificações de make check (check-*.sh e test-commit-msg.sh).
+│   └── templates/         Pós-"Use this template": bootstrap-github.sh e reset-template.sh.
 └── docs/
     ├── ARCHITECTURE.md    Este arquivo.
     ├── SETUP.md           Preparar o ambiente.
@@ -45,7 +47,7 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 | Instrução só do Claude Code | `CLAUDE.md` | Sem duplicar o conteúdo de `AGENTS.md` |
 | Preferência pessoal | `CLAUDE.local.md` (ignorado) | Não polui o repositório |
 | Comando que pessoa ou agente executa | Alvo no `Makefile` chamando `scripts/*.sh` | Uma porta de entrada, lógica testável em sh |
-| Verificação automática | `scripts/check-*.sh` e alvo `check-*` | `make check` agrega tudo; a CI roda o mesmo |
+| Verificação automática | `scripts/checks/check-*.sh` e alvo `check-*` | `make check` agrega tudo; a CI roda o mesmo |
 | Implementação de lint, format, test, build da stack | `scripts/<alvo>.sh` no projeto gerado | O contrato do `Makefile` não muda; ver `ADR/0003` |
 | Decisão de padrão ou arquitetura | `docs/ADR/NNNN-*.md` | Histórico com alternativas descartadas; camada no front-matter |
 | Explicação longa, com fontes | `docs/*.md` | `AGENTS.md` aponta, não repete |

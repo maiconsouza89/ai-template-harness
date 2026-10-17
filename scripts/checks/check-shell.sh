@@ -2,7 +2,7 @@
 # Valida a sintaxe de todos os scripts sh e hooks. Usa shellcheck se disponível (obrigatório na CI).
 set -eu
 cd "$(git rev-parse --show-toplevel)"
-files=$(git ls-files 'scripts/*.sh' '.githooks/*')
+files=$(git ls-files 'scripts/*.sh' 'scripts/*/*.sh' '.githooks/*')
 for f in $files; do
   sh -n "$f" || { echo "check-shell: erro de sintaxe em $f" >&2; exit 1; }
 done

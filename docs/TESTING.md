@@ -7,13 +7,13 @@ roda o mesmo alvo (`.github/workflows/ci.yml`), então o que passa local passa l
 
 | Alvo | Script | Verifica |
 | --- | --- | --- |
-| `check-branch` | `scripts/check-branch.sh` | Nome do branch no formato `<tipo>/<descricao>` com os tipos do commit; `main`, branch do release-please e PRs de fork isentos |
-| `check-hooks` | `scripts/test-commit-msg.sh` | Hook `commit-msg` com cabeçalhos válidos e inválidos (acentos, limite de 72 caracteres, tipos, escopo, ponto final, segunda linha) |
-| `check-eol` | `scripts/check-eol.sh` | Nenhum arquivo versionado com CRLF ou fim de linha misto (`git ls-files --eol`) |
-| `check-shell` | `scripts/check-shell.sh` | `sh -n` em todos os scripts e hooks; `shellcheck -s sh` (pula localmente se ausente; falha na CI) |
-| `check-actions` | `scripts/check-actions.sh` | Workflows com actionlint (pula localmente se ausente; falha na CI) e toda action fixada por SHA completo com comentário de versão |
-| `check-secrets` | `scripts/check-secrets.sh` | Segredos no histórico do Git com gitleaks (pula localmente se ausente; falha na CI) |
-| `check-adr` | `scripts/check-adr.sh` | `docs/ADR` com o `audit.py` da skill adr-writer: nomes, front-matter, camadas, cadeias de supersede; regenera `index.md` e falha se ele estava desatualizado (pula localmente sem python3; falha na CI) |
+| `check-branch` | `scripts/checks/check-branch.sh` | Nome do branch no formato `<tipo>/<descricao>` com os tipos do commit; `main`, branch do release-please e PRs de fork isentos |
+| `check-hooks` | `scripts/checks/test-commit-msg.sh` | Hook `commit-msg` com cabeçalhos válidos e inválidos (acentos, limite de 72 caracteres, tipos, escopo, ponto final, segunda linha) |
+| `check-eol` | `scripts/checks/check-eol.sh` | Nenhum arquivo versionado com CRLF ou fim de linha misto (`git ls-files --eol`) |
+| `check-shell` | `scripts/checks/check-shell.sh` | `sh -n` em todos os scripts e hooks; `shellcheck -s sh` (pula localmente se ausente; falha na CI) |
+| `check-actions` | `scripts/checks/check-actions.sh` | Workflows com actionlint (pula localmente se ausente; falha na CI) e toda action fixada por SHA completo com comentário de versão |
+| `check-secrets` | `scripts/checks/check-secrets.sh` | Segredos no histórico do Git com gitleaks (pula localmente se ausente; falha na CI) |
+| `check-adr` | `scripts/checks/check-adr.sh` | `docs/ADR` com o `audit.py` da skill adr-writer: nomes, front-matter, camadas, cadeias de supersede; regenera `index.md` e falha se ele estava desatualizado (pula localmente sem python3; falha na CI) |
 | `lint`, `test` | `scripts/contract.sh` | Alvos do contrato; rodam `scripts/lint.sh` e `test.sh` se existirem, senão avisam e passam |
 
 Cada alvo também roda sozinho: `make check-hooks`.
@@ -46,7 +46,7 @@ ADR. Enquanto o script não existe, o alvo avisa e passa.
 
 ## Como adicionar uma verificação
 
-1. Crie `scripts/check-<nome>.sh` em POSIX `sh`, com `set -eu`, saída `ok: ...` no sucesso e
+1. Crie `scripts/checks/check-<nome>.sh` em POSIX `sh`, com `set -eu`, saída `ok: ...` no sucesso e
    mensagem clara no erro (`exit 1`).
 2. Adicione o alvo `check-<nome>` no `Makefile` com comentário `##` e inclua-o nas dependências
    de `check`.
@@ -56,5 +56,5 @@ ADR. Enquanto o script não existe, o alvo avisa e passa.
 
 ## Ao mudar o hook `commit-msg`
 
-Acrescente o caso em `scripts/test-commit-msg.sh` antes de mudar o hook: um aceito e um rejeitado
+Acrescente o caso em `scripts/checks/test-commit-msg.sh` antes de mudar o hook: um aceito e um rejeitado
 para cada regra nova.

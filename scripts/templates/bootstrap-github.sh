@@ -3,7 +3,7 @@
 # configurações de PR, auto-merge, permissão das Actions e ruleset de main.
 # Idempotente: pode rodar de novo. Requer gh autenticado com acesso de admin ao repositório.
 #
-# Uso: sh scripts/bootstrap-github.sh [owner/repo]   (padrão: o remoto origin)
+# Uso: sh scripts/templates/bootstrap-github.sh [owner/repo]   (padrão: o remoto origin)
 set -eu
 
 repo="${1:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}"

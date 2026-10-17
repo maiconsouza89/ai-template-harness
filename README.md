@@ -17,8 +17,8 @@ verificação automática. O que não está no repositório não existe para o a
 3. Aplique o que "Use this template" não copia e zere o que ele copia demais:
 
    ```sh
-   sh scripts/bootstrap-github.sh   # PRs só por squash, auto-merge, ruleset de main com os checks
-   sh scripts/reset-template.sh     # remove o CHANGELOG do template e zera a versão
+   sh scripts/templates/bootstrap-github.sh   # PRs só por squash, auto-merge, ruleset de main com os checks
+   sh scripts/templates/reset-template.sh     # remove o CHANGELOG do template e zera a versão
    ```
 
    O bootstrap avisa se falta o secret `RELEASE_PLEASE_TOKEN` e diz como criá-lo. Detalhes em
