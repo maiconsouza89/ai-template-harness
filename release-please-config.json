@@ -21,11 +21,13 @@
     },
     {
       "type": "ci",
-      "section": "Alterado"
+      "section": "Manutenção",
+      "hidden": true
     },
     {
       "type": "build",
-      "section": "Alterado"
+      "section": "Manutenção",
+      "hidden": true
     },
     {
       "type": "revert",
