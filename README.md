@@ -26,7 +26,7 @@ verificação automática. O que não está no repositório não existe para o a
 
 4. Substitua este README pelo do seu projeto, implemente `scripts/lint.sh`, `format.sh`,
    `test.sh` e `build.sh` para a sua stack e registre a escolha em um ADR
-   ([`docs/decisions/README.md`](docs/decisions/README.md)).
+   ([`docs/ADR/README.md`](docs/ADR/README.md)).
 5. Leia o [guia de contribuição](CONTRIBUTING.md). Agentes de código começam por
    [`AGENTS.md`](AGENTS.md).
 

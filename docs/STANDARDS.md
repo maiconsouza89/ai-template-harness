@@ -2,7 +2,7 @@
 
 Cada padrão adotado, onde ele vive no repositório e a fonte oficial que o fundamenta. O "como"
 está em `CONTRIBUTING.md`; o "por quê" de cada escolha, com as alternativas descartadas, está em
-`docs/decisions/`. Motivo de registrar tudo em arquivos: para um agente, o que não está no
+`docs/ADR/`. Motivo de registrar tudo em arquivos: para um agente, o que não está no
 repositório não existe. Convenções viram arquivos versionados e, sempre que possível,
 verificação automática (`make check`).
 
@@ -21,7 +21,7 @@ verificação automática (`make check`).
 | Harness | `AGENTS.md` como fonte; `CLAUDE.md` importa; `Makefile` como superfície única | raiz | agents.md, Claude Code memory | 0002 |
 | Stack | Agnóstico por contrato de alvos (`lint`, `format`, `test`, `build`) | `Makefile`, `scripts/contract.sh` | — | 0003 |
 | CI | `make check` e título do PR como checks obrigatórios; actions fixadas por SHA | `.github/workflows/` | GitHub Docs, OpenSSF | 0003 |
-| Decisões | ADRs no formato MADR 4.0, em português | `docs/decisions/` | adr.github.io/madr | 0000 |
+| Decisões | ADRs em português com front-matter, camada e índice gerado (skill adr-writer) | `docs/ADR/`, `.claude/skills/adr-writer/` | adr.github.io/madr | 0005, 0006 |
 | Licença | MIT | `LICENSE` | choosealicense.com | 0001 |
 | Assinatura de commits | Não adotada | — | — | 0001 |
 

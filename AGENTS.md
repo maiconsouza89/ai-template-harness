@@ -18,7 +18,7 @@ que possível, verificação automática. O que não está no repositório não 
 | O que `make check` valida e como adicionar verificações | `docs/TESTING.md` |
 | Fluxo de trabalho, commits, PRs e versões | `CONTRIBUTING.md` |
 | Cada padrão, onde vive e a fonte oficial | `docs/STANDARDS.md` |
-| Decisões já tomadas e alternativas descartadas | `docs/decisions/` |
+| Decisões já tomadas e alternativas descartadas | `docs/ADR/` |
 
 ## Comandos
 
@@ -42,15 +42,17 @@ Contrato de alvos, igual em qualquer stack: `make lint`, `make format`, `make te
   e a CI validam; as regras completas estão em `CONTRIBUTING.md`.
 - Rode `make check` antes de cada commit e de abrir o PR. Se uma verificação falhar, corrija a
   causa; não desative a verificação.
-- Mudança que cria ou altera um padrão do repositório exige um ADR novo em `docs/decisions/`
-  (formato em `docs/decisions/README.md`).
+- Mudança que cria ou altera um padrão do repositório exige um ADR novo em `docs/ADR/`
+  (formato e regras em `docs/ADR/README.md`). ADR aceito não se edita: um registro novo o
+  substitui com `supersedes` e `superseded-by` nos dois lados. `make check-adr` audita e gera o
+  `index.md`; inclua o índice regenerado no commit.
 - Não edite `CHANGELOG.md` nem `.release-please-manifest.json`: são gerados pelo
-  release-please a partir dos commits (`docs/decisions/0004`). A descrição do commit é a
+  release-please a partir dos commits (`docs/ADR/0004`). A descrição do commit é a
   entrada do changelog, então escreva-a para quem usa o template.
 - Documentação em português. Código, nomes de arquivo, tipos e escopos de commit em inglês.
 - Texto em UTF-8 com fim de linha LF (`.editorconfig` e `.gitattributes`). Shell em POSIX `sh`,
   sem bashismos.
-- Stack por contrato (`docs/decisions/0003`): a stack do projeto vive em `scripts/lint.sh`,
+- Stack por contrato (`docs/ADR/0003`): a stack do projeto vive em `scripts/lint.sh`,
   `format.sh`, `test.sh` e `build.sh`, registrada em um ADR. Ao criar esses scripts, use as
   ferramentas da stack; o `Makefile` e `AGENTS.md` não mudam.
 - Workflows em `.github/workflows/` usam actions fixadas por SHA completo com comentário da

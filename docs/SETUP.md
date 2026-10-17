@@ -10,6 +10,7 @@
 | shellcheck | opcional | lint dos scripts em `make check-shell`; sem ele, só a sintaxe é validada |
 | actionlint | opcional | valida os workflows em `make check-actions`; sem ele, pula com aviso |
 | gitleaks | opcional | procura segredos em `make check-secrets`; sem ele, pula com aviso |
+| python3 | opcional | auditoria dos ADRs em `make check-adr`; sem ele, pula com aviso |
 
 As ferramentas opcionais são obrigatórias na CI (`CI=true` faz o check falhar se faltarem).
 
