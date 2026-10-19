@@ -7,8 +7,7 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 
 ```text
 .
-├── AGENTS.md              Instruções para agentes (fonte única). Mapa, não manual.
-├── CLAUDE.md              Importa AGENTS.md; só o específico do Claude Code.
+├── CLAUDE.md              Instruções para agentes (fonte única). Mapa, não manual.
 ├── Makefile               Superfície única de comandos: make setup, make check.
 ├── README.md              Para pessoas: o que é e como usar o template.
 ├── CONTRIBUTING.md        Fluxo de trabalho, commits, PRs, versões.
@@ -44,22 +43,20 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 
 | Conteúdo | Lugar | Motivo |
 | --- | --- | --- |
-| Instrução para agente que vale para todo o repositório | `AGENTS.md` | Lido por todas as ferramentas; `CLAUDE.md` importa |
-| Instrução só do Claude Code | `CLAUDE.md` | Sem duplicar o conteúdo de `AGENTS.md` |
+| Instrução para agente | `CLAUDE.md` | Fonte única; aponta para `docs/`, não repete |
 | Preferência pessoal | `CLAUDE.local.md` (ignorado) | Não polui o repositório |
 | Comando que pessoa ou agente executa | Alvo no `Makefile` chamando `scripts/*.sh` | Uma porta de entrada, lógica testável em sh |
 | Verificação automática | `scripts/checks/check-*.sh` e alvo `check-*` | `make check` agrega tudo; a CI roda o mesmo |
 | Implementação de lint, format, test, build da stack | `scripts/<alvo>.sh` no projeto gerado | O contrato do `Makefile` não muda; ver `ADR/0003` |
 | Decisão de padrão ou arquitetura | `docs/ADR/NNNN-*.md` | Histórico com alternativas descartadas; camada no front-matter |
-| Explicação longa, com fontes | `docs/*.md` | `AGENTS.md` aponta, não repete |
+| Explicação longa, com fontes | `docs/*.md` | `CLAUDE.md` aponta, não repete |
 | Arquivo de comunidade (`CONTRIBUTING`, `SECURITY`, `CODE_OF_CONDUCT`) | Raiz | Reconhecido pelo GitHub; `LICENSE` só é detectado na raiz |
 
 ## Princípios
 
 - **Raiz é contrato, `docs/` é conhecimento.** Um `ls` na raiz mostra como trabalhar; `docs/`
   explica por quê.
-- **Convenção vira arquivo, arquivo vira verificação.** Toda regra em `AGENTS.md` deve ter, quando
+- **Convenção vira arquivo, arquivo vira verificação.** Toda regra em `CLAUDE.md` deve ter, quando
   possível, um `check-*` que a aplica.
 - **Agnóstico por contrato.** Nada no template depende de linguagem. O `Makefile` fixa a interface
-  (`lint`, `format`, `test`, `build`); o projeto gerado implementa `scripts/<alvo>.sh` e registra
-  um ADR (`ADR/0003`).
+  e o projeto gerado a implementa; ver `docs/TESTING.md` e `ADR/0003`.

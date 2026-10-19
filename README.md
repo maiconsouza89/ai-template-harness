@@ -28,19 +28,13 @@ verificação automática. O que não está no repositório não existe para o a
    `test.sh` e `build.sh` para a sua stack e registre a escolha em um ADR
    ([`docs/ADR/README.md`](docs/ADR/README.md)).
 5. Leia o [guia de contribuição](CONTRIBUTING.md). Agentes de código começam por
-   [`AGENTS.md`](AGENTS.md).
+   [`CLAUDE.md`](CLAUDE.md).
 
 ## O que está incluído
 
-Instruções para agentes (`AGENTS.md`), `Makefile` com `make check`, hook de commit, CI agnóstica
+Instruções para agentes (`CLAUDE.md`), `Makefile` com `make check`, hook de commit, CI agnóstica
 de stack e release automática. O mapa completo está em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md);
 cada padrão e sua fonte, em [`docs/STANDARDS.md`](docs/STANDARDS.md).
-
-## Padrões
-
-- Commits: Conventional Commits 1.0.0, tipos em inglês, descrição em português.
-- Versões: SemVer 2.0.0, tag `vX.Y.Z` criada pela GitHub Release a cada merge com `feat` ou `fix`.
-- Branches: GitHub Flow, merge por squash, `main` protegido.
 
 ## Licença
 

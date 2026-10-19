@@ -20,7 +20,7 @@
 
 | # | decisão | status | data |
 |---|---|---|---|
-| [0002](0002-usar-agents-md-como-fonte-e-makefile-como-interface.md) | Usar AGENTS.md como fonte única e Makefile como interface | accepted | 2026-10-16 |
+| [0002](0002-usar-agents-md-como-fonte-e-makefile-como-interface.md) | Usar CLAUDE.md como fonte única e Makefile como interface | accepted | 2026-10-16 |
 
 ## ci
 

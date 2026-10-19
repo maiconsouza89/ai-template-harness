@@ -25,7 +25,7 @@ camadas são as partes que um projeto gerado pode trocar sem afetar as outras.
 ## Decisão
 
 Escolhidas as **quatro camadas**, porque cada uma pode ser substituída por outra ferramenta sem
-tocar nas demais (trocar release-please por cocogitto não muda o hook nem o `AGENTS.md`), e os
+tocar nas demais (trocar release-please por cocogitto não muda o hook nem o `CLAUDE.md`), e os
 ADRs existentes caem em exatamente uma delas: 0001 em `workflow`, 0002 em `harness`, 0003 em
 `ci`, 0004 em `release`.
 

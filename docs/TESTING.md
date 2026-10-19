@@ -51,7 +51,7 @@ ADR. Enquanto o script não existe, o alvo avisa e passa.
 2. Adicione o alvo `check-<nome>` no `Makefile` com comentário `##` e inclua-o nas dependências
    de `check`.
 3. Documente a linha na tabela acima.
-4. Se a verificação aplicar uma regra nova, registre a regra em `AGENTS.md` e, se for decisão de
+4. Se a verificação aplicar uma regra nova, registre a regra em `CLAUDE.md` e, se for decisão de
    padrão, um ADR.
 
 ## Ao mudar o hook `commit-msg`

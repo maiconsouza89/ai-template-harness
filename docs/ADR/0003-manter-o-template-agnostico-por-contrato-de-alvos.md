@@ -32,7 +32,7 @@ fixadas por SHA completo sem Dependabot (atualização manual).
 
 ## Consequências
 
-- Bom: o template serve a qualquer linguagem e `AGENTS.md` não muda com a stack.
+- Bom: o template serve a qualquer linguagem e `CLAUDE.md` não muda com a stack.
 - Bom: local e CI rodam o mesmo comando; o que passa aqui passa lá.
 - Ruim: `make lint` e `make test` passam sem fazer nada até a stack ser implementada.
 - Ruim: os SHAs das actions envelhecem sem Dependabot; revisar a cada release.
