@@ -18,7 +18,7 @@ verificação automática (`make check`).
 | Release | Automática a cada merge em `main`, por PR de release com auto-merge | `.github/workflows/release.yml` | release-please | 0004 |
 | Texto | UTF-8 e LF | `.editorconfig`, `.gitattributes` | editorconfig.org, gitattributes | 0001 |
 | Validação local | Hook `commit-msg` em POSIX `sh`, ativado por `core.hooksPath` | `.githooks/`, `scripts/setup.sh` | githooks | 0001 |
-| Harness | `AGENTS.md` como fonte; `CLAUDE.md` importa; `Makefile` como superfície única | raiz | agents.md, Claude Code memory | 0002 |
+| Harness | `CLAUDE.md` como fonte única; `Makefile` como superfície única | raiz | Claude Code memory | 0002 |
 | Stack | Agnóstico por contrato de alvos (`lint`, `format`, `test`, `build`) | `Makefile`, `scripts/contract.sh` | — | 0003 |
 | CI | `make check` e título do PR como checks obrigatórios; actions fixadas por SHA | `.github/workflows/` | GitHub Docs, OpenSSF | 0003 |
 | Decisões | ADRs em português com front-matter, camada e índice gerado (skill adr-writer) | `docs/ADR/`, `.claude/skills/adr-writer/` | adr.github.io/madr | 0005, 0006 |
@@ -52,5 +52,5 @@ via `gh`; o 3 é manual (o script avisa); o 5 só vale para o template.
 - Git: githooks https://git-scm.com/docs/githooks · gitattributes https://git-scm.com/docs/gitattributes · gitignore https://git-scm.com/docs/gitignore
 - EditorConfig: https://editorconfig.org/
 - MADR 4.0: https://adr.github.io/madr/
-- Harness engineering: OpenAI https://openai.com/index/harness-engineering · Anthropic https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents · Adobe https://opensource.adobe.com/ai-repo-harness-guide/ · AGENTS.md https://agents.md/ · Claude Code memory https://code.claude.com/docs/en/memory
+- Harness engineering: OpenAI https://openai.com/index/harness-engineering · Anthropic https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents · Adobe https://opensource.adobe.com/ai-repo-harness-guide/ · Claude Code memory https://code.claude.com/docs/en/memory
 - Fixação de actions por SHA: https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions

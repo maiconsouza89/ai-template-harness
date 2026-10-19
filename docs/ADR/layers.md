@@ -14,6 +14,6 @@ conectam) em vez do interior de uma camada.
 | slug | camada | responsabilidade | definida em |
 |---|---|---|---|
 | `workflow` | Fluxo de trabalho | Git, branches, commits, versionamento, licença e idioma: como o repositório recebe mudanças | 0006 |
-| `harness` | Harness para agentes | AGENTS.md, CLAUDE.md, Makefile, docs/ e ADRs: o que o agente lê e executa | 0006 |
+| `harness` | Harness para agentes | CLAUDE.md, Makefile, docs/ e ADRs: o que o agente lê e executa | 0006 |
 | `ci` | Integração contínua | Verificações locais e no GitHub Actions, contrato de alvos, proteção de main | 0006 |
 | `release` | Release | Versão, changelog, tag e GitHub Release | 0006 |

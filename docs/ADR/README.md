@@ -124,10 +124,10 @@ Consequência tem que ser **verificável** — algo que alguém possa descobrir 
 
 ## Manutenção
 
-```bash
-# audita: nomes, front-matter, camadas, numeração, cadeias de supersede, índice
-python3 .claude/skills/adr-writer/scripts/audit.py docs/ADR
-
-# regenera o index.md a partir do front-matter (rode a cada ADR novo ou mudança de status)
-python3 .claude/skills/adr-writer/scripts/audit.py docs/ADR --index
+```sh
+# audita nomes, front-matter, camadas, numeração e cadeias de supersede; regenera o index.md
+make check-adr
 ```
+
+Para depurar, o script pode ser chamado direto:
+`python3 .claude/skills/adr-writer/scripts/audit.py docs/ADR [--index]`.

@@ -12,10 +12,9 @@ make setup
 make check
 ```
 
-`make setup` aponta `core.hooksPath` para `.githooks/`, onde o hook `commit-msg` valida o
-cabeçalho de cada commit. `make check` roda todas as verificações e deve passar antes de cada
-commit e de abrir um PR (detalhes em [`docs/TESTING.md`](docs/TESTING.md)). Ambiente completo em
-[`docs/SETUP.md`](docs/SETUP.md).
+`make setup` ativa os hooks versionados; `make check` deve passar antes de cada commit e de
+abrir um PR. Ambiente em [`docs/SETUP.md`](docs/SETUP.md); verificações em
+[`docs/TESTING.md`](docs/TESTING.md).
 
 ## Fluxo de trabalho (GitHub Flow)
 
@@ -71,7 +70,7 @@ chore!: exige commits assinados
 - [SemVer 2.0.0](https://semver.org/lang/pt-BR/). Primeira versão `0.1.0`. Enquanto `0.y.z`,
   `feat` e breaking change sobem MINOR e `fix` sobe PATCH.
 - A tag `vX.Y.Z` é a fonte da verdade da versão; `.release-please-manifest.json` guarda a última lançada.
-- A release é automática ([ADR 0004](docs/ADR/0004-release-automatica-com-release-please.md)):
+- A release é automática ([ADR 0004](docs/ADR/0004-automatizar-release-com-release-please.md)):
   a cada merge em `main`, o release-please abre ou atualiza o PR `chore(release): vX.Y.Z` com a
   versão e o `CHANGELOG.md` calculados dos commits. Quando os checks passam, o PR é mesclado
   sozinho, criando a tag e a GitHub Release.
