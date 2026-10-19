@@ -1,5 +1,11 @@
 # ai-template-harness
 
+[![CI](https://github.com/maiconsouza89/ai-template-harness/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/maiconsouza89/ai-template-harness/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/maiconsouza89/ai-template-harness)](https://github.com/maiconsouza89/ai-template-harness/releases)
+[![License: MIT](https://img.shields.io/github/license/maiconsouza89/ai-template-harness)](LICENSE)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-fe5196?logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org/pt-br/v1.0.0/)
+[![Use this template](https://img.shields.io/badge/Use%20this-template-2ea44f?logo=github)](https://github.com/maiconsouza89/ai-template-harness/generate)
+
 Template de repositório para desenvolvimento assistido por IA, construído em torno de
 *harness engineering*: convenções viram arquivos versionados e, sempre que possível,
 verificação automática. O que não está no repositório não existe para o agente.
