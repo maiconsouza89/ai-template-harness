@@ -1,6 +1,6 @@
 ---
 status: accepted
-date: 2026-10-16
+date: 2026-10-19
 layer: harness
 title: "Usar CLAUDE.md como fonte única e Makefile como interface"
 description: "Por que as instruções para agentes vivem só em CLAUDE.md, com Makefile como porta de entrada, em vez de AGENTS.md importado ou arquivos duplicados."
@@ -13,8 +13,10 @@ superseded-by:
 ## Contexto e problema
 
 Agentes de código começam cada sessão sem memória: o que não está em arquivos versionados não
-existe para eles. Precisamos de um ponto de entrada único, lido por qualquer ferramenta, que
-aponte para o conhecimento em `docs/` e dê um comando único para validar o trabalho.
+existe para eles. O Claude Code é a ferramenta usada neste repositório. Precisamos de um ponto
+de entrada único, carregado por ele no início de cada sessão, que aponte para o conhecimento em
+`docs/` e dê um comando único para validar o trabalho. A versão anterior desta decisão mantinha
+`AGENTS.md` como fonte importada por `CLAUDE.md`; os dois arquivos duplicavam a porta de entrada.
 
 ## Opções consideradas
 
@@ -41,6 +43,6 @@ aponta, `docs/` explica, `Makefile` executa.
 
 ## Referências
 
-Consultado em 2026-10-16.
+Consultado em 2026-10-19.
 
-- [Claude Code: memória do projeto](https://code.claude.com/docs/en/memory) — o que o Claude Code carrega da raiz do projeto e como `CLAUDE.local.md` se soma.
+- [Claude Code: memória do projeto](https://code.claude.com/docs/en/memory) — `CLAUDE.md` e `CLAUDE.local.md` são carregados da raiz no início da sessão; imports `@path` também contam no contexto; alvo de menos de 200 linhas por arquivo.
