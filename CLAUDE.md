@@ -39,6 +39,10 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
 - **PRD** em `docs/PRD.md`: regras de produto, requisitos `RF-NNN` e mapa de dependências com ondas
   de implementação; não fala de stack (isso é ADR). Use `/prd-writer` para criar ou revisar; a skill
   valida a estrutura com `scripts/validate.py`.
+- **HLD** em `docs/HLD.md`: o como técnico, entre o PRD e os ADRs. Componentes com diagrama Mermaid,
+  fluxos, modelo de dados, interfaces, metas de escala, segurança, observabilidade, riscos e
+  rastreabilidade com os `RF-NNN`; toda tecnologia cita um ADR ou fica `pendente de ADR`. Use
+  `/hld-writer` para criar ou revisar; a skill valida com `scripts/validate.py` e exporta JSON.
 
 ## Regras
 
