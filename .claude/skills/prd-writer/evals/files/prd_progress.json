@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "prd_path": "PRD.md",
+  "generated_at": "2026-10-10T12:00:00Z",
+  "features": {
+    "RF-001": {
+      "name": "Acesso de dono e barbeiro",
+      "priority": 1,
+      "wave": 1,
+      "dependencies": [],
+      "status": "done",
+      "cycles": 1,
+      "failure_reason": null,
+      "report_path": "docs/reports/eval-RF-001-20261012.md",
+      "started_at": "2026-10-11T09:00:00Z",
+      "updated_at": "2026-10-12T17:00:00Z",
+      "completed_at": "2026-10-12T17:00:00Z"
+    },
+    "RF-002": {
+      "name": "Cadastro da barbearia, serviços e barbeiros",
+      "priority": 1,
+      "wave": 2,
+      "dependencies": [
+        "RF-001"
+      ],
+      "status": "done",
+      "cycles": 0,
+      "failure_reason": null,
+      "report_path": "docs/reports/eval-RF-002-20261014.md",
+      "started_at": "2026-10-13T09:00:00Z",
+      "updated_at": "2026-10-14T11:00:00Z",
+      "completed_at": "2026-10-14T11:00:00Z"
+    },
+    "RF-003": {
+      "name": "Agendamento pelo cliente",
+      "priority": 1,
+      "wave": 3,
+      "dependencies": [
+        "RF-002"
+      ],
+      "status": "implemented",
+      "cycles": 2,
+      "failure_reason": null,
+      "report_path": null,
+      "started_at": "2026-10-15T09:00:00Z",
+      "updated_at": "2026-10-16T18:00:00Z",
+      "completed_at": null
+    },
+    "RF-004": {
+      "name": "Agenda do dia e marcação manual",
+      "priority": 1,
+      "wave": 4,
+      "dependencies": [
+        "RF-002",
+        "RF-003"
+      ],
+      "status": "pending",
+      "cycles": 0,
+      "failure_reason": null,
+      "report_path": null,
+      "started_at": null,
+      "updated_at": "2026-10-10T12:00:00Z",
+      "completed_at": null
+    },
+    "RF-005": {
+      "name": "Cancelamento e remarcação pelo cliente",
+      "priority": 1,
+      "wave": 4,
+      "dependencies": [
+        "RF-003"
+      ],
+      "status": "pending",
+      "cycles": 0,
+      "failure_reason": null,
+      "report_path": null,
+      "started_at": null,
+      "updated_at": "2026-10-10T12:00:00Z",
+      "completed_at": null
+    },
+    "RF-006": {
+      "name": "Lembretes automáticos",
+      "priority": 1,
+      "wave": 5,
+      "dependencies": [
+        "RF-003",
+        "RF-005"
+      ],
+      "status": "pending",
+      "cycles": 0,
+      "failure_reason": null,
+      "report_path": null,
+      "started_at": null,
+      "updated_at": "2026-10-10T12:00:00Z",
+      "completed_at": null
+    },
+    "RF-007": {
+      "name": "Controle de faltas e sinal",
+      "priority": 2,
+      "wave": 5,
+      "dependencies": [
+        "RF-003",
+        "RF-004"
+      ],
+      "status": "pending",
+      "cycles": 0,
+      "failure_reason": null,
+      "report_path": null,
+      "started_at": null,
+      "updated_at": "2026-10-10T12:00:00Z",
+      "completed_at": null
+    }
+  }
+}
