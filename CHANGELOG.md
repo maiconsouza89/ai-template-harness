@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.3.0...v0.4.0) (2026-10-20)
+
+
+### Adicionado
+
+* **skills:** adiciona skill prd-writer com PRD e mapa de dependências ([#21](https://github.com/maiconsouza89/ai-template-harness/issues/21)) ([e5c045f](https://github.com/maiconsouza89/ai-template-harness/commit/e5c045f0f8c6674c81f74d2ab3cdea7e054ea6ce))
+
 ## [0.3.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.2.0...v0.3.0) (2026-10-17)
 
 
