@@ -6,7 +6,6 @@
 
 | # | decisão | status | data |
 |---|---|---|---|
-| [0000](0000-usar-markdown-architectural-decision-records.md) | Usar Markdown Architectural Decision Records | superseded | 2026-10-17 |
 | [0005](0005-adotar-o-formato-adr-writer-em-docs-adr.md) | Adotar o formato da skill adr-writer em docs/ADR | accepted | 2026-10-17 |
 | [0006](0006-organizar-as-decisoes-por-camada.md) | Organizar as decisões nas camadas workflow, harness, ci e release | accepted | 2026-10-17 |
 
