@@ -3,59 +3,93 @@
   "evals": [
     {
       "id": 0,
+      "name": "barbearia-direto-com-stack",
       "prompt": "Preciso do PRD do sistema que vamos construir, em docs/PRD.md. Não tenho mais ninguém pra responder perguntas agora, então usa o que está aqui e marca hipótese onde faltar.\n\nÉ um sistema de agendamento para barbearias pequenas (1 a 5 cadeiras). Hoje o dono marca no WhatsApp e numa agenda de papel; perde uns 8 a 10 horários por semana por desencontro e não-comparecimento, e gasta quase 1 hora por dia respondendo mensagem. Já tentaram usar o Google Agenda compartilhado mas os clientes não usavam.\n\nPúblico: dono da barbearia (administra), barbeiros (veem a própria agenda) e cliente final (marca pelo celular sem instalar nada). Objetivo: reduzir não-comparecimento pela metade em 3 meses e tirar o dono do WhatsApp.\n\nO que precisa ter: cadastro da barbearia com serviços (nome, duração, preço) e barbeiros com horário de trabalho; cliente escolhe serviço, barbeiro (ou 'qualquer'), dia e horário livre e confirma com nome e telefone; lembrete automático pro cliente 24h e 2h antes com opção de cancelar; cliente pode cancelar/remarcar até 2h antes; dono vê a agenda do dia de todos e marca manualmente também (cliente que liga); marcar não-comparecimento e, depois de 2 faltas em 60 dias, o cliente só agenda pagando sinal. Fora de escopo: pagamento online do serviço inteiro, programa de fidelidade, app nativo, múltiplas unidades.\n\nA gente já decidiu que vai ser Node com Postgres e o lembrete via WhatsApp Business API.",
-      "expected_output": "docs/PRD.md completo em português seguindo o template: resumo, contexto com números, objetivos com métrica e meta, escopo, RFs numerados com fluxo/exceções/erros/prioridade, NFRs com performance e disponibilidade (hipóteses marcadas), decisões de produto (sinal após 2 faltas, janela de 2h), dependência externa do canal de mensagens, riscos, critérios de aceitação, validação, e mapa Mermaid com ondas e caminho crítico. Node/Postgres/WhatsApp API não aparecem como stack no PRD (o canal de mensagens aparece como dependência externa descrita pelo que faz); o relatório final lista essas decisões como pendentes de ADR.",
+      "expected_output": "docs/PRD.md em português com as 9 seções do template; RFs para acesso/papéis (fundação), cadastro, agendamento, agenda do dia, cancelamento, lembretes e faltas/sinal; Consome/Fornece fechados (ex: agendamento de RF-agendamento usado pela agenda, lembretes e faltas); tabela topológica com prioridade 1-3; requisitos de fundação com a nota nas ondas; ondas e caminho crítico; Mermaid graph TD igual à tabela; critérios por RF e de integração; Node/Postgres/WhatsApp não aparecem como stack (canal de mensagens é dependência externa descrita pelo que faz); docs/prd_progress.json gerado pelo progress.py com todos os RFs pending; relatório final com hipóteses, lacunas e decisões pendentes de ADR.",
       "files": [],
       "assertions": [
-        "PRD em português com as 12 seções do template presentes e na ordem (Resumo ... Mapa de dependências e paralelismo)",
-        "Todo requisito funcional tem id RF-NNN, descrição, fluxo principal (3 a 8 passos), exceções, erros previstos e prioridade",
-        "Requisitos não funcionais incluem Performance e Disponibilidade com meta numérica",
-        "Mapa em bloco Mermaid com arestas rotuladas dado|fluxo|regra, sem ciclos, citando só RFs existentes",
-        "Tabela de ondas cobre todos os RFs, respeita predecessores e há linha 'Caminho crítico'",
-        "Hipóteses marcadas explicitamente com '(hipótese)' onde o brief não deu a informação",
-        "Nenhum termo de stack (linguagem, banco, framework, protocolo) no corpo do PRD",
-        "Relatório final lista hipóteses, lacunas e decisões técnicas pendentes de ADR",
-        "validate.py sai com 0 erros no PRD gerado",
-        "Regra de produto 'sinal após 2 faltas em 60 dias' e 'janela de cancelamento de 2h' aparecem como decisão de produto ou RF",
-        "Node, Postgres e WhatsApp Business API não aparecem como stack no PRD; canal de lembretes aparece como dependência externa e o relatório os cita como pendentes de ADR"
+        "docs/PRD.md em português com exatamente as 9 seções '## N. ...' do template, na ordem, e cabeçalho com Versão, Data e Responsável",
+        "Todo RF da seção 6 tem id RF-NNN, descrição em uma frase, bloco Capacidades com pelo menos um número e bloco Experiência em passos",
+        "Blocos Consome e Fornece fecham nos dois lados: todo '- RF-NNN:' em Consome tem um Fornece no RF citado com '(usado por ...)' incluindo o consumidor, e vice-versa",
+        "Tabela da seção 8 em ordem topológica com prioridade 1, 2 ou 3, coluna 'Depende de' contendo todo Consome, sem ciclo",
+        "Ondas de execução calculadas da tabela (onda = 1 + maior onda das dependências), ordenadas por prioridade e ID, com linha 'Caminho crítico' com o número certo de ondas",
+        "Mermaid 'graph TD' com exatamente as arestas da tabela e todos os RFs como nós",
+        "Há subseção 'Requisitos de fundação' com o RF de acesso/papéis e a '**Nota:**' nas ondas",
+        "Seção 9 tem critérios para todo RF (sucesso e falha) e bloco 'Integração entre requisitos' com ao menos um critério por Consome citando os dois RFs",
+        "Hipóteses marcadas literalmente com '(hipótese)' onde o brief não deu a informação, sem travessão '—' no PRD",
+        "Node, Postgres e WhatsApp Business API não aparecem como stack no PRD; o canal de mensagens aparece em 'Dependências externas' descrito pelo que faz, com '(trava RF-NNN)'",
+        "validate.py da skill sai com 0 erros no PRD gerado",
+        "docs/prd_progress.json existe, é JSON válido com schema_version 1 e tem toda RF da seção 6 como chave em features com status pending, prioridade, onda e dependências iguais ao PRD",
+        "Regras 'sinal após 2 faltas em 60 dias' e 'cancelar até 2h antes' aparecem como capacidade com número",
+        "Relatório final lista caminho do PRD e do progresso, hipóteses, lacunas, requisitos adicionados sem pedido e decisões pendentes de ADR (Node, Postgres, WhatsApp API)"
       ]
     },
     {
       "id": 1,
+      "name": "reembolso-direto-interno",
       "prompt": "monta o PRD em docs/PRD.md de um portal interno de reembolso de despesas pra nossa empresa (uns 300 funcionários, 12 gestores aprovadores, financeiro com 3 pessoas). hoje é formulário em excel mandado por email, o financeiro gasta ~40h/mês conferindo e uns 15% dos pedidos voltam por falta de nota ou centro de custo errado. pagamento atrasa em média 18 dias.\n\nquero: funcionário cadastra despesa com foto/pdf da nota, valor, data, categoria e centro de custo; política limita valor por categoria (ex: almoço até R$ 60, hotel até R$ 400/noite) e bloqueia acima disso salvo justificativa; gestor aprova ou devolve com comentário; financeiro vê fila de aprovados, marca como pago e exporta lote pro sistema contábil que a gente já usa; funcionário acompanha status; relatório mensal por centro de custo pro financeiro. meta: pagamento em até 7 dias, devolução abaixo de 5%, financeiro gastando menos de 10h/mês. fora: adiantamento de viagem, cartão corporativo, integração automática com o contábil (por enquanto exporta arquivo). segue sem me perguntar, assume o que precisar.",
-      "expected_output": "PRD em português conforme template, com RFs separados para cadastro, validação de política, aprovação, pagamento/exportação, acompanhamento e relatório; política por categoria como decisão de produto; exportação para o sistema contábil como dependência externa/pré-requisito descrita pelo que faz; NFRs com permissão por papel e auditoria; mapa de dependências onde cadastro precede validação/aprovação e aprovação precede pagamento; ondas com paralelismo (ex: relatório e acompanhamento em paralelo a pagamento); caminho crítico; hipóteses marcadas; validador passa sem erro.",
+      "expected_output": "PRD em português nas 9 seções, com RFs separados para cadastro de despesa (com limites de arquivo e campos), validação de política por categoria (limites numéricos), aprovação, pagamento e exportação, acompanhamento e relatório; Consome/Fornece encadeando despesa → política → aprovação → pagamento e despesa → acompanhamento/relatório; exportação para o contábil como dependência externa descrita pelo que faz; NFRs com permissão por papel e auditoria; ondas com paralelismo (acompanhamento e relatório em paralelo ao pagamento); caminho crítico; progress.json gerado; hipóteses marcadas; validador sem erro.",
       "files": [],
       "assertions": [
-        "PRD em português com as 12 seções do template presentes e na ordem (Resumo ... Mapa de dependências e paralelismo)",
-        "Todo requisito funcional tem id RF-NNN, descrição, fluxo principal (3 a 8 passos), exceções, erros previstos e prioridade",
-        "Requisitos não funcionais incluem Performance e Disponibilidade com meta numérica",
-        "Mapa em bloco Mermaid com arestas rotuladas dado|fluxo|regra, sem ciclos, citando só RFs existentes",
-        "Tabela de ondas cobre todos os RFs, respeita predecessores e há linha 'Caminho crítico'",
-        "Hipóteses marcadas explicitamente com '(hipótese)' onde o brief não deu a informação",
+        "docs/PRD.md em português com exatamente as 9 seções '## N. ...' do template, na ordem, e cabeçalho com Versão, Data e Responsável",
+        "Todo RF da seção 6 tem id RF-NNN, descrição em uma frase, bloco Capacidades com pelo menos um número e bloco Experiência em passos",
+        "Blocos Consome e Fornece fecham nos dois lados: todo '- RF-NNN:' em Consome tem um Fornece no RF citado com '(usado por ...)' incluindo o consumidor, e vice-versa",
+        "Tabela da seção 8 em ordem topológica com prioridade 1, 2 ou 3, coluna 'Depende de' contendo todo Consome, sem ciclo",
+        "Ondas de execução calculadas da tabela (onda = 1 + maior onda das dependências), ordenadas por prioridade e ID, com linha 'Caminho crítico' com o número certo de ondas",
+        "Mermaid 'graph TD' com exatamente as arestas da tabela e todos os RFs como nós",
+        "Seção 9 tem critérios para todo RF (sucesso e falha) e bloco 'Integração entre requisitos' com ao menos um critério por Consome citando os dois RFs",
+        "Hipóteses marcadas literalmente com '(hipótese)' onde o brief não deu a informação, sem travessão '—' no PRD",
         "Nenhum termo de stack (linguagem, banco, framework, protocolo) no corpo do PRD",
-        "Relatório final lista hipóteses, lacunas e decisões técnicas pendentes de ADR",
-        "validate.py sai com 0 erros no PRD gerado",
-        "Limites por categoria (R$ 60 almoço, R$ 400 hotel) e bloqueio salvo justificativa aparecem como RF ou decisão de produto",
-        "Exportação para o sistema contábil aparece como RF descrito pelo que faz e dependência externa/pré-requisito, sem integração automática (fora de escopo)"
+        "validate.py da skill sai com 0 erros no PRD gerado",
+        "docs/prd_progress.json existe, é JSON válido com schema_version 1 e tem toda RF da seção 6 como chave em features com status pending, prioridade, onda e dependências iguais ao PRD",
+        "Limites por categoria (R$ 60 almoço, R$ 400 hotel) e bloqueio salvo justificativa aparecem como capacidades com número; cadastro e aprovação têm Tratamento de erros (mexem em dado persistente)",
+        "Exportação para o sistema contábil aparece como RF descrito pelo que faz e em 'Dependências externas', sem integração automática (fora de escopo)",
+        "Relatório final lista caminho do PRD e do progresso, hipóteses, lacunas e requisitos adicionados sem pedido"
       ]
     },
     {
       "id": 2,
+      "name": "cursos-estruturar-ideia",
       "prompt": "Quero estruturar a ideia antes de começar a codar. É uma plataforma pra uma escola de idiomas pequena oferecer cursos online gravados com certificado. Aluno compra o curso, assiste as aulas em ordem, faz um quiz ao final de cada módulo (precisa de 70% pra liberar o próximo), e no fim do curso ganha certificado em PDF com código de verificação público. Professor sobe vídeo, material em PDF e monta o quiz. Admin da escola cadastra professores e cursos, define preço, e vê relatório de vendas e conclusão. Hoje eles vendem pelo Hotmart e mandam as aulas por link do Drive, perdem controle de quem concluiu e emitem certificado na mão (cerca de 30 por mês, 2 dias de atraso). Objetivo: 100% dos certificados automáticos e taxa de conclusão de curso de 25% pra 40% em 6 meses. Fora de escopo: aulas ao vivo, fórum, app mobile, afiliados. Gera o docs/PRD.md, não precisa me entrevistar, marca o que for suposição.",
-      "expected_output": "PRD em português seguindo o template; RFs para cadastro de cursos/professores, publicação de conteúdo, compra, assistir em ordem, quiz com gate de 70%, certificado com verificação pública, relatórios; regra de 70% e ordem obrigatória como decisões de produto com trade-off; meio de pagamento como dependência externa descrita pelo que faz (sem citar Hotmart como stack escolhida); mapa com cadeia cadastro → conteúdo → compra → aula → quiz → certificado e paralelismo de relatório/verificação pública; validador sem erro; hipóteses marcadas.",
+      "expected_output": "PRD em português nas 9 seções; RFs para acesso/papéis, cadastro de cursos e professores, publicação de conteúdo (limites de vídeo e PDF), quiz, compra, assistir em ordem com gate de 70 por cento, certificado com verificação pública, relatórios; Consome/Fornece com progresso do aluno fluindo de aulas → quiz → certificado; meio de pagamento como dependência externa descrita pelo que faz (sem Hotmart como stack); ondas com paralelismo (relatório e verificação pública) e caminho crítico; progress.json; validador sem erro; hipóteses marcadas.",
       "files": [],
       "assertions": [
-        "PRD em português com as 12 seções do template presentes e na ordem (Resumo ... Mapa de dependências e paralelismo)",
-        "Todo requisito funcional tem id RF-NNN, descrição, fluxo principal (3 a 8 passos), exceções, erros previstos e prioridade",
-        "Requisitos não funcionais incluem Performance e Disponibilidade com meta numérica",
-        "Mapa em bloco Mermaid com arestas rotuladas dado|fluxo|regra, sem ciclos, citando só RFs existentes",
-        "Tabela de ondas cobre todos os RFs, respeita predecessores e há linha 'Caminho crítico'",
-        "Hipóteses marcadas explicitamente com '(hipótese)' onde o brief não deu a informação",
+        "docs/PRD.md em português com exatamente as 9 seções '## N. ...' do template, na ordem, e cabeçalho com Versão, Data e Responsável",
+        "Todo RF da seção 6 tem id RF-NNN, descrição em uma frase, bloco Capacidades com pelo menos um número e bloco Experiência em passos",
+        "Blocos Consome e Fornece fecham nos dois lados: todo '- RF-NNN:' em Consome tem um Fornece no RF citado com '(usado por ...)' incluindo o consumidor, e vice-versa",
+        "Tabela da seção 8 em ordem topológica com prioridade 1, 2 ou 3, coluna 'Depende de' contendo todo Consome, sem ciclo",
+        "Ondas de execução calculadas da tabela (onda = 1 + maior onda das dependências), ordenadas por prioridade e ID, com linha 'Caminho crítico' com o número certo de ondas",
+        "Mermaid 'graph TD' com exatamente as arestas da tabela e todos os RFs como nós",
+        "Seção 9 tem critérios para todo RF (sucesso e falha) e bloco 'Integração entre requisitos' com ao menos um critério por Consome citando os dois RFs",
+        "Hipóteses marcadas literalmente com '(hipótese)' onde o brief não deu a informação, sem travessão '—' no PRD",
         "Nenhum termo de stack (linguagem, banco, framework, protocolo) no corpo do PRD",
-        "Relatório final lista hipóteses, lacunas e decisões técnicas pendentes de ADR",
-        "validate.py sai com 0 erros no PRD gerado",
-        "Gate de 70 por cento no quiz e ordem obrigatória das aulas aparecem como RF e/ou decisão de produto com trade-off",
-        "Certificado com código de verificação público é RF próprio e meio de pagamento é dependência externa descrita pelo que faz"
+        "validate.py da skill sai com 0 erros no PRD gerado",
+        "docs/prd_progress.json existe, é JSON válido com schema_version 1 e tem toda RF da seção 6 como chave em features com status pending, prioridade, onda e dependências iguais ao PRD",
+        "Gate de 70 por cento no quiz e ordem obrigatória das aulas aparecem como capacidades com número; o RF de quiz tem Escopo mínimo ou a prioridade reflete o essencial",
+        "Certificado com código de verificação público é RF próprio e meio de pagamento é dependência externa descrita pelo que faz",
+        "Relatório final lista caminho do PRD e do progresso, hipóteses, lacunas e requisitos adicionados sem pedido"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "revisao-com-progresso",
+      "prompt": "Já temos o PRD da agenda da barbearia em docs/PRD.md e o docs/prd_progress.json (já implementamos os dois primeiros RFs e o terceiro está em avaliação). Duas mudanças: (1) adicionar avaliação do atendimento pelo cliente: 1 hora depois do horário concluído, o cliente recebe pelo mesmo canal dos lembretes um link pra dar nota de 1 a 5 e um comentário opcional, e o dono vê a média por barbeiro no painel; (2) tirar o controle de faltas e sinal (RF-007) desta versão, vamos deixar pra depois. Não precisa me entrevistar, só atualiza os dois arquivos e me diz o que mudou.",
+      "expected_output": "docs/PRD.md revisado: RF-008 novo (avaliação) com Consome de RF-004 (atendimento concluído) e RF-006 (canal de envio) ou equivalente, histórias, critérios e critério de integração; RF-007 removido das seções 5, 6, 8 e 9 e listado em Fora de escopo com o número e o motivo; referências a sinal em RF-003 e RF-004 e a dependência externa de cobrança removidas; tabela, ondas, caminho crítico e Mermaid refeitos; versão 0.2.0 e data atualizada; validador sem erro; docs/prd_progress.json atualizado pelo progress.py: RF-001 e RF-002 continuam done com seus timestamps, RF-003 continua implemented com cycles 2, RF-007 vira removed, RF-008 entra pending; relatório diz o que mudou e avisa que RF-003 (implemented) teve texto tocado se foi o caso.",
+      "files": [
+        "evals/files/PRD.md",
+        "evals/files/prd_progress.json"
+      ],
+      "assertions": [
+        "docs/PRD.md continua com exatamente as 9 seções do template e a versão subiu para 0.2.0 com data atualizada",
+        "RF-008 (avaliação do atendimento) existe nas seções 5, 6, 8 e 9 com Capacidades com número (1 hora depois, nota 1 a 5), Experiência, e Consome fechado com Fornece nos RFs de origem",
+        "RF-007 não aparece mais nas seções 5, 6, 8 (tabela, ondas, Mermaid) nem 9, e está listado em Fora de escopo com 'RF-007' e um motivo",
+        "Nenhuma referência órfã ao sinal ou a RF-007 ficou em RF-003, RF-004 ou em Dependências externas (a cobrança do sinal saiu)",
+        "Tabela, ondas, caminho crítico e Mermaid foram recalculados e são coerentes entre si",
+        "validate.py da skill sai com 0 erros no PRD revisado",
+        "docs/prd_progress.json: RF-001 e RF-002 continuam status done com started_at, completed_at, cycles e report_path originais; RF-003 continua implemented com cycles 2",
+        "docs/prd_progress.json: RF-007 tem status removed e mantém name, priority, wave e dependencies antigos; RF-008 tem status pending com cycles 0 e campos opcionais null",
+        "docs/prd_progress.json: generated_at original (2026-10-10T12:00:00Z) preservado; schema_version 1; sem arquivo .tmp sobrando",
+        "Relatório final diz o que mudou (RF-008 adicionado, RF-007 removido, versão) e cita o estado do progresso"
       ]
     }
   ]

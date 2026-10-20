@@ -36,9 +36,11 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
   camada válida em `layers.md`; `index.md` é gerado. `make check-adr` roda o `audit.py` da skill
   `.claude/skills/adr-writer/` e falha se o índice estava desatualizado, então inclua o índice
   regenerado no commit. Use `/adr-writer` para criar, auditar ou substituir um ADR.
-- **PRD** em `docs/PRD.md`: regras de produto, requisitos `RF-NNN` e mapa de dependências com ondas
-  de implementação; não fala de stack (isso é ADR). Use `/prd-writer` para criar ou revisar; a skill
-  valida a estrutura com `scripts/validate.py`.
+- **PRD** em `docs/PRD.md`: 9 seções com requisitos `RF-NNN`, contratos Consome/Fornece entre eles,
+  mapa de dependências com ondas de implementação e critérios de aceitação; não fala de stack (isso é
+  ADR). Ao lado, `docs/prd_progress.json` guarda o estado de implementação de cada RF; é gerado por
+  `scripts/progress.py` da skill, nunca à mão. Use `/prd-writer` para criar ou revisar; a skill valida
+  a estrutura com `scripts/validate.py`.
 - **HLD** em `docs/HLD.md`: o como técnico, entre o PRD e os ADRs. Componentes com diagrama Mermaid,
   fluxos, modelo de dados, interfaces, metas de escala, segurança, observabilidade, riscos e
   rastreabilidade com os `RF-NNN`; toda tecnologia cita um ADR ou fica `pendente de ADR`. Use
