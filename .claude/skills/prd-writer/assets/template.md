@@ -1,0 +1,202 @@
+# PRD: [nome do sistema]
+
+Versão: 0.1.0
+Data: AAAA-MM-DD
+Responsável: [nome de quem responde pelo PRD]
+
+---
+
+## Resumo
+
+[Até 5 frases: o que é o sistema, para quem, qual problema resolve e qual resultado de negócio se espera.]
+
+---
+
+## Contexto e problema
+
+Público-alvo
+- [público 1, com o que o caracteriza]
+- [público 2]
+
+Cenários de uso chave
+- [cenário 1: quem faz o quê, em que situação]
+- [cenário 2]
+
+Contexto de implantação
+- [sistema novo | substitui o processo ou sistema X | integra-se a Y. Descreva o que o sistema existente faz, não como é feito]
+
+Problemas priorizados
+- [problema 1. Impacto: número aproximado (custo, tempo, erro, cliente). Prioridade: alta|media|baixa]
+- [problema 2. Impacto: ... Prioridade: ...]
+
+---
+
+## Objetivos e métricas
+
+| Objetivo | Métrica | Meta |
+| --- | --- | --- |
+| [objetivo 1] | [como se mede] | [número e prazo] |
+| [objetivo 2] | [métrica 2] | [meta 2] |
+
+---
+
+## Escopo
+
+Incluso
+- [o que precisa existir nesta entrega]
+
+Fora de escopo
+- [o que explicitamente não entra, e em uma palavra por quê, quando ajudar]
+
+---
+
+## Requisitos funcionais
+
+### RF-001 [nome do requisito]
+[Uma frase: o que o sistema tem que fazer.]
+
+**Fluxo principal**
+- [passo 1]
+- [passo 2]
+- [passo 3]
+
+**Fluxos alternativos e exceções**
+- [variação ou exceção 1]
+
+**Erros previstos**
+- [condição que bloqueia ou retorna erro, e o que o usuário vê]
+
+**Prioridade:** alta
+
+---
+
+### RF-002 [nome do requisito 2]
+[descrição]
+
+**Fluxo principal**
+- [passo 1]
+- [passo 2]
+
+**Fluxos alternativos e exceções**
+- [variação ou exceção]
+
+**Erros previstos**
+- [erro previsto]
+
+**Prioridade:** media
+
+---
+
+## Requisitos não funcionais
+
+Performance
+- [meta observável pelo usuário. ex: busca de produto responde em até 1 segundo para 95 por cento das consultas]
+
+Disponibilidade
+- [ex: 99.9 por cento de disponibilidade mensal no horário comercial]
+
+Segurança e autorização
+- [ex: quem pode fazer o quê, por papel; alterações sensíveis registradas com autor e horário]
+
+Auditoria e rastreabilidade
+- [ex: toda falha de pagamento é rastreável até o pedido e o cliente]
+
+Confiabilidade e integridade de dados
+- [ex: estoque nunca fica negativo; venda e baixa de estoque acontecem juntas ou não acontecem]
+
+Compatibilidade
+- [ex: navegadores dos últimos 2 anos em desktop e celular; português do Brasil]
+
+Compliance
+- [ex: dados pessoais tratados conforme a LGPD, com exclusão sob pedido em até 15 dias]
+
+Acessibilidade
+- [ex: fluxos principais operáveis por teclado e leitor de tela, WCAG 2.1 nível AA]
+
+---
+
+## Decisões de produto e trade-offs
+
+### Decisão: [regra de produto já dada 1]
+- **Justificativa:** [por que]
+- **Trade-off:** [o que se perde ou fica limitado]
+
+### Decisão: [decisão 2]
+- **Justificativa:** [por que]
+- **Trade-off:** [custo ou limitação]
+
+---
+
+## Dependências
+
+### [externa|organizacional|pré-requisito]: [título]
+[Quem precisa entregar o quê, por quê e o que trava enquanto não chega.]
+
+### [tipo]: [título 2]
+[descrição]
+
+---
+
+## Riscos e mitigação
+
+### [risco 1 em uma frase]
+- **Probabilidade:** [baixa|media|alta]
+- **Impacto:** [o que acontece se ocorrer]
+- **Mitigação:**
+  - [ação 1]
+  - [ação 2]
+- **Plano de contingência:** [plano B se ocorrer mesmo assim]
+
+### [risco 2 em uma frase]
+- **Probabilidade:** [baixa|media|alta]
+- **Impacto:** [impacto]
+- **Mitigação:**
+  - [ação]
+- **Plano de contingência:** [plano B]
+
+---
+
+## Critérios de aceitação
+
+- [critério 1, verificável por alguém de fora do time]
+- [critério 2]
+- [critério 3]
+
+---
+
+## Validação
+
+Tipos de validação obrigatórios
+- [ex: testes automatizados das regras de negócio críticas]
+- [ex: teste de ponta a ponta do fluxo principal de cada RF de prioridade alta]
+- [ex: validação de carga na meta de performance declarada]
+
+Estratégia de validação
+- [ex: roteiro de aceitação executado com usuários reais antes de liberar; validação exploratória interna por sprint]
+
+---
+
+## Mapa de dependências e paralelismo
+
+Aresta A → B significa: B não pode ser construído ou validado sem A. Rótulo: dado, fluxo ou regra.
+
+```mermaid
+graph LR
+  RF001["RF-001 Nome curto"]
+  RF002["RF-002 Nome curto"]
+  RF003["RF-003 Nome curto"]
+  DEP1{{"DEP-1 Nome da dependência externa"}}
+  RF001 -->|dado| RF002
+  RF001 -->|regra| RF003
+  DEP1 -->|fluxo| RF003
+```
+
+| Onda | Requisitos (paralelos entre si) | Depende de |
+| --- | --- | --- |
+| 1 | RF-001 | nenhum |
+| 2 | RF-002, RF-003 | RF-001, DEP-1 |
+
+Caminho crítico: RF-001 → RF-003 (2 ondas).
+
+Dependências externas no mapa
+- DEP-1: [título da dependência na seção Dependências, e o que ela destrava]

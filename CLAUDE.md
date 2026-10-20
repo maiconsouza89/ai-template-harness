@@ -36,6 +36,9 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
   camada válida em `layers.md`; `index.md` é gerado. `make check-adr` roda o `audit.py` da skill
   `.claude/skills/adr-writer/` e falha se o índice estava desatualizado, então inclua o índice
   regenerado no commit. Use `/adr-writer` para criar, auditar ou substituir um ADR.
+- **PRD** em `docs/PRD.md`: regras de produto, requisitos `RF-NNN` e mapa de dependências com ondas
+  de implementação; não fala de stack (isso é ADR). Use `/prd-writer` para criar ou revisar; a skill
+  valida a estrutura com `scripts/validate.py`.
 
 ## Regras
 
