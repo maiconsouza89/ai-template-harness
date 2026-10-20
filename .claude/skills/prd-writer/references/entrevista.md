@@ -1,6 +1,6 @@
 # Guia da entrevista
 
-Perguntas por etapa, opções para oferecer quando o usuário não sabe, defaults (sempre marcados como hipótese) e checagens antes de gerar. Use como base; adapte ao vocabulário do usuário. Uma ideia por pergunta. Em cada etapa, feche com resumo de 3 a 6 linhas e confirmação.
+Perguntas por etapa, opções para oferecer quando o usuário não sabe, defaults (sempre marcados como hipótese) e checagens antes de gerar. Use como base; adapte ao vocabulário do usuário. As perguntas de cada etapa são feitas uma de cada vez, nesta ordem, pulando as que o material do usuário já respondeu. Cada uma vai com 2 a 4 alternativas montadas do contexto e a recomendada em primeiro, marcada "(Recomendado)"; as opções e defaults abaixo são a matéria-prima dessas alternativas. Em cada etapa, feche com resumo de 3 a 6 linhas e confirmação.
 
 ## Etapa 1: problema e oportunidade
 

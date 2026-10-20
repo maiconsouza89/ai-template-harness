@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Valida a estrutura de um PRD gerado pela skill prd-writer e, opcionalmente, exporta JSON.
+"""Valida a estrutura de um PRD gerado pela skill prd-writer.
 
-Uso: python3 validate.py docs/PRD.md [--json docs/PRD.json]
+Uso: python3 validate.py docs/PRD.md
 
 Checa o que é mecânico: as 9 seções na ordem do template, placeholders esquecidos, requisitos
 funcionais completos (descrição, Capacidades, Experiência), contratos Consome/Fornece fechados
@@ -12,7 +12,6 @@ Avisos não derrubam. Só biblioteca padrão.
 
 O módulo também expõe `analyze(text)` para o progress.py reaproveitar a leitura do PRD.
 """
-import json
 import re
 import sys
 from pathlib import Path
@@ -679,7 +678,7 @@ def check_style(text, rep):
 # ---------- análise completa ----------
 
 def analyze(text):
-    """Roda todas as checagens. Retorna (report, data) com o que o JSON e o progress.py precisam."""
+    """Roda todas as checagens. Retorna (report, data) com o que o progress.py precisa."""
     rep = Report()
     data = {"requirements": [], "graph": {}}
     check_header(text, rep)
@@ -709,66 +708,8 @@ def analyze(text):
     return rep, data
 
 
-# ---------- json ----------
-
-def prune(obj):
-    if isinstance(obj, dict):
-        return {k: v for k, v in ((k, prune(v)) for k, v in obj.items()) if v not in ("", None, [], {})}
-    if isinstance(obj, list):
-        return [v for v in (prune(x) for x in obj) if v not in ("", None, [], {})]
-    return obj
-
-
-def build_json(data):
-    g = data.get("graph", {})
-    f_ids = {f["id"] for f in (g.get("foundation") or [])}
-    reqs = []
-    for r in data["requirements"]:
-        rid = r["id"]
-        reqs.append({
-            **r,
-            "priority": g.get("priority", {}).get(rid),
-            "dependencies": g.get("deps", {}).get(rid, []),
-            "wave": g.get("wave_of", {}).get(rid),
-            "foundation": rid in f_ids,
-            "stories": data.get("stories", {}).get(rid, []),
-            "acceptance": data.get("acceptance", {}).get(rid, []),
-        })
-    doc = {
-        "meta": data["meta"],
-        "executive_summary": data.get("summary", ""),
-        "problem": {
-            "pains": [{"title": t, "items": i} for t, i in data.get("pains", [])],
-            "opportunity": data.get("opportunity", []),
-        },
-        "audience": {
-            "profiles": [{"name": n, "items": i} for n, i in data.get("profiles", [])],
-            "behavioral_profile": data.get("behavior", []),
-        },
-        "objectives": data.get("goals", []),
-        "non_functional": data.get("nfr", []),
-        "requirements": reqs,
-        "out_of_scope": [{"category": c, "items": i} for c, i in data.get("out_of_scope", [])],
-        "dependency_graph": {
-            "order": g.get("order") or [],
-            "foundation": g.get("foundation") or [],
-            "waves": [{"wave": w, "requirements": g["waves"][w]} for w in sorted(g.get("waves", {}))],
-            "critical_path": g.get("critical", []),
-            "external_dependencies": g.get("external", []),
-            "mermaid": g.get("mermaid", ""),
-        },
-        "integration_criteria": data.get("integration", []),
-    }
-    return prune(doc)
-
-
 def main(argv):
     args = list(argv[1:])
-    json_out = None
-    if "--json" in args:
-        i = args.index("--json")
-        json_out = Path(args[i + 1]) if i + 1 < len(args) else None
-        del args[i : i + 2]
     if len(args) != 1:
         print(__doc__)
         return 2
@@ -787,11 +728,6 @@ def main(argv):
     cp = " → ".join(g.get("critical", []))
     print(f"{path}: {len(data['requirements'])} RFs em {n_waves} onda(s), caminho crítico {cp or 'n/a'}, "
           f"{data.get('hypotheses', 0)} hipóteses, {len(rep.errors)} erro(s), {len(rep.warnings)} aviso(s)")
-    if json_out and not rep.errors:
-        json_out.write_text(json.dumps(build_json(data), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        print(f"json: {json_out}")
-    elif json_out:
-        print("json não gerado: corrija os erros primeiro")
     return 1 if rep.errors else 0
 
 
