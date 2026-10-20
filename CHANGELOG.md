@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.5.0...v0.6.0) (2026-10-20)
+
+
+### Adicionado
+
+* **skills:** reescreve prd-writer com contratos entre RFs e progresso ([#26](https://github.com/maiconsouza89/ai-template-harness/issues/26)) ([ffde638](https://github.com/maiconsouza89/ai-template-harness/commit/ffde638d2f0592cd041b32cbc3cb5bf2cb76feb2))
+
 ## [0.5.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.4.0...v0.5.0) (2026-10-20)
 
 
