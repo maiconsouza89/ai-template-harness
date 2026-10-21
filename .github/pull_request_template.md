@@ -9,5 +9,5 @@
 
 - [ ] `make check` passa localmente.
 - [ ] Documentos afetados atualizados (`docs/`, `CONTRIBUTING.md`, `README.md`, `CLAUDE.md`).
-- [ ] Se cria ou altera um padrão do repositório: ADR novo em `docs/ADR/`.
-- [ ] Se este é o repositório do template: a mudança continua agnóstica de stack (`docs/ADR/0003`).
+- [ ] Se cria ou altera um padrão do repositório: ADR novo em `docs/adr/`.
+- [ ] Se este é o repositório do template: a mudança continua agnóstica de stack (`docs/adr/0003`).

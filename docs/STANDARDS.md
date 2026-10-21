@@ -2,7 +2,7 @@
 
 Cada padrão adotado, onde ele vive no repositório e a fonte oficial que o fundamenta. O "como"
 está em `CONTRIBUTING.md`; o "por quê" de cada escolha, com as alternativas descartadas, está em
-`docs/ADR/`. Motivo de registrar tudo em arquivos: para um agente, o que não está no
+`docs/adr/`. Motivo de registrar tudo em arquivos: para um agente, o que não está no
 repositório não existe. Convenções viram arquivos versionados e, sempre que possível,
 verificação automática (`make check`).
 
@@ -21,7 +21,8 @@ verificação automática (`make check`).
 | Harness | `CLAUDE.md` como fonte única; `Makefile` como superfície única | raiz | Claude Code memory | 0002 |
 | Stack | Agnóstico por contrato de alvos (`lint`, `format`, `test`, `build`) | `Makefile`, `scripts/contract.sh` | — | 0003 |
 | CI | `make check` e título do PR como checks obrigatórios; actions fixadas por SHA | `.github/workflows/` | GitHub Docs, OpenSSF | 0003 |
-| Decisões | ADRs em português com front-matter, camada e índice gerado (skill adr-writer) | `docs/ADR/`, `.claude/skills/adr-writer/` | adr.github.io/madr | 0005, 0006 |
+| Decisões | ADRs em português com front-matter e índice mantido por script (skill `adr`) | `docs/adr/`, `.claude/skills/adr/` | adr.github.io/madr | 0006, 0007 |
+| Documentação | `docs/` por tipo com templates, front-matter, lacunas `[A CONFIRMAR]` e validação em `make check-docs` (skill `docs-init`) | `docs/README.md`, `.claude/skills/docs-init/` | — | 0007 |
 | Licença | MIT | `LICENSE` | choosealicense.com | 0001 |
 | Assinatura de commits | Não adotada | — | — | 0001 |
 

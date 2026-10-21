@@ -4,7 +4,7 @@
 SHELL := /bin/sh
 .DEFAULT_GOAL := help
 
-.PHONY: help setup check check-branch check-hooks check-eol check-shell check-actions check-secrets check-adr \
+.PHONY: help setup check check-branch check-hooks check-eol check-shell check-actions check-secrets check-docs \
 	lint format test build
 
 help: ## Lista os alvos disponíveis
@@ -13,7 +13,7 @@ help: ## Lista os alvos disponíveis
 setup: ## Ativa os hooks versionados (uma vez após o clone)
 	@sh scripts/setup.sh
 
-check: check-branch check-hooks check-eol check-shell check-actions check-secrets check-adr lint test ## Roda todas as verificações
+check: check-branch check-hooks check-eol check-shell check-actions check-secrets check-docs lint test ## Roda todas as verificações
 	@echo "ok: todas as verificações passaram"
 
 check-branch: ## Valida o nome do branch (<tipo>/<descricao>)
@@ -34,8 +34,8 @@ check-actions: ## Valida os workflows do GitHub Actions (actionlint)
 check-secrets: ## Procura segredos no histórico do Git (gitleaks)
 	@sh scripts/checks/check-secrets.sh
 
-check-adr: ## Audita os ADRs em docs/ADR e regenera o índice (adr-writer)
-	@sh scripts/checks/check-adr.sh
+check-docs: ## Valida docs/ (front-matter, links, ADRs, FDDs) e testa os scripts da docs-init
+	@sh scripts/checks/check-docs.sh
 
 # Contrato de alvos, igual em qualquer stack. Cada projeto gerado implementa scripts/<alvo>.sh;
 # sem o script, contract.sh avisa e passa. check inclui lint e test; format e build são manuais.

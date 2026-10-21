@@ -1,7 +1,7 @@
 # Arquitetura do repositório
 
 Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (ver
-`ADR/0003`); diretórios de código entram no projeto gerado a partir dele.
+`adr/0003`); diretórios de código entram no projeto gerado a partir dele.
 
 ## Mapa
 
@@ -11,7 +11,7 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 ├── Makefile               Superfície única de comandos: make setup, make check.
 ├── README.md              Para pessoas: o que é e como usar o template.
 ├── CONTRIBUTING.md        Fluxo de trabalho, commits, PRs, versões.
-├── CHANGELOG.md           Gerado pelo release-please; não editar (ADR/0004).
+├── CHANGELOG.md           Gerado pelo release-please; não editar (adr/0004).
 ├── release-please-config.json, .release-please-manifest.json   Configuração da release.
 ├── LICENSE                MIT.
 ├── .editorconfig          UTF-8, LF, indentação.
@@ -23,6 +23,8 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 │                          ci.yml (make check), pr-title.yml (título do PR),
 │                          release.yml (release-please + auto-merge).
 ├── .vscode/               extensions.json: extensões recomendadas (EditorConfig).
+├── .claude/               skills/ (docs-init, adr, fdd, docs-review) e agents/ (subagents que
+│                          escrevem e revisam a documentação). Específico do Claude Code.
 ├── scripts/               Lógica dos alvos do Makefile, em POSIX sh.
 │   ├── setup.sh           Ativa os hooks versionados (make setup).
 │   ├── contract.sh        Despacha lint/format/test/build para scripts/<alvo>.sh se existir.
@@ -35,8 +37,15 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
     ├── SETUP.md           Preparar o ambiente.
     ├── STANDARDS.md       Cada padrão, onde vive, fonte oficial e configuração do GitHub.
     ├── TESTING.md         O que make check valida.
-    └── ADR/               ADRs com front-matter e camada (layers.md); README.md tem as regras,
-                           template.md o modelo, index.md é gerado por make check-adr.
+    ├── README.md          Estrutura e convenções da documentação do produto.
+    ├── glossary.md        Termos do domínio.
+    ├── product/           PRD e roadmap.
+    ├── architecture/      HLD, diagrams/ e components/.
+    ├── adr/               ADRs; README.md é o índice, mantido por new_adr.py.
+    ├── features/          FDDs.
+    ├── runbooks/, guides/ Operação e guias para pessoas.
+    ├── templates/         Modelos de cada tipo (copiados pela skill docs-init).
+    └── _intake/           Entrevistas e notas brutas; nada aqui é documentação final.
 ```
 
 ## Onde colocar o quê
@@ -47,8 +56,9 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 | Preferência pessoal | `CLAUDE.local.md` (ignorado) | Não polui o repositório |
 | Comando que pessoa ou agente executa | Alvo no `Makefile` chamando `scripts/*.sh` | Uma porta de entrada, lógica testável em sh |
 | Verificação automática | `scripts/checks/check-*.sh` e alvo `check-*` | `make check` agrega tudo; a CI roda o mesmo |
-| Implementação de lint, format, test, build da stack | `scripts/<alvo>.sh` no projeto gerado | O contrato do `Makefile` não muda; ver `ADR/0003` |
-| Decisão de padrão ou arquitetura | `docs/ADR/NNNN-*.md` | Histórico com alternativas descartadas; camada no front-matter |
+| Implementação de lint, format, test, build da stack | `scripts/<alvo>.sh` no projeto gerado | O contrato do `Makefile` não muda; ver `adr/0003` |
+| Decisão de padrão ou arquitetura | `docs/adr/NNNN-*.md` | Histórico com alternativas descartadas; skill `adr` numera e indexa |
+| Requisitos, arquitetura e design de feature | `docs/product/`, `docs/architecture/`, `docs/features/` | Um template por tipo em `docs/templates/`; ver `docs/README.md` |
 | Explicação longa, com fontes | `docs/*.md` | `CLAUDE.md` aponta, não repete |
 | Arquivo de comunidade (`CONTRIBUTING`, `SECURITY`, `CODE_OF_CONDUCT`) | Raiz | Reconhecido pelo GitHub; `LICENSE` só é detectado na raiz |
 
@@ -59,4 +69,4 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 - **Convenção vira arquivo, arquivo vira verificação.** Toda regra em `CLAUDE.md` deve ter, quando
   possível, um `check-*` que a aplica.
 - **Agnóstico por contrato.** Nada no template depende de linguagem. O `Makefile` fixa a interface
-  e o projeto gerado a implementa; ver `docs/TESTING.md` e `ADR/0003`.
+  e o projeto gerado a implementa; ver `docs/TESTING.md` e `adr/0003`.
