@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.6.0...v0.7.0) (2026-10-21)
+
+
+### Adicionado
+
+* **docs:** adota sistema de documentação docs-init com subagents ([#29](https://github.com/maiconsouza89/ai-template-harness/issues/29)) ([e453b93](https://github.com/maiconsouza89/ai-template-harness/commit/e453b93c7043b56c76d2eb810751ca7f321ec988))
+
 ## [0.6.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.5.0...v0.6.0) (2026-10-20)
 
 
