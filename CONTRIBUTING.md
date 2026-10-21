@@ -1,12 +1,61 @@
 # Contribuindo
 
-Obrigado por contribuir. Este guia resume o fluxo de trabalho. A fundamentação de cada regra
-está em [`docs/STANDARDS.md`](docs/STANDARDS.md) e em [`docs/adr/`](docs/adr/).
+Obrigado por contribuir. Este guia resume o fluxo de trabalho; o "por quê" de cada regra, com
+as alternativas descartadas, está em [`docs/adr/`](docs/adr/).
 
-## Configuração inicial
+## Ambiente
 
-Preparo do ambiente e `make setup` em [`docs/SETUP.md`](docs/SETUP.md). `make check` deve passar
-antes de cada commit e de abrir um PR; o que ele valida está em [`docs/TESTING.md`](docs/TESTING.md).
+| Ferramenta | Versão | Uso |
+| --- | --- | --- |
+| Git | ≥ 2.22 | `core.hooksPath`, `git branch --show-current` |
+| POSIX `sh` | qualquer | hooks e scripts |
+| GNU Make | ≥ 3.81 | `make setup`, `make check` |
+| shellcheck | opcional | lint dos scripts em `make check-shell`; sem ele, só a sintaxe é validada |
+| actionlint | opcional | valida os workflows em `make check-actions`; sem ele, pula com aviso |
+| gitleaks | opcional | procura segredos em `make check-secrets`; sem ele, pula com aviso |
+| python3 | opcional | validação de `docs/` em `make check-docs`; sem ele, pula com aviso |
+
+As ferramentas opcionais são obrigatórias na CI (`CI=true make check` reproduz isso localmente).
+No Windows, use WSL ou Git Bash (ambos trazem `sh`; `make` vem via WSL, Chocolatey ou Scoop).
+`.editorconfig` cuida de UTF-8, LF e indentação; no VS Code, aceite a extensão recomendada em
+`.vscode/extensions.json`.
+
+Após o clone, uma única vez:
+
+```sh
+make setup    # aponta core.hooksPath para .githooks/; o Git não ativa hooks sozinho
+make check    # confirma que tudo passa
+```
+
+## Verificações
+
+`make check` é a única porta de entrada e deve passar antes de cada commit e de abrir um PR. A
+CI (`.github/workflows/ci.yml`) roda o mesmo alvo, então o que passa local passa lá. `make help`
+lista cada `check-*` com o que ele valida; o cabeçalho de cada `scripts/checks/check-*.sh`
+detalha. Cada alvo também roda sozinho: `make check-hooks`.
+
+O ruleset de `main` exige dois checks verdes antes do merge; é a única lista.
+
+| Check | Workflow | O que faz |
+| --- | --- | --- |
+| `check` | `ci.yml` | `make check` em Ubuntu com shellcheck, actionlint e gitleaks instalados (histórico completo) |
+| `pr-title` | `pr-title.yml` | Título do PR no padrão do hook `commit-msg` |
+
+Para adicionar uma verificação:
+
+1. Crie `scripts/checks/check-<nome>.sh` em POSIX `sh`, com `set -eu`, saída `ok: ...` no sucesso
+   e mensagem clara no erro (`exit 1`).
+2. Adicione o alvo `check-<nome>` no `Makefile` com comentário `##` e inclua-o nas dependências
+   de `check`.
+3. Se a verificação aplicar uma regra nova, registre a regra em `CLAUDE.md` e, se for decisão de
+   padrão, um ADR.
+
+Ao mudar o hook `commit-msg`, acrescente antes o caso em `scripts/tests/test-commit-msg.sh`: um
+aceito e um rejeitado para cada regra nova.
+
+`make lint`, `make format`, `make test` e `make build` existem em qualquer projeto gerado. Para
+implementar, crie `scripts/<alvo>.sh` (POSIX sh, pode chamar a ferramenta da stack) e registre
+um ADR. Enquanto o script não existe, o alvo avisa e passa.
 
 ## Fluxo de trabalho (GitHub Flow)
 
@@ -16,7 +65,7 @@ antes de cada commit e de abrir um PR; o que ele valida está em [`docs/TESTING.
 2. Faça commits convencionais no branch (ver abaixo), com `make check` passando.
 3. Abra o pull request com título no formato Conventional Commits e preencha o template (o quê,
    por quê, checklist). Com squash merge, o título do PR vira o cabeçalho do commit em `main`.
-4. Aguarde os checks obrigatórios (lista em [`docs/TESTING.md`](docs/TESTING.md)) e responda à revisão.
+4. Aguarde os checks obrigatórios e responda à revisão.
 5. Faça merge por squash. O branch é apagado automaticamente.
 
 `main` só recebe mudanças por pull request. Não há branches permanentes de `develop` ou
@@ -67,6 +116,8 @@ chore!: exige commits assinados
   `perf` → Alterado, `revert` → Revertido; os demais tipos não aparecem nem geram versão) e o
   mescla sozinho quando os checks passam. Para segurar uma release, não mescle esse PR.
 - Não edite `CHANGELOG.md` nem `.release-please-manifest.json` à mão.
+- Para testar a configuração sem criar nada:
+  `npx release-please release-pr --repo-url=<owner>/<repo> --token="$(gh auth token)" --dry-run`.
 
 ## Decisões
 

@@ -12,3 +12,4 @@ Crie com a skill `adr`, que numera o arquivo e acrescenta a linha abaixo.
 | 0005 | [Adotar o formato da skill adr-writer em docs/ADR](0005-adotar-o-formato-adr-writer-em-docs-adr.md) | superseded | 2026-10-17 |
 | 0006 | [Organizar as decisões nas camadas workflow, harness, ci e release](0006-organizar-as-decisoes-por-camada.md) | accepted | 2026-10-17 |
 | 0007 | [Adotar o sistema de documentação docs-init em docs](0007-adotar-o-sistema-de-documentacao-docs-init-em-docs.md) | accepted | 2026-10-21 |
+| 0008 | [Manter na raiz como trabalhar e em docs o produto e as decisões](0008-manter-na-raiz-como-trabalhar-e-em-docs-o-produto-e-as-decisoes.md) | accepted | 2026-10-21 |

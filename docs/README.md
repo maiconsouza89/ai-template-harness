@@ -1,9 +1,9 @@
 # Documentação
 
-Toda a documentação do projeto vive nesta pasta, organizada por tipo. Documentos do próprio
-repositório (`ARCHITECTURE.md`, `SETUP.md`, `STANDARDS.md`, `TESTING.md`) ficam na raiz de `docs/`
-e não seguem as convenções abaixo; os documentos do produto ficam nas subpastas. Este arquivo é a
-fonte única das convenções: as skills e os subagents o leem antes de escrever.
+Toda a documentação do produto vive nesta pasta, organizada por tipo. Como trabalhar no
+repositório (ambiente, verificações, fluxo, commits, release) fica na raiz, em `CONTRIBUTING.md`
+e `README.md`; aqui ficam o produto e as decisões. Este arquivo é a fonte única das convenções:
+as skills e os subagents o leem antes de escrever.
 
 ## Estrutura
 
