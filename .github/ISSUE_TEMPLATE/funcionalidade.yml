@@ -20,11 +20,11 @@ body:
     id: alternativas
     attributes:
       label: Alternativas consideradas
-      description: Outras formas de resolver e por que foram descartadas. Vira a base do ADR, se a mudança criar ou alterar um padrão.
+      description: Outras formas de resolver e por que foram descartadas.
   - type: checkboxes
     id: escopo
     attributes:
       label: Escopo
       options:
-        - label: Se este é o repositório do template, a mudança continua agnóstica de stack (ver `docs/ADR/0003`).
+        - label: Se este é o repositório do template, a mudança continua agnóstica de stack (ver `docs/adr/0003`).
         - label: Cria ou altera um padrão do repositório e, portanto, precisa de um ADR.
