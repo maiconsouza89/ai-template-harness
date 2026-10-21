@@ -13,13 +13,7 @@ verificação automática. O que não está no repositório não existe para o a
 ## Como usar
 
 1. No GitHub, clique em **Use this template** e crie o seu repositório.
-2. Clone, ative os hooks e confira que tudo passa:
-
-   ```sh
-   make setup
-   make check
-   ```
-
+2. Clone e prepare o ambiente: [`docs/SETUP.md`](docs/SETUP.md) (`make setup`, `make check`).
 3. Aplique o que "Use this template" não copia e zere o que ele copia demais:
 
    ```sh
@@ -32,7 +26,7 @@ verificação automática. O que não está no repositório não existe para o a
 
 4. Substitua este README pelo do seu projeto, implemente `scripts/lint.sh`, `format.sh`,
    `test.sh` e `build.sh` para a sua stack e registre a escolha em um ADR
-   ([`docs/adr/README.md`](docs/adr/README.md)).
+   ([`docs/README.md`](docs/README.md)).
 5. Leia o [guia de contribuição](CONTRIBUTING.md). Agentes de código começam por
    [`CLAUDE.md`](CLAUDE.md).
 

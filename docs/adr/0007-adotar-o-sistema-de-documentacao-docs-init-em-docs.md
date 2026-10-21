@@ -26,8 +26,11 @@ Substituir as três skills por um sistema de documentação em `docs/`, organiza
 (`product/`, `architecture/`, `adr/`, `features/`, `runbooks/`, `guides/`, `templates/`, `_intake/`),
 com a skill `docs-init` (entrevista e geração via subagents `prd-writer`, `architecture-writer`,
 `adr-extractor` e `docs-reviewer`), as skills `adr`, `fdd` e `docs-review`, e um só validador
-(`validate.py`) rodado por `make check-docs`. Os ADRs existentes migram para `docs/adr/` mudando
-apenas o front-matter; o corpo dos registros aceitos fica intacto.
+(`validate.py`) rodado por `make check-docs`. `docs/README.md` é a fonte única das convenções,
+lida por pessoas, skills e subagents; o scaffold o copia para projetos que não o tenham. O
+repositório do template versiona só `docs/adr/`; as outras pastas nascem com a skill no projeto
+gerado. Os ADRs existentes migram para `docs/adr/` mudando apenas o front-matter; o corpo dos
+registros aceitos fica intacto.
 
 ## Alternativas consideradas
 - **Manter as três skills e só adicionar FDD e roadmap**: menos mudança agora, mas quatro validadores, quatro entrevistas e três lugares para a mesma regra de front-matter.
@@ -43,10 +46,10 @@ apenas o front-matter; o corpo dos registros aceitos fica intacto.
 
 ### Negativas e trade-offs
 - Python 3 continua necessário para a validação; sem ele, o check é pulado localmente e falha na CI.
-- Skills e subagents são específicos do Claude Code; outros agentes seguem só `docs/README.md` e as convenções.
+- Skills e subagents são específicos do Claude Code; outros agentes e pessoas seguem `docs/README.md`, que por isso concentra as convenções.
 - Os ADRs 0001 a 0006 mantêm o H1 `# NNNN.` do formato anterior, enquanto os novos usam `# ADR-NNNN:`.
 - O índice de ADRs volta a ser mantido pelo script `new_adr.py` em vez de regenerado em cada check.
 
 ## Referências
-- [Convenções da documentação](../README.md) e `.claude/skills/docs-init/references/convencoes.md`.
+- [Convenções da documentação](../README.md).
 - [ADR 0005](0005-adotar-o-formato-adr-writer-em-docs-adr.md), substituído por este registro.

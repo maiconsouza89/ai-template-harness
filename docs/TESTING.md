@@ -13,7 +13,7 @@ roda o mesmo alvo (`.github/workflows/ci.yml`), então o que passa local passa l
 | `check-shell` | `scripts/checks/check-shell.sh` | `sh -n` em todos os scripts e hooks; `shellcheck -s sh` (pula localmente se ausente; falha na CI) |
 | `check-actions` | `scripts/checks/check-actions.sh` | Workflows com actionlint (pula localmente se ausente; falha na CI) e toda action fixada por SHA completo com comentário de versão |
 | `check-secrets` | `scripts/checks/check-secrets.sh` | Segredos no histórico do Git com gitleaks (pula localmente se ausente; falha na CI) |
-| `check-docs` | `scripts/checks/check-docs.sh` | `docs/` com o `validate.py` da skill docs-init: front-matter, status por tipo, datas ISO, links relativos, numeração de ADRs e FDDs, `superseded_by`; depois `scripts/tests/test-docs-scripts.sh` roda scaffold, new_adr e validate em diretório temporário (pula localmente sem python3; falha na CI) |
+| `check-docs` | `scripts/checks/check-docs.sh` | `docs/` com o `validate.py` da skill docs-init: front-matter, status por tipo, datas ISO, links relativos, numeração de ADRs e FDDs, `superseded_by`, documento fora do índice da pasta (aviso); depois `scripts/tests/test-docs-scripts.sh` roda scaffold, new_adr e validate em diretório temporário (pula localmente sem python3; falha na CI) |
 | `lint`, `test` | `scripts/contract.sh` | Alvos do contrato; rodam `scripts/lint.sh` e `test.sh` se existirem, senão avisam e passam |
 
 Cada alvo também roda sozinho: `make check-hooks`.

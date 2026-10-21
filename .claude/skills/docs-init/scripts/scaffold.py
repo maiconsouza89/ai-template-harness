@@ -11,7 +11,10 @@ import shutil
 import sys
 from pathlib import Path
 
-TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "assets" / "templates"
+SKILL_DIR = Path(__file__).resolve().parent.parent
+TEMPLATES_DIR = SKILL_DIR / "assets" / "templates"
+# A fonte das convenções é docs/README.md do repositório que contém a skill (.claude/skills/docs-init).
+REPO_DOCS_README = SKILL_DIR.parents[2] / "docs" / "README.md"
 
 FOLDERS = [
     "product",
@@ -34,48 +37,12 @@ INDEX_TABLE = "| Documento | Tipo | Status | Atualizado |\n|---|---|---|---|\n"
 READMES = {
     "README.md": """# Documentação
 
-Toda a documentação do projeto vive nesta pasta, organizada por tipo. Documentos do próprio
-repositório (como `ARCHITECTURE.md`, `SETUP.md` ou `TESTING.md`) ficam na raiz de `docs/`; os
-documentos do produto ficam nas subpastas abaixo.
+Documentação do projeto organizada por tipo: `product/` (PRD, roadmap), `architecture/` (HLD,
+componentes), `adr/` (decisões), `features/` (FDD), `runbooks/`, `guides/`, `templates/` (modelos)
+e `_intake/` (entrevistas brutas). Cada pasta tem um `README.md` como índice.
 
-## Estrutura
-
-| Pasta | O que guarda |
-|---|---|
-| `product/` | PRDs e o roadmap |
-| `architecture/` | HLD, diagramas e um documento por componente em `components/` |
-| `adr/` | Architecture Decision Records, um por decisão |
-| `features/` | Feature Design Documents (FDD), um por feature |
-| `runbooks/` | Procedimentos operacionais |
-| `guides/` | Guias para pessoas: onboarding, como fazer X |
-| `templates/` | Modelos de cada tipo de documento |
-| `_intake/` | Entrevistas e notas brutas; nada aqui é documentação final |
-
-Cada pasta tem um `README.md` que funciona como índice. O `glossary.md` define os termos do domínio.
-
-## Como navegar
-
-Comece pelo PRD em `product/` para entender o que o produto faz e por quê. O HLD em
-`architecture/` mostra como ele é construído. Cada escolha técnica tem um ADR em `adr/`, e cada
-feature em desenvolvimento tem um FDD em `features/`. O roadmap em `product/roadmap.md` diz o que
-está em andamento.
-
-## Como criar um documento novo
-
-- Documentação do zero ou atualização geral: skill `docs-init` ("documenta esse projeto").
-- Decisão técnica: skill `adr` ("cria um ADR para X").
-- Design de uma feature: skill `fdd` ("cria o FDD da feature Y").
-- Auditoria: skill `docs-review` ("revisa a documentação").
-
-Sem as skills, copie o modelo de `templates/` e siga as convenções.
-
-## Convenções principais
-
-1. Todo documento começa com frontmatter YAML: `title`, `type`, `status`, `date` e `owners`.
-2. Nomes em kebab-case sem acento; ADR é `NNNN-titulo.md`, FDD é `fdd-NNN-titulo.md`.
-3. ADR aceito é imutável: outra decisão vira um ADR novo com `supersedes` e `superseded_by`.
-4. O que não se sabe fica no texto como `[A CONFIRMAR: pergunta objetiva]`, nunca como suposição.
-5. Links sempre relativos ao arquivo atual; diagramas em Mermaid dentro do Markdown.
+[A CONFIRMAR: este repositório não tem docs/README.md com as convenções; copie o do template
+ai-template-harness ou escreva as convenções aqui.]
 """,
     "glossary.md": """# Glossário
 
@@ -156,6 +123,10 @@ def main() -> int:
         target = root / relative
         if target.exists():
             print(f"pulado: {target} já existe")
+            continue
+        if relative == "README.md" and REPO_DOCS_README.is_file():
+            shutil.copyfile(REPO_DOCS_README, target)
+            print(f"criado: {target} (copiado de {REPO_DOCS_README})")
             continue
         target.write_text(content, encoding="utf-8")
         print(f"criado: {target}")

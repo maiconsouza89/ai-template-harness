@@ -12,7 +12,7 @@ verificação automática (`make check`).
 | --- | --- | --- | --- | --- |
 | Branch padrão | `main` | — | git-init | 0001 |
 | Modelo de branches | GitHub Flow; branches `<tipo>/<descricao>`; merge por squash; branch apagado | `scripts/checks/check-branch.sh`, ruleset | GitHub Docs (GitHub flow) | 0001 |
-| Commits | Conventional Commits 1.0.0; tipos do `config-conventional` em inglês; descrição em português; cabeçalho ≤ 72 caracteres | `.githooks/commit-msg`, `pr-title.yml` | conventionalcommits.org, commitlint, cbea.ms | 0001 |
+| Commits | Conventional Commits 1.0.0 (formato em `CONTRIBUTING.md`) | `.githooks/commit-msg`, `pr-title.yml` | conventionalcommits.org, commitlint, cbea.ms | 0001 |
 | Versionamento | SemVer 2.0.0, início em `0.1.0`; tag `vX.Y.Z` criada pela GitHub Release | `release-please-config.json` | semver.org | 0001, 0004 |
 | Changelog | Gerado pelo release-please, seções do Keep a Changelog em português | `CHANGELOG.md` | keepachangelog.com, release-please | 0004 |
 | Release | Automática a cada merge em `main`, por PR de release com auto-merge | `.github/workflows/release.yml` | release-please | 0004 |
@@ -22,7 +22,7 @@ verificação automática (`make check`).
 | Stack | Agnóstico por contrato de alvos (`lint`, `format`, `test`, `build`) | `Makefile`, `scripts/contract.sh` | — | 0003 |
 | CI | `make check` e título do PR como checks obrigatórios; actions fixadas por SHA | `.github/workflows/` | GitHub Docs, OpenSSF | 0003 |
 | Decisões | ADRs em português com front-matter e índice mantido por script (skill `adr`) | `docs/adr/`, `.claude/skills/adr/` | adr.github.io/madr | 0006, 0007 |
-| Documentação | `docs/` por tipo com templates, front-matter, lacunas `[A CONFIRMAR]` e validação em `make check-docs` (skill `docs-init`) | `docs/README.md`, `.claude/skills/docs-init/` | — | 0007 |
+| Documentação | `docs/` por tipo; convenções em `docs/README.md`; validação em `make check-docs` (skill `docs-init`) | `docs/README.md`, `.claude/skills/docs-init/` | — | 0007 |
 | Licença | MIT | `LICENSE` | choosealicense.com | 0001 |
 | Assinatura de commits | Não adotada | — | — | 0001 |
 
@@ -42,16 +42,7 @@ via `gh`; o 3 é manual (o script avisa); o 5 só vale para o template.
 
 ## Referências
 
-- Conventional Commits 1.0.0: https://www.conventionalcommits.org/pt-br/v1.0.0/
-- Tipos de commit (`config-conventional`): https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional
-- Chris Beams, How to Write a Git Commit Message: https://cbea.ms/git-commit/
-- SemVer 2.0.0: https://semver.org/lang/pt-BR/
-- Keep a Changelog 1.1.0: https://keepachangelog.com/en/1.1.0/
-- release-please: https://github.com/googleapis/release-please
-- GitHub Flow: https://docs.github.com/en/get-started/using-github/github-flow
-- GitHub: squash merge https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/configuring-commit-squashing-for-pull-requests · rulesets https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets · template repository https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-template-repository · community files https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file
-- Git: githooks https://git-scm.com/docs/githooks · gitattributes https://git-scm.com/docs/gitattributes · gitignore https://git-scm.com/docs/gitignore
-- EditorConfig: https://editorconfig.org/
-- MADR 4.0: https://adr.github.io/madr/
-- Harness engineering: OpenAI https://openai.com/index/harness-engineering · Anthropic https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents · Adobe https://opensource.adobe.com/ai-repo-harness-guide/ · Claude Code memory https://code.claude.com/docs/en/memory
-- Fixação de actions por SHA: https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions
+As fontes de cada padrão estão na seção Referências do ADR correspondente. Sobre harness
+engineering, que não tem ADR próprio: OpenAI https://openai.com/index/harness-engineering ·
+Anthropic https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents ·
+Adobe https://opensource.adobe.com/ai-repo-harness-guide/

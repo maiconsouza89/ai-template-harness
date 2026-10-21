@@ -1,4 +1,0 @@
-# Componentes
-
-| Componente | Responsabilidade | Doc |
-|---|---|---|

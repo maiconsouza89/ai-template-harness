@@ -37,15 +37,10 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
     ├── SETUP.md           Preparar o ambiente.
     ├── STANDARDS.md       Cada padrão, onde vive, fonte oficial e configuração do GitHub.
     ├── TESTING.md         O que make check valida.
-    ├── README.md          Estrutura e convenções da documentação do produto.
-    ├── glossary.md        Termos do domínio.
-    ├── product/           PRD e roadmap.
-    ├── architecture/      HLD, diagrams/ e components/.
+    ├── README.md          Fonte única das convenções e da estrutura da documentação do produto.
     ├── adr/               ADRs; README.md é o índice, mantido por new_adr.py.
-    ├── features/          FDDs.
-    ├── runbooks/, guides/ Operação e guias para pessoas.
-    ├── templates/         Modelos de cada tipo (copiados pela skill docs-init).
-    └── _intake/           Entrevistas e notas brutas; nada aqui é documentação final.
+    └── <tipo>/            product/, architecture/, features/, ... criados pela skill docs-init
+                           no projeto gerado; tabela em docs/README.md.
 ```
 
 ## Onde colocar o quê
@@ -58,7 +53,7 @@ Estrutura atual e regra de onde colocar cada coisa. O template não tem stack (v
 | Verificação automática | `scripts/checks/check-*.sh` e alvo `check-*` | `make check` agrega tudo; a CI roda o mesmo |
 | Implementação de lint, format, test, build da stack | `scripts/<alvo>.sh` no projeto gerado | O contrato do `Makefile` não muda; ver `adr/0003` |
 | Decisão de padrão ou arquitetura | `docs/adr/NNNN-*.md` | Histórico com alternativas descartadas; skill `adr` numera e indexa |
-| Requisitos, arquitetura e design de feature | `docs/product/`, `docs/architecture/`, `docs/features/` | Um template por tipo em `docs/templates/`; ver `docs/README.md` |
+| Requisitos, arquitetura e design de feature | `docs/<tipo>/` | Um template por tipo; ver `docs/README.md` |
 | Explicação longa, com fontes | `docs/*.md` | `CLAUDE.md` aponta, não repete |
 | Arquivo de comunidade (`CONTRIBUTING`, `SECURITY`, `CODE_OF_CONDUCT`) | Raiz | Reconhecido pelo GitHub; `LICENSE` só é detectado na raiz |
 

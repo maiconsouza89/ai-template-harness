@@ -1,10 +1,7 @@
 # Architecture Decision Records
 
-ADRs são imutáveis depois de aceitos: uma decisão muda por meio de um ADR novo, que preenche
-`supersedes`, enquanto o antigo recebe `superseded_by` e o status `superseded`. Os ADRs do
-template carregam a chave opcional `layer` (ver 0006); ela não é exigida em registros novos.
-Regras completas em `.claude/skills/docs-init/references/convencoes.md`; modelo em
-`../templates/adr.md`; crie registros com a skill `adr`.
+Um registro por decisão; regras, modelo e ciclo de status em [`../README.md`](../README.md).
+Crie com a skill `adr`, que numera o arquivo e acrescenta a linha abaixo.
 
 | Número | Título | Status | Data |
 |---|---|---|---|

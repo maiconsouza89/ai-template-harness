@@ -10,7 +10,7 @@ Objetivo: transformar o que o usuário sabe sobre o projeto em uma primeira vers
 ## Antes de perguntar
 1. Verifique se `docs/` existe com as subpastas por tipo (`product/`, `architecture/`, `adr/`). Se existir, leia os READMEs e o frontmatter dos arquivos e trate a execução como atualização, não como criação. Pergunte apenas sobre o que está faltando ou marcado como `[A CONFIRMAR]`.
 2. Leia README.md, manifestos (package.json, pyproject.toml, go.mod, pom.xml, Cargo.toml, docker-compose, etc.) e a estrutura de pastas. Anote o que o repositório já responde para não perguntar isso ao usuário.
-3. Leia `references/convencoes.md` antes de gerar qualquer arquivo.
+3. Leia `docs/README.md` (as convenções da documentação) antes de gerar qualquer arquivo. Se não existir, o scaffold o cria.
 
 ## Entrevista
 - Explique em duas frases o que vai acontecer: algumas rodadas de perguntas curtas, depois a geração dos documentos.
@@ -26,7 +26,7 @@ Salve a entrevista em `docs/_intake/entrevista-AAAA-MM-DD.md` com as seções: C
 
 ## Geração
 1. Rode `python3 .claude/skills/docs-init/scripts/scaffold.py` para criar a árvore e os READMEs.
-2. Delegue em paralelo para os subagents abaixo. Para cada um, passe na mensagem: o caminho da entrevista, o caminho do template em `docs/templates/`, o caminho de `references/convencoes.md` e o caminho do arquivo de saída.
+2. Delegue em paralelo para os subagents abaixo. Para cada um, passe na mensagem: o caminho da entrevista, o caminho do template em `docs/templates/`, o caminho de `docs/README.md` (convenções) e o caminho do arquivo de saída.
    - `prd-writer`: `docs/product/prd-<nome-kebab>.md`
    - `architecture-writer`: `docs/architecture/hld-visao-geral.md`
    - `adr-extractor`: um arquivo por decisão em `docs/adr/`

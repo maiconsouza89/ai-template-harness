@@ -197,6 +197,17 @@ def check_gaps(root, path, text, report):
             report.warning(rel, f"linha {line_no}: {line.strip()}")
 
 
+def check_index(root, path, report):
+    """Avisa se o README.md da pasta do documento não tem link para ele."""
+    index = path.parent / "README.md"
+    rel = path.relative_to(root).as_posix()
+    if not index.exists():
+        report.warning(rel, f"pasta sem índice README.md")
+        return
+    if f"({path.name})" not in index.read_text(encoding="utf-8"):
+        report.warning(rel, f"não está no índice {index.relative_to(root).as_posix()}")
+
+
 def check_roadmap(root, path, text, report):
     rel = path.relative_to(root).as_posix()
     section = None
@@ -242,6 +253,7 @@ def main() -> int:
         docs.append((path, fm))
         check_links(root, path, text, report)
         check_gaps(root, path, text, report)
+        check_index(root, path, report)
         if fm is not None and fm.get("type") == "roadmap":
             check_roadmap(root, path, text, report)
 

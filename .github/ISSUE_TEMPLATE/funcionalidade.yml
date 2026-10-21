@@ -20,7 +20,7 @@ body:
     id: alternativas
     attributes:
       label: Alternativas consideradas
-      description: Outras formas de resolver e por que foram descartadas. Vira a base do ADR, se a mudança criar ou alterar um padrão.
+      description: Outras formas de resolver e por que foram descartadas.
   - type: checkboxes
     id: escopo
     attributes:

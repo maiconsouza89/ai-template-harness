@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cria um ADR numerado a partir de docs/templates/adr.md e atualiza o índice.
+"""Cria um ADR numerado a partir de docs/templates/adr.md (ou do modelo da skill) e atualiza o índice.
 
 Uso: python3 new_adr.py "Título da decisão" [--supersedes NNNN] [--root docs]
 """
@@ -12,6 +12,7 @@ import unicodedata
 from pathlib import Path
 
 ADR_NAME_RE = re.compile(r"^(\d{4})-.*\.md$")
+SKILL_TEMPLATE = Path(__file__).resolve().parent.parent.parent / "docs-init" / "assets" / "templates" / "adr.md"
 TABLE_HEADER = "| Número | Título | Status | Data |"
 
 
@@ -102,11 +103,13 @@ def main() -> int:
     root = Path(args.root)
     adr_dir = root / "adr"
     template = root / "templates" / "adr.md"
+    if not template.exists():
+        template = SKILL_TEMPLATE
     if not adr_dir.is_dir():
         print(f"erro: pasta {adr_dir} não existe; rode o scaffold.py antes", file=sys.stderr)
         return 1
     if not template.exists():
-        print(f"erro: template {template} não encontrado", file=sys.stderr)
+        print(f"erro: template adr.md não encontrado em {root / 'templates'} nem em {SKILL_TEMPLATE}", file=sys.stderr)
         return 1
 
     supersedes = args.supersedes.zfill(4) if args.supersedes else ""

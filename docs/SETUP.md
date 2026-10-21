@@ -27,14 +27,6 @@ make check    # confirma que tudo passa
 
 `make setup` é o único passo manual após o clone. O Git não ativa hooks sozinho por segurança.
 
-## Git na máquina (uma vez por pessoa)
-
-```sh
-git config --global user.name  "Seu Nome"
-git config --global user.email "voce@exemplo.com"
-git config --global init.defaultBranch main
-```
-
 ## Editor
 
 `.editorconfig` cuida de UTF-8, LF e indentação. No VS Code, aceite a extensão recomendada em
