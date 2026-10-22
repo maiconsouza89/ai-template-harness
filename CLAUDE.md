@@ -29,9 +29,11 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
   stack em um ADR; `Makefile` e `CLAUDE.md` não mudam.
 - **Release automática** (`docs/adr/0004`). `CHANGELOG.md` e `.release-please-manifest.json` são
   gerados pelo release-please a partir dos commits; não edite nenhum dos dois.
-- **Documentação** (`docs/adr/0007`). `docs/` é organizada por tipo e `docs/README.md` é a fonte
-  única das convenções: front-matter obrigatório, nomes, ADR imutável, lacunas como
-  `[A CONFIRMAR: pergunta]`. `make check-docs` valida tudo com o `validate.py` da skill `docs-init`.
+- **Documentação** (`docs/adr/0007`, `docs/adr/0009`). `docs/` é organizada por tipo e
+  `docs/README.md` é a fonte única das convenções: front-matter obrigatório, nomes, ADR imutável,
+  lacunas como `[A CONFIRMAR: pergunta]`, PRD por requisitos `RF-NNN` com contratos e tabela de
+  dependências, roadmap com ondas derivadas do PRD. `make check-docs` valida tudo com o
+  `validate.py` da skill `docs-init`.
 - **Skills e subagents.** `/docs-init` entrevista e gera PRD, HLD, ADRs e roadmap delegando aos
   subagents de `.claude/agents/`; `/adr` cria um ADR numerado e indexado; `/fdd` desenha uma
   feature; `/docs-review` audita. Entrevistas fazem uma pergunta por vez, com alternativas e uma

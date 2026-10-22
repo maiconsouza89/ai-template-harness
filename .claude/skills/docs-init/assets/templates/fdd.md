@@ -6,13 +6,14 @@ status: draft           # draft | review | approved | implemented
 date: AAAA-MM-DD
 owners: [<engenheiro responsável>]
 prd: <link para o PRD>
+requirements: [RF-000]   # requisitos do PRD que este FDD implementa
 related: []
 ---
 
 # FDD-000: <Nome da feature>
 
 ## Resumo
-O que a feature faz e qual requisito do PRD atende.
+O que a feature faz e qual requisito do PRD atende (RF-NNN, com link para a seção do PRD).
 
 ## Contexto e motivação
 Por que agora e o que muda para o usuário.

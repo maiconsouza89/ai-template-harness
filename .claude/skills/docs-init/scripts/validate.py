@@ -3,6 +3,10 @@
 
 Uso: python3 validate.py [--root docs]
 
+Checa frontmatter, links relativos, numeração de ADRs e FDDs, índice de cada pasta e marcas de
+lacuna. Para PRDs aplica as checagens de conteúdo de prd_checks.py (seções, RF-NNN, contratos,
+tabela de dependências) e, para o roadmap, confere que a seção "Ordem de execução" bate com o que a
+tabela de cada PRD produz e que todo RF-NNN citado existe em algum PRD.
 Sai com código 1 se houver erros; avisos não falham. Sem dependências externas.
 """
 
@@ -10,6 +14,14 @@ import argparse
 import re
 import sys
 from pathlib import Path
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import prd_checks  # noqa: E402
+
+TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "assets" / "templates"
+# Tipos cujos títulos H2 precisam ser os do template. PRD é checado por prd_checks (com ordem).
+TEMPLATE_SECTION_TYPES = ("roadmap",)
 
 TYPED_FOLDERS = ["product", "architecture", "adr", "features", "runbooks", "guides"]
 IGNORED_FOLDERS = {"templates", "_intake"}
@@ -28,6 +40,7 @@ ADR_NAME_RE = re.compile(r"^(\d{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
 FDD_NAME_RE = re.compile(r"^fdd-(\d{3})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
 LINK_RE = re.compile(r"(?<!!)\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 GAP_RE = re.compile(r"\[A CONFIRMAR")
+HYPOTHESIS = "(hipótese)"
 
 
 def parse_frontmatter(text):
@@ -83,6 +96,7 @@ class Report:
         self.errors = []
         self.warnings = []
         self.gaps = 0
+        self.hypotheses = 0
 
     def error(self, path, message):
         self.errors.append(f"{path}: {message}")
@@ -208,6 +222,46 @@ def check_index(root, path, report):
         report.warning(rel, f"não está no índice {index.relative_to(root).as_posix()}")
 
 
+def template_sections(doc_type):
+    tpl = TEMPLATES_DIR / f"{doc_type}.md"
+    if not tpl.is_file():
+        return []
+    return re.findall(r"^## (.+)$", prd_checks.strip_frontmatter(tpl.read_text(encoding="utf-8")), re.MULTILINE)
+
+
+def check_template_sections(path, text, doc_type, report):
+    """Erro quando um título H2 do template do tipo falta ou foi renomeado."""
+    rel = path
+    titles = set(re.findall(r"^## (.+)$", text, re.MULTILINE))
+    for expected in template_sections(doc_type):
+        if expected.strip() not in titles:
+            report.error(rel, f"seção do template '{doc_type}' ausente ou renomeada: '## {expected}'")
+
+
+def check_prd(rel, text, report):
+    rep, _ = prd_checks.analyze(text)
+    for item in rep.errors:
+        report.error(rel, item)
+    for item in rep.warnings:
+        report.warning(rel, item)
+    report.hypotheses += rep.hypotheses
+
+
+def check_roadmap_order(root, path, text, report):
+    """Confere a seção Ordem de execução com os PRDs ligados; devolve os RF citados no roadmap."""
+    rel = path.relative_to(root).as_posix()
+
+    def load_prd(prd_path):
+        return prd_path.read_text(encoding="utf-8") if prd_path.is_file() else None
+
+    errors, warnings, cited = prd_checks.check_roadmap_order(text, path, load_prd)
+    for item in errors:
+        report.error(rel, item)
+    for item in warnings:
+        report.warning(rel, item)
+    return cited
+
+
 def check_roadmap(root, path, text, report):
     rel = path.relative_to(root).as_posix()
     section = None
@@ -246,6 +300,8 @@ def main() -> int:
         return 1
 
     docs = []
+    known_rfs = set()
+    cited_rfs = {}
     for path in iter_documents(root):
         rel = path.relative_to(root).as_posix()
         text = path.read_text(encoding="utf-8")
@@ -254,8 +310,21 @@ def main() -> int:
         check_links(root, path, text, report)
         check_gaps(root, path, text, report)
         check_index(root, path, report)
-        if fm is not None and fm.get("type") == "roadmap":
+        doc_type = fm.get("type") if fm is not None else None
+        if doc_type in TEMPLATE_SECTION_TYPES:
+            check_template_sections(rel, text, doc_type, report)
+        if doc_type == "prd":
+            check_prd(rel, text, report)
+            known_rfs.update(prd_checks.RF_ID.findall(text))
+        elif doc_type == "roadmap":
             check_roadmap(root, path, text, report)
+            cited_rfs[rel] = check_roadmap_order(root, path, text, report)
+        elif doc_type == "fdd":
+            cited_rfs[rel] = set(prd_checks.RF_ID.findall(text))
+    for rel, cited in cited_rfs.items():
+        for rid in sorted(cited - known_rfs):
+            if rid != "RF-000":
+                report.error(rel, f"cita {rid}, que não existe em nenhum PRD de product/")
 
     check_adrs(root, docs, report)
     check_fdds(root, docs, report)
@@ -272,7 +341,8 @@ def main() -> int:
         print("  nenhum")
     print(
         f"Resumo: {len(docs)} documento(s), {len(report.errors)} erro(s), "
-        f"{len(report.warnings)} aviso(s), {report.gaps} ocorrência(s) de [A CONFIRMAR]"
+        f"{len(report.warnings)} aviso(s), {report.gaps} ocorrência(s) de [A CONFIRMAR], "
+        f"{report.hypotheses} de {HYPOTHESIS}"
     )
     return 1 if report.errors else 0
 

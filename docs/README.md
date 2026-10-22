@@ -63,10 +63,19 @@ Valores de `status` por tipo:
 - ADR é imutável depois de `accepted`. Para mudar uma decisão, crie outro ADR, preencha
   `supersedes` no novo e `superseded_by` no antigo, e mude o status do antigo para `superseded`.
   O ADR nasce `proposed`; quem aceita é uma pessoa.
-- PRD aponta para os FDDs que o implementam. FDD aponta para o PRD e para os ADRs que justificam
-  suas escolhas. HLD referencia os ADRs estruturais.
-- Roadmap: item sem link para PRD ou FDD é ideia, não compromisso. Nada é apagado; o que sai vai
-  para "Adiado ou removido" com motivo e data.
+- PRD tem 9 seções fixas e requisitos funcionais identificados por `RF-NNN` (3 dígitos), usados
+  nas histórias (seção 5), nos requisitos (6), na tabela de dependências (8) e nos critérios (9).
+  O ID é imutável e nunca é reutilizado; RF removido sai dessas seções e entra em "Fora de
+  escopo" com o motivo. Cada RF declara o que consome de outros e o que fornece a eles; a coluna
+  "Depende de" da seção 8 é um superconjunto dos Consome. `make check-docs` valida tudo isso com
+  `prd_checks.py`. PRD aponta para os FDDs que o implementam.
+- FDD aponta para o PRD, lista em `requirements` os `RF-NNN` que implementa e cita os ADRs que
+  justificam suas escolhas. HLD referencia os ADRs estruturais.
+- Roadmap: a seção "Ordem de execução" (ondas, caminho crítico, diagrama) é derivada da tabela de
+  dependências do PRD por `python3 .claude/skills/docs-init/scripts/prd_checks.py <prd> --ondas`
+  e não é editada à mão; a validação acusa divergência. Itens de Agora e Próximo citam os `RF-NNN`
+  que entregam. Item sem link para PRD ou FDD é ideia, não compromisso. Nada é apagado; o que sai
+  vai para "Adiado ou removido" com motivo e data.
 
 ## Links e diagramas
 
@@ -81,6 +90,11 @@ Valores de `status` por tipo:
   precisa ser respondível em uma frase. A validação conta as marcas.
 - Nunca preencha métricas, prazos, nomes de pessoas ou tecnologias que não estejam na entrevista
   ou no código.
+- A única exceção é o número operacional de um requisito (limite, quantidade, prazo de SLA,
+  regra de erro): sem ele o RF não é implementável, então ele pode ser proposto com `(hipótese)`
+  no fim da linha, nessa forma literal, só nos blocos Capacidades e Tratamento de erros do PRD.
+  A validação conta as marcas e avisa acima de 30 ou fora desses blocos. `[A CONFIRMAR]` é o que
+  não se sabe; `(hipótese)` é o que foi proposto e precisa ser confirmado.
 
 ## Estilo
 

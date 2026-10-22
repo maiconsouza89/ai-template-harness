@@ -13,3 +13,4 @@ Crie com a skill `adr`, que numera o arquivo e acrescenta a linha abaixo.
 | 0006 | [Organizar as decisões nas camadas workflow, harness, ci e release](0006-organizar-as-decisoes-por-camada.md) | accepted | 2026-10-17 |
 | 0007 | [Adotar o sistema de documentação docs-init em docs](0007-adotar-o-sistema-de-documentacao-docs-init-em-docs.md) | accepted | 2026-10-21 |
 | 0008 | [Manter na raiz como trabalhar e em docs o produto e as decisões](0008-manter-na-raiz-como-trabalhar-e-em-docs-o-produto-e-as-decisoes.md) | accepted | 2026-10-21 |
+| 0009 | [Estruturar o PRD por requisitos rastreáveis e derivar a ordem de execução no roadmap](0009-estruturar-o-prd-por-requisitos-rastreaveis-e-derivar-a-ordem-de-execucao-no-roadmap.md) | proposed | 2026-10-21 |
