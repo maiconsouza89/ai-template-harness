@@ -7,7 +7,7 @@ description: Conduz uma entrevista estruturada (em blocos por etapa) e gera o PR
 
 O PRD responde quatro perguntas para quem vai construir e para quem vai conferir depois: **por que o sistema existe, o que ele precisa fazer, como saberemos que está pronto e em que ordem construir**. Tudo nesta skill serve a isso.
 
-Ele fala de **produto**: regras, fluxos, metas observáveis, riscos. Não fala de stack. Linguagem, banco, framework, protocolo, hospedagem e arquitetura ficam fora, porque o PRD precisa continuar verdadeiro quando a stack mudar, e porque essas escolhas já têm casa neste repositório: `docs/ADR/` via `/adr-writer`. Quando o usuário disser "vamos usar X" no meio da entrevista, anote como **decisão pendente de ADR** no relatório final e não no PRD. A exceção é quando a tecnologia é o próprio produto ou uma restrição imposta de fora (integração obrigatória com o ERP da empresa, por exemplo): aí ela entra como dependência externa ou requisito, descrita pelo que faz, não por como é feita.
+Ele fala de **produto**: regras, fluxos, metas observáveis, riscos. Não fala de stack. Linguagem, banco, framework, protocolo, hospedagem e arquitetura ficam fora, porque o PRD precisa continuar verdadeiro quando a stack mudar, e porque essas escolhas já têm casa neste repositório: `docs/adr/` via `/adr-writer`. Quando o usuário disser "vamos usar X" no meio da entrevista, anote como **decisão pendente de ADR** no relatório final e não no PRD. A exceção é quando a tecnologia é o próprio produto ou uma restrição imposta de fora (integração obrigatória com o ERP da empresa, por exemplo): aí ela entra como dependência externa ou requisito, descrita pelo que faz, não por como é feita.
 
 ## Modos
 

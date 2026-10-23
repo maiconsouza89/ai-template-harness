@@ -1,7 +1,6 @@
 ---
 status: accepted
 date: 2026-10-10
-layer: stack
 title: "Usar Kafka como plataforma de streaming"
 description: "Por que Kafka em vez de fila tradicional, em uma frase: retenção e reprocessamento por partição."
 supersedes:

@@ -1,7 +1,6 @@
 ---
 status: proposed
 date: AAAA-MM-DD
-layer: <slug de docs/ADR/layers.md, ou `stack`>
 title: "Título da decisão"
 description: "Por que <decisão> em vez de <alternativa principal>, em uma frase."
 supersedes:
@@ -12,8 +11,7 @@ superseded-by:
 
 ## Contexto e problema
 
-<Até 5 frases: qual é o problema, que forças estão em jogo, por que ele precisa de decisão agora.
-Se a decisão mexe na fronteira entre camadas, diga quais camadas ela toca.>
+<Até 5 frases: qual é o problema, que forças estão em jogo, por que ele precisa de decisão agora.>
 
 ## Opções consideradas
 

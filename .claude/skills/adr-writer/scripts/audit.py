@@ -2,23 +2,16 @@
 """Audita um diretório de ADRs (formato MADR minimal).
 
 Uso:
-    python3 audit.py <caminho/para/docs/ADR>            # audita
-    python3 audit.py <caminho/para/docs/ADR> --index    # audita e regenera index.md
+    python3 audit.py <caminho/para/docs/adr>            # audita
+    python3 audit.py <caminho/para/docs/adr> --index    # audita e regenera index.md
 
 Verifica só o que é mecânico e determinístico: nome de arquivo, front-matter,
-camada, ciclo de status, numeração e integridade das cadeias de supersede.
+ciclo de status, numeração e integridade das cadeias de supersede.
 
-Duas coisas saem do próprio acervo em vez de estarem fixas aqui, para o acervo
-poder evoluir sem que este script vire o gargalo:
-
-  - seções e chaves obrigatórias vêm do `template.md` da pasta (menos as
-    listadas em OPTIONAL_SECTIONS, checadas só quando presentes);
-  - camadas válidas vêm da primeira coluna da tabela de `layers.md`, mais o
-    slug reservado `stack`.
-
-Sem `template.md`, cai no conjunto padrão. Sem `layers.md`, avisa uma vez e não
-valida `layer` — num repo onde as camadas ainda não foram decididas, registro
-vazio é o estado correto, não um erro.
+Seções e chaves obrigatórias vêm do `assets/template.md` da skill (menos as
+listadas em OPTIONAL_SECTIONS, checadas só quando presentes). O template fica
+só na skill, e não no acervo, para não haver duas cópias que divergem. Sem ele,
+cai no conjunto padrão.
 
 Sai com código 1 se houver erro, 0 se só houver aviso (ou nada).
 """
@@ -29,12 +22,12 @@ from pathlib import Path
 
 STATUSES = {"proposed", "accepted", "rejected", "superseded", "deprecated"}
 TERMINAL = {"rejected", "superseded", "deprecated"}
-RESERVED_LAYER = "stack"
 FILENAME_RE = re.compile(r"^(\d{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
 H1_RE = re.compile(r"^#\s+(\d{4})\.\s+(\S.*)$", re.MULTILINE)
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
-SKIP = {"readme.md", "template.md", "index.md", "layers.md"}
+SKIP = {"readme.md", "index.md"}
+TEMPLATE = Path(__file__).resolve().parent.parent / "assets" / "template.md"
 
 CONTEXT = "## Contexto e problema"
 OPTIONS = "## Opções consideradas"
@@ -42,7 +35,7 @@ CONSEQUENCES = "## Consequências"
 REFERENCES = "## Referências"
 
 DEFAULT_SECTIONS = [CONTEXT, OPTIONS, "## Decisão", CONSEQUENCES]
-DEFAULT_FM_KEYS = ["status", "date", "layer", "title", "description", "supersedes", "superseded-by"]
+DEFAULT_FM_KEYS = ["status", "date", "title", "description", "supersedes", "superseded-by"]
 
 # Seções que o template traz mas que nem todo ADR precisa ter.
 OPTIONAL_SECTIONS = {REFERENCES}
@@ -52,8 +45,6 @@ CONSULTED_RE = re.compile(r"[Cc]onsultado em (\d{4}-\d{2}-\d{2})")
 
 INDEX_NAME = "index.md"
 INDEX_MARKER = "<!-- Gerado por scripts/audit.py --index. Não edite à mão. -->"
-TABLE_ROW_RE = re.compile(r"^\|(.+)\|\s*$")
-SEPARATOR_RE = re.compile(r"^[\s:|-]+$")
 
 errors, warnings = [], []
 
@@ -82,44 +73,13 @@ def parse_front_matter(text):
     return data
 
 
-def required_sections_and_fm_keys(adr_dir):
-    tpl = adr_dir / "template.md"
-    if not tpl.is_file():
+def required_sections_and_fm_keys():
+    if not TEMPLATE.is_file():
         return DEFAULT_SECTIONS, DEFAULT_FM_KEYS
-    tpl_text = tpl.read_text(encoding="utf-8")
+    tpl_text = TEMPLATE.read_text(encoding="utf-8")
     found = [s.strip() for s in re.findall(r"^##\s+.+$", tpl_text, re.MULTILINE)]
     fm = parse_front_matter(tpl_text)
     return (found or DEFAULT_SECTIONS), (list(fm.keys()) if fm else DEFAULT_FM_KEYS)
-
-
-def parse_layer_registry(adr_dir):
-    """Slugs da primeira coluna da tabela de `layers.md`, na ordem em que aparecem.
-
-    A ordem importa: é ela que dá a ordem das seções do índice, então o índice
-    sai na mesma sequência em que as camadas foram decididas em vez de numa
-    ordem alfabética que não diz nada.
-
-    Retorna None quando o registro não existe — sem registro não há o que
-    validar, e isso é diferente de um registro vazio (que rejeita tudo que não
-    seja `stack`).
-    """
-    registry = adr_dir / "layers.md"
-    if not registry.is_file():
-        return None
-    slugs = []
-    for line in registry.read_text(encoding="utf-8").splitlines():
-        m = TABLE_ROW_RE.match(line.strip())
-        if not m:
-            continue
-        cells = [c.strip() for c in m.group(1).split("|")]
-        if not cells or SEPARATOR_RE.match(cells[0]) or not cells[0]:
-            continue
-        slug = cells[0].strip("`")
-        if slug.lower() in {"slug", "camada"}:  # cabeçalho da tabela
-            continue
-        if slug not in slugs:
-            slugs.append(slug)
-    return slugs
 
 
 def section_body(text, heading, all_headings):
@@ -131,37 +91,21 @@ def section_body(text, heading, all_headings):
     return text[start : min(ends)] if ends else text[start:]
 
 
-def render_index(adrs, layer_order):
-    """Índice por camada, derivado só do front-matter.
+def render_index(adrs):
+    """Índice em ordem numérica, derivado só do front-matter.
 
     Gerado em vez de mantido à mão porque um índice manual descola do acervo no
     primeiro ADR que alguém esquece de listar — e um índice que mente é pior que
     índice nenhum, já que ninguém confere.
     """
-    known = [RESERVED_LAYER] + [s for s in (layer_order or []) if s != RESERVED_LAYER]
-    used = {a["fm"].get("layer", "").strip() for a in adrs.values()}
-    extra = sorted(l for l in used if l and l not in known)
-    groups = known + extra + [""]
-
-    lines = ["# ADRs", "", INDEX_MARKER, ""]
-    for layer in groups:
-        entries = sorted(
-            (n, a) for n, a in adrs.items() if a["fm"].get("layer", "").strip() == layer
+    lines = ["# ADRs", "", INDEX_MARKER, "", "| # | decisão | status | data |", "|---|---|---|---|"]
+    for number, adr in sorted(adrs.items()):
+        fm = adr["fm"]
+        title = fm.get("title") or adr["h1_title"] or "(sem título)"
+        lines.append(
+            f"| [{number}]({adr['name']}) | {title} | {fm.get('status', '')} | {fm.get('date', '')} |"
         )
-        if not entries:
-            continue
-        lines.append(f"## {layer}" if layer else "## sem camada")
-        lines.append("")
-        lines.append("| # | decisão | status | data |")
-        lines.append("|---|---|---|---|")
-        for number, adr in entries:
-            fm = adr["fm"]
-            title = fm.get("title") or adr["h1_title"] or "(sem título)"
-            lines.append(
-                f"| [{number}]({adr['name']}) | {title} | {fm.get('status', '')} | {fm.get('date', '')} |"
-            )
-        lines.append("")
-    return "\n".join(lines).rstrip() + "\n"
+    return "\n".join(lines) + "\n"
 
 
 def main():
@@ -176,11 +120,7 @@ def main():
         print(f"erro: {adr_dir} não é um diretório")
         return 2
 
-    sections, fm_keys = required_sections_and_fm_keys(adr_dir)
-    layer_order = parse_layer_registry(adr_dir)
-    valid_layers = None if layer_order is None else set(layer_order) | {RESERVED_LAYER}
-    if layer_order is None:
-        warn("-", "sem `layers.md` na pasta — o campo `layer` não foi validado")
+    sections, fm_keys = required_sections_and_fm_keys()
 
     files = sorted(p for p in adr_dir.glob("*.md") if p.name.lower() not in SKIP)
     if not files:
@@ -214,21 +154,6 @@ def main():
         date = fm.get("date", "")
         if date and not DATE_RE.match(date):
             err(name, f"date `{date}` fora do formato ISO AAAA-MM-DD")
-
-        # Camada: erro em vez de aviso porque um `layer` fora do registro é sempre
-        # uma das duas coisas — slug errado, ou uma camada que ninguém decidiu ainda.
-        # As duas precisam de ação antes do ADR entrar.
-        # A chave ausente já foi reportada acima; aqui só se ela existe e está vazia.
-        if "layer" in fm_keys and "layer" in fm:
-            layer = fm.get("layer", "").strip()
-            if not layer:
-                err(name, "`layer` vazio — diga a camada da stack, ou `stack` se a decisão for sobre a composição dela")
-            elif valid_layers is not None and layer not in valid_layers:
-                err(
-                    name,
-                    f"camada `{layer}` não está em layers.md — corrija o slug ou registre a camada "
-                    f"no ADR `stack` que a criou",
-                )
 
         h1 = H1_RE.search(text)
         h1_title = ""
@@ -315,7 +240,7 @@ def main():
     # Índice: sempre comparado, escrito só com --index. Assim a auditoria acusa
     # o índice velho sem alterar o repo de quem só quis auditar.
     index_path = adr_dir / INDEX_NAME
-    expected = render_index(adrs, layer_order)
+    expected = render_index(adrs)
     current = index_path.read_text(encoding="utf-8") if index_path.is_file() else None
     if write_index:
         if current != expected:

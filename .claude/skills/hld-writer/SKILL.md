@@ -7,7 +7,7 @@ description: Conduz uma entrevista estruturada (em blocos por etapa) e gera o HL
 
 O HLD responde quatro perguntas para quem vai implementar e para quem vai operar: **como a solução se divide em componentes, como eles conversam, onde o dado vive e o que garante que isso escala, resiste, é seguro e é observável**. Tudo nesta skill serve a isso.
 
-Ele fala do **como** técnico. Não reconta a regra de negócio: isso é o PRD em `docs/PRD.md`, e o HLD o cita por `RF-NNN`. Também não é o lugar de justificar cada escolha de tecnologia: isso é ADR em `docs/ADR/`, e o HLD aponta para o número. A divisão de trabalho neste repositório é **PRD diz o quê, HLD diz como, ADR diz por quê**. Quando o usuário trouxer uma tecnologia na entrevista, ela entra no HLD com a coluna "Decisão" preenchida: o ADR que já existe, ou `pendente de ADR` com a decisão listada no fim do documento e no relatório final. Tecnologia sem decisão registrada é a primeira coisa que o leitor de daqui a seis meses vai questionar.
+Ele fala do **como** técnico. Não reconta a regra de negócio: isso é o PRD em `docs/PRD.md`, e o HLD o cita por `RF-NNN`. Também não é o lugar de justificar cada escolha de tecnologia: isso é ADR em `docs/adr/`, e o HLD aponta para o número. A divisão de trabalho neste repositório é **PRD diz o quê, HLD diz como, ADR diz por quê**. Quando o usuário trouxer uma tecnologia na entrevista, ela entra no HLD com a coluna "Decisão" preenchida: o ADR que já existe, ou `pendente de ADR` com a decisão listada no fim do documento e no relatório final. Tecnologia sem decisão registrada é a primeira coisa que o leitor de daqui a seis meses vai questionar.
 
 ## Modos
 
@@ -26,7 +26,7 @@ O HLD do sistema vive em **`docs/HLD.md`** na raiz do repositório (`git rev-par
 Antes de perguntar qualquer coisa, leia o que já existe:
 
 - **`docs/PRD.md`**, se existir. É de onde saem os RFs que a arquitetura precisa atender e os requisitos não funcionais que viram metas (disponibilidade, performance, segurança, compliance). Anote a versão para o cabeçalho. O `Responsável` é quem o usuário indicar; sem indicação, use o nome do `git config user.name` marcado `(hipótese)` ou escreva `a definir`. Se não existir, diga em uma linha que `/prd-writer` gera um, e continue: o HLD pode nascer sem PRD, mas a seção de rastreabilidade vai dizer isso em vez de fingir cobertura.
-- **`docs/ADR/index.md`**, se existir. Toda tecnologia ou padrão que já tem ADR entra no HLD com o número; o que não tem vira pendência. Não reabra uma decisão `accepted` na entrevista: cite-a.
+- **`docs/adr/index.md`**, se existir. Toda tecnologia ou padrão que já tem ADR entra no HLD com o número; o que não tem vira pendência. Não reabra uma decisão `accepted` na entrevista: cite-a.
 
 ## Modo: Entrevista
 
@@ -53,7 +53,7 @@ Regras da conversa:
 - **Quando o usuário não sabe, ofereça 2 ou 3 opções plausíveis** e marque a escolhida como `(hipótese)`. Os defaults de `references/entrevista.md` existem para isso. Nunca preencha em silêncio.
 - **Inconsistência para a entrevista.** Meta de disponibilidade que a topologia não entrega (um banco sem réplica e 99.99 por cento), componente que aparece num fluxo e não na lista, interface externa sem autenticação: aponte e peça correção antes de continuar.
 - **Não invente detalhes.** Se o usuário não deu, é lacuna ou hipótese, nunca fato.
-- **Não reabra decisão aceita.** ADR `accepted` em `docs/ADR/` é cenário dado. Se o usuário quiser mudar, isso é um ADR novo com `supersedes`, via `/adr-writer`, não uma linha do HLD.
+- **Não reabra decisão aceita.** ADR `accepted` em `docs/adr/` é cenário dado. Se o usuário quiser mudar, isso é um ADR novo com `supersedes`, via `/adr-writer`, não uma linha do HLD.
 - Perguntas simples, uma ideia por pergunta, sem travessão "—" no texto. A regra do travessão vale também para o HLD gerado.
 
 ## Modo: Direto
@@ -97,7 +97,7 @@ Três hábitos fazem quase todo o trabalho:
 
 **Hipótese é marcada, sempre, e na linha em que ocorre.** Tudo que você completou sem o usuário dizer leva `(hipótese)` no fim da linha, nessa forma literal, porque é ela que o validador conta e que o leitor procura; variantes como "(hipótese sobre o volume)" se perdem. Vale para número que você inventou (SLA, limite, retenção) e vale em dobro quando o HLD muda algo que o brief ou o PRD disse: reordenar o pipeline, trocar síncrono por assíncrono, dividir um componente. Mudança dessas é hipótese marcada no próprio texto, não só no relatório, porque quem lê o HLD daqui a um mês não vai ler o relatório. Quem lê precisa separar o que o time decidiu do que o documento sugeriu. Passou de 30 marcações, você está desenhando demais pelo usuário: corte ou pergunte. O relatório final lista todas as hipóteses, agrupadas por seção, as que mais mudam a arquitetura primeiro.
 
-**Toda tecnologia aponta para uma decisão.** A tabela de tecnologias tem a coluna "Decisão" e ela nunca fica vazia: ou é `ADR-NNNN` que existe em `docs/ADR/`, ou é `pendente de ADR` com a decisão repetida em "Decisões pendentes de ADR" com as opções em jogo e o critério de escolha. O HLD não é o lugar de argumentar por que PostgreSQL e não outro banco; é o lugar de dizer que o banco é PostgreSQL e onde está o argumento.
+**Toda tecnologia aponta para uma decisão.** A tabela de tecnologias tem a coluna "Decisão" e ela nunca fica vazia: ou é `ADR-NNNN` que existe em `docs/adr/`, ou é `pendente de ADR` com a decisão repetida em "Decisões pendentes de ADR" com as opções em jogo e o critério de escolha. O HLD não é o lugar de argumentar por que PostgreSQL e não outro banco; é o lugar de dizer que o banco é PostgreSQL e onde está o argumento.
 
 ## Finalizar
 
