@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Valida a estrutura de um HLD gerado pela skill hld-writer e, opcionalmente, exporta JSON.
+"""Valida a estrutura de um HLD gerado pela skill hld-writer.
 
-Uso: python3 validate.py docs/HLD.md [--json docs/HLD.json] [--prd docs/PRD.md]
+Uso: python3 validate.py docs/architecture/hld.md [--prd docs/product/prd.md]
 
 Checa o que é mecânico: seções obrigatórias na ordem do template, placeholders esquecidos,
 componentes da tabela presentes no diagrama (e vice-versa), tecnologias sem decisão (ADR ou
 pendência), interfaces sem protocolo ou exposição, metas sem número, riscos incompletos e RFs da
-rastreabilidade que não existem no PRD. Sai com código 1 quando há erro. Avisos não derrubam.
-
-Com --json, escreve o HLD como JSON (chaves em inglês, valores em português, sem campos vazios),
-derivado do Markdown para que os dois nunca divergam. Só biblioteca padrão.
+rastreabilidade que não existem no PRD. Cruza com o acervo de ADRs (docs/architecture/adr/*.md,
+lido pelo front-matter, não pelo index.md): ADR citado que não existe, está superseded, rejected
+ou deprecated é erro; proposed é aviso; tecnologia 'pendente de ADR' que já tem ADR aceito é
+erro; ADR aceito que o HLD não cita é aviso. Compara a versão do PRD no cabeçalho com a do PRD
+atual. Sai com código 1 quando há erro. Avisos não derrubam. Só biblioteca padrão.
 """
-import json
 import re
 import sys
 from pathlib import Path
@@ -36,6 +36,15 @@ SECURITY_SUBS = ["Autenticação", "Autorização", "Proteção de dados", "Gest
 OBS_SUBS = ["Logs", "Métricas", "Tracing", "Dashboards e alertas"]
 DATA_SUBS = ["Entidades principais", "Relações", "Fonte de verdade"]
 ADR_REF = re.compile(r"ADR[- ]?(\d{4})", re.IGNORECASE)
+# Mesmo padrão de nome e de front-matter do audit.py da adr-writer; copiado, não importado,
+# para cada skill continuar autocontida.
+ADR_FILE_RE = re.compile(r"^(\d{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
+FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
+ADR_FM_KEYS = ("status", "title", "description", "superseded_by")
+# Palavras que aparecem em quase todo título de ADR e não identificam a tecnologia.
+GENERIC_WORDS = {"plataforma", "servico", "serviço", "sistema", "banco", "ferramenta", "ferramentas", "provedor",
+                 "linguagem", "framework", "cliente", "dados", "usar", "adotar", "motor", "padrao", "padrão",
+                 "formato", "ambiente", "armazenamento", "cache", "fila", "mensageria", "streaming"}
 
 errors, warnings = [], []
 
@@ -133,6 +142,32 @@ def norm(s):
     return re.sub(r"[^\w]+", " ", s.lower()).strip()
 
 
+def load_adrs(adr_dir):
+    """Front-matter de cada ADR do acervo: {"0007": {status, title, description, superseded_by}}.
+
+    Lê os arquivos NNNN-*.md, e não o index.md, porque o índice é gerado e pode não existir ou
+    estar desatualizado. Arquivo sem front-matter entra com campos vazios: o audit.py da
+    adr-writer é quem reclama disso; aqui só precisamos saber que o número existe.
+    """
+    adrs = {}
+    if not adr_dir or not adr_dir.is_dir():
+        return adrs
+    for p in sorted(adr_dir.glob("*.md")):
+        m = ADR_FILE_RE.match(p.name)
+        if not m:
+            continue
+        data = {k: "" for k in ADR_FM_KEYS}
+        fm = FM_RE.match(p.read_text(encoding="utf-8"))
+        if fm:
+            for line in fm.group(1).splitlines():
+                key, _, value = line.partition(":")
+                key = key.strip().replace("-", "_")
+                if key in data:
+                    data[key] = value.strip().strip("\"'")
+        adrs[m.group(1)] = data
+    return adrs
+
+
 # ---------- checks ----------
 
 def check_header(text):
@@ -171,7 +206,8 @@ def check_placeholders(text):
         err("data do cabeçalho ainda é AAAA-MM-DD")
     for tag in ("ADR-NNNN", "RF-NNN"):
         if tag in body:
-            err(f"placeholder não preenchido: {tag}")
+            err(f"placeholder não preenchido: {tag} (se for prosa, como 'trocados pelos RF-NNN', "
+                "escreva 'pelos números do PRD'; o validador não distingue prosa de placeholder)")
 
 
 def check_objective(body):
@@ -398,6 +434,15 @@ def check_traceability(body, header_prd, prd_path, comp_names, interface_names):
             err(f"{rf} existe no PRD mas não aparece na rastreabilidade")
         for rf in sorted(hld_rfs - prd_rfs):
             err(f"{rf} citado na rastreabilidade não existe no PRD")
+        # O HLD foi escrito contra uma versão do PRD; quando o PRD sobe, a rastreabilidade e as
+        # metas podem ter envelhecido. Aviso, não erro: cabe a quem lê decidir se algo mudou.
+        hld_ver = re.search(r"vers[aã]o\s+(\d+\.\d+\.\d+)", header_prd, re.IGNORECASE)
+        prd_ver = re.search(r"^Versão:\s*(\d+\.\d+\.\d+)", prd, re.MULTILINE)
+        if hld_ver and prd_ver and hld_ver.group(1) != prd_ver.group(1):
+            warn(f"HLD escrito contra o PRD {hld_ver.group(1)}; PRD atual é {prd_ver.group(1)}: "
+                 "revise rastreabilidade e metas")
+        elif prd_ver and not hld_ver:
+            warn("cabeçalho 'PRD:' sem a versão do PRD (ex: 'docs/product/prd.md versão 0.1.0')")
     elif rows and not no_prd:
         warn("PRD não encontrado para cruzar os RFs (use --prd <caminho>)")
     for row in rows:
@@ -407,25 +452,77 @@ def check_traceability(body, header_prd, prd_path, comp_names, interface_names):
     return rows, nfr
 
 
-def check_adrs(body, techs_pending, adr_dir):
-    adrs = bullets_under(body, "ADRs associados")
+def check_adrs(body, techs_all, adr_dir, acervo, full_text):
+    techs_pending = [t["name"] for t in techs_all if "pendente" in t["decision"].lower()]
+    assoc = bullets_under(body, "ADRs associados")
     pending = bullets_under(body, "Decisões pendentes de ADR")
     steps = bullets_under(body, "Próximos passos")
     if not steps:
         err("ADRs e próximos passos sem 'Próximos passos' com itens")
-    if not adrs and not pending:
+    if not assoc and not pending:
         err("ADRs e próximos passos sem 'ADRs associados' nem 'Decisões pendentes de ADR'")
     pend_text = " ".join(pending).lower()
     for tech in techs_pending:
         if norm(tech) not in norm(pend_text):
             err(f"tecnologia '{tech}' está 'pendente de ADR' mas não aparece em 'Decisões pendentes de ADR'")
-    if adr_dir and adr_dir.is_dir():
-        existing = {m.group(1) for p in adr_dir.glob("*.md") for m in [re.match(r"(\d{4})-", p.name)] if m}
-        for item in adrs:
-            for num in ADR_REF.findall(item):
-                if num not in existing:
-                    err(f"ADR-{num} citado não existe em {adr_dir}")
-    return adrs, pending, steps
+    if not (adr_dir and adr_dir.is_dir()):
+        return assoc, pending, steps
+
+    # Citação vigente é o primeiro ADR da célula Decisão de cada tecnologia e o primeiro de cada
+    # item de "ADRs associados": esses precisam existir e ainda valer, e um superseded aponta
+    # para o sucessor, que é quem o HLD deve citar. Mencionar o ADR antigo em prosa ("substitui o
+    # ADR-0003") é histórico legítimo e só gera aviso, para o leitor confirmar que é só isso.
+    decisive = set()
+    for tech in techs_all:
+        found = ADR_REF.findall(tech["decision"])
+        if found:
+            decisive.add(found[0])
+    for item in assoc:
+        found = ADR_REF.findall(item)
+        if found:
+            decisive.add(found[0])
+    mentioned = set(ADR_REF.findall(full_text))
+    for num in sorted(mentioned):
+        adr = acervo.get(num)
+        if adr is None:
+            err(f"ADR-{num} citado não existe em {adr_dir}")
+            continue
+        status = adr["status"]
+        if num in decisive:
+            if status == "superseded":
+                succ = f": cite ADR-{adr['superseded_by']}" if adr["superseded_by"] else ""
+                err(f"ADR-{num} está superseded{succ}")
+            elif status in ("rejected", "deprecated"):
+                err(f"ADR-{num} está {status} e não sustenta decisão do HLD")
+            elif status == "proposed":
+                warn(f"ADR-{num} ainda está proposed: decisão em discussão; cite como 'ADR-{num} (proposed)' até ser aceito")
+        elif status in ("superseded", "rejected", "deprecated"):
+            warn(f"ADR-{num} ({status}) é mencionado no texto; confirme que é só histórico e que a decisão vigente cita o sucessor")
+    cited = mentioned
+
+    # Tecnologia pendente que o acervo já decidiu: o HLD deve citar o ADR, não reabrir a decisão.
+    accepted = {n: a for n, a in acervo.items() if a["status"] == "accepted"}
+    for tech in techs_pending:
+        t = norm(tech)
+        for num, adr in accepted.items():
+            text = norm(adr["title"] + " " + adr["description"])
+            if t and t in text:
+                err(f"tecnologia '{tech}' está 'pendente de ADR' mas ADR-{num} aceito já decide isso: '{adr['title']}'")
+                break
+            # Nome composto ("Fila (RabbitMQ)") contra título curto: um token longo em comum é só suspeita.
+            # Palavras genéricas de título ("plataforma", "serviço") não contam, senão tudo casa com tudo.
+            toks = [tok for tok in t.split() if len(tok) >= 5 and tok not in GENERIC_WORDS]
+            if any(tok in norm(adr["title"]).split() for tok in toks):
+                warn(f"tecnologia '{tech}' pendente parece coberta por ADR-{num} aceito: '{adr['title']}'")
+                break
+
+    # ADR aceito que o HLD ignora pode ser escopo de outro sistema; quem lê decide. ADR sobre o
+    # próprio processo de decisão (o 0001 "Usar ADRs...") nunca entra num HLD e não gera aviso.
+    for num in sorted(set(accepted) - cited):
+        if re.search(r"\badrs?\b", accepted[num]["title"], re.IGNORECASE):
+            continue
+        warn(f"ADR-{num} aceito ('{accepted[num]['title']}') não é citado no HLD; confirme se está fora do escopo")
+    return assoc, pending, steps
 
 
 def check_style(text):
@@ -433,118 +530,23 @@ def check_style(text):
         warn(f"{text.count('—')} travessão(ões) '—' no texto; a regra do HLD é não usar")
     hyp = len(re.findall(r"\(hipótese\)", text))
     if hyp > 30:
-        warn(f"{hyp} hipóteses; acima de 30 o documento está desenhando demais pelo usuário")
+        warn(f"{hyp} hipóteses; acima de 30 o documento está desenhando demais pelo usuário "
+             "(a mesma hipótese marcada em várias seções conta várias vezes: uma marca por decisão)")
+    variants = re.findall(r"\(hipótese[:,]? [^)]{1,60}\)", text)
+    if variants:
+        warn(f"{len(variants)} marca(s) na forma '(hipótese ...)', ex.: {variants[0]!r}; "
+             "use a forma literal '(hipótese)' no fim da linha, que é a que o validador conta")
     lines = text.count("\n")
     if lines > 600:
         warn(f"{lines} linhas; orçamento do HLD é 250 a 600")
     return hyp
 
 
-# ---------- json ----------
-
-def prune(obj):
-    """Remove campos vazios recursivamente."""
-    if isinstance(obj, dict):
-        return {k: v for k, v in ((k, prune(v)) for k, v in obj.items()) if v not in ("", None, [], {})}
-    if isinstance(obj, list):
-        return [v for v in (prune(x) for x in obj) if v not in ("", None, [], {})]
-    return obj
-
-
-def first_paragraph(body):
-    for para in re.split(r"\n\s*\n", body.strip()):
-        p = para.strip()
-        if p and not p.startswith(("-", "|", "```", "#")) and not re.match(r"^[A-ZÁÉÍÓÚÂÊÔÃÕ][^\n]{0,60}$", p):
-            return p
-    return ""
-
-
-def build_json(text, by, data):
-    meta_m = lambda f: (re.search(rf"^{f}: (.+)$", text, re.MULTILINE) or [None, ""])[1].strip()
-    deploy = bullets_under(by.get("Arquitetura geral", ""), "Ambiente de implantação")
-    deploy_kind = ""
-    if deploy:
-        low = deploy[0].lower()
-        deploy_kind = "hybrid" if "híbrid" in low or "hibrid" in low else "on-premises" if "on-prem" in low else "cloud" if "cloud" in low or "nuvem" in low else ""
-    sec = data["security"]
-    obs = data["observability"]
-    sa = data["scalability"]
-    dm = data["data_model"]
-    doc = {
-        "meta": {
-            "system": (re.search(r"^# HLD: (.+)$", text, re.MULTILINE) or [None, ""])[1].strip(),
-            "hld_owner": meta_m("Responsável"),
-            "version": meta_m("Versão"),
-            "date": meta_m("Data"),
-            "prd": meta_m("PRD"),
-        },
-        "objective": {
-            "technical_goal": first_paragraph(by.get("Objetivo técnico", "")),
-            "problems_addressed": bullets_under(by.get("Objetivo técnico", ""), "Problemas técnicos endereçados"),
-            "linked_systems": bullets_under(by.get("Objetivo técnico", ""), "Sistemas e módulos conectados"),
-        },
-        "architecture": {
-            "topology_overview": first_paragraph(by.get("Arquitetura geral", "")),
-            "component_diagram_mermaid": (mermaid_blocks(by.get("Arquitetura geral", "")) or [""])[0].strip(),
-            "deployment": deploy_kind,
-            "deployment_notes": deploy,
-            "technologies": data["techs"],
-            "patterns": bullets_under(by.get("Arquitetura geral", ""), "Padrões adotados"),
-        },
-        "components": data["components"],
-        "flows": {
-            "request_flows": data["flows"],
-            "data_flow": data["data_flow"],
-            "persistence": data["persistence"],
-        },
-        "data_model": {
-            "entities": dm.get("Entidades principais", []),
-            "relationships": dm.get("Relações", []),
-            "source_of_truth": dm.get("Fonte de verdade", []),
-            "sync_and_cache": dm.get("Sincronização e cache", []),
-            "versioning_and_retention": dm.get("Versionamento e retenção", []),
-        },
-        "interfaces": data["interfaces"],
-        "scalability_availability": {
-            "approach": sa.get("Abordagem geral", []),
-            "techniques": sa.get("Técnicas aplicadas", []),
-            "targets": sa.get("Metas", []),
-        },
-        "security": {
-            "authentication": sec.get("Autenticação", []),
-            "authorization": sec.get("Autorização", []),
-            "data_protection": sec.get("Proteção de dados", []),
-            "secrets_management": sec.get("Gestão de segredos", []),
-        },
-        "observability": {
-            "logs": obs.get("Logs", []),
-            "metrics": obs.get("Métricas", []),
-            "tracing": obs.get("Tracing", []),
-            "dashboards_alerts": obs.get("Dashboards e alertas", []),
-        },
-        "risks": data["risks"],
-        "traceability": {
-            "requirements": data["trace_rows"],
-            "non_functional": data["trace_nfr"],
-        },
-        "adrs_next_steps": {
-            "adrs": data["adrs"],
-            "pending_decisions": data["pending"],
-            "next_steps": data["steps"],
-        },
-    }
-    return prune(doc)
-
-
 # ---------- main ----------
 
 def main(argv):
     args = [a for a in argv[1:]]
-    json_out = prd_arg = None
-    if "--json" in args:
-        i = args.index("--json")
-        json_out = Path(args[i + 1]) if i + 1 < len(args) else None
-        del args[i : i + 2]
+    prd_arg = None
     if "--prd" in args:
         i = args.index("--prd")
         prd_arg = Path(args[i + 1]) if i + 1 < len(args) else None
@@ -557,9 +559,10 @@ def main(argv):
         print(f"arquivo não encontrado: {path}")
         return 2
     text = path.read_text(encoding="utf-8")
-    docs_dir = path.resolve().parent
-    prd_path = prd_arg or (docs_dir / "PRD.md")
-    adr_dir = docs_dir / "ADR"
+    # Layout padrão: docs/architecture/{hld.md, adr/} e docs/product/prd.md.
+    arch_dir = path.resolve().parent
+    prd_path = prd_arg or (arch_dir.parent / "product" / "prd.md")
+    adr_dir = arch_dir / "adr"
 
     check_header(text)
     sections = split_sections(text)
@@ -596,8 +599,10 @@ def main(argv):
     if "Rastreabilidade com o PRD" in by:
         data["trace_rows"], data["trace_nfr"] = check_traceability(
             by["Rastreabilidade com o PRD"], header_prd, prd_path, comp_names, [i["name"] for i in data["interfaces"]])
+    acervo = load_adrs(adr_dir)
     if "ADRs e próximos passos" in by:
-        data["adrs"], data["pending"], data["steps"] = check_adrs(by["ADRs e próximos passos"], pending_techs, adr_dir)
+        data["adrs"], data["pending"], data["steps"] = check_adrs(
+            by["ADRs e próximos passos"], data["techs"], adr_dir, acervo, text)
     hyp = check_style(text)
 
     for w in warnings:
@@ -605,13 +610,9 @@ def main(argv):
     for e in errors:
         print(f"erro: {e}")
     print(f"{path}: {len(data['components'])} componentes, {len(data['interfaces'])} interfaces, "
-          f"{len(data['flows'])} fluxos, {len(pending_techs)} tecnologia(s) pendente(s) de ADR, "
+          f"{len(data['flows'])} fluxos, {len(acervo)} ADR(s) no acervo, "
+          f"{len(pending_techs)} tecnologia(s) pendente(s) de ADR, "
           f"{hyp} hipóteses, {len(errors)} erro(s), {len(warnings)} aviso(s)")
-
-    if json_out is not None:
-        doc = build_json(text, by, data)
-        json_out.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        print(f"json: {json_out}")
     return 1 if errors else 0
 
 

@@ -3,7 +3,7 @@
 Versão: 0.1.0
 Data: AAAA-MM-DD
 Responsável: [responsável técnico]
-PRD: [docs/PRD.md versão X.Y.Z | não há PRD]
+PRD: [docs/product/prd.md versão X.Y.Z | não há PRD]
 
 ---
 
@@ -45,7 +45,7 @@ Tecnologias principais
 
 | Tecnologia | Papel | Decisão |
 | --- | --- | --- |
-| [tecnologia 1] | [para que serve neste sistema] | [ADR-NNNN | pendente de ADR] |
+| [tecnologia 1] | [para que serve neste sistema] | [ADR-NNNN | ADR-NNNN (proposed) | pendente de ADR] |
 | [tecnologia 2] | [papel] | [ADR-NNNN | pendente de ADR] |
 
 Padrões adotados
@@ -181,7 +181,7 @@ Dashboards e alertas
 
 ## Rastreabilidade com o PRD
 
-[sem PRD: abra com uma linha dizendo que não há PRD e que os requisitos vieram do brief, numerados como RB-NN. Com PRD: apague esta linha.]
+[sem PRD: abra com uma linha dizendo que não há PRD, que os requisitos vieram do brief numerados como RB-NN e serão trocados pelos números do PRD quando ele existir (sem escrever RF-NNN literal, que o validador lê como placeholder). Com PRD: apague esta linha.]
 
 | Requisito | Componentes | Interfaces | Fluxo |
 | --- | --- | --- | --- |

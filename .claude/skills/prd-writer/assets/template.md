@@ -55,6 +55,8 @@ Fora de escopo
 ### RF-001 [nome do requisito]
 [Uma frase: o que o sistema tem que fazer.]
 
+**Para quem:** [público do Contexto que este RF atende, e o que ganha com ele]
+
 **Fluxo principal**
 - [passo 1]
 - [passo 2]
@@ -64,26 +66,38 @@ Fora de escopo
 - [variação ou exceção 1]
 
 **Erros previstos**
-- [condição que bloqueia ou retorna erro, e o que o usuário vê]
+- [condição que bloqueia ou retorna erro, e o que o usuário vê. Bloco obrigatório só quando o RF cria, altera ou apaga dado, mexe com dinheiro ou permissão, ou é irreversível]
 
 **Prioridade:** alta
+
+**Critérios de aceitação**
+- [resultado verificável do fluxo principal]
+- [resultado verificável de uma falha ou exceção]
 
 ---
 
 ### RF-002 [nome do requisito 2]
 [descrição]
 
+**Para quem:** [público e ganho]
+
+**Depende de**
+- RF-001 (dado): [o que este RF lê ou altera e que RF-001 cria]
+- DEP-1 (fluxo): [o que precisa chegar de fora antes. Motivo: dado, fluxo ou regra. Omita o bloco se o RF não depende de nada]
+
 **Fluxo principal**
 - [passo 1]
 - [passo 2]
+- [passo 3]
 
 **Fluxos alternativos e exceções**
 - [variação ou exceção]
 
-**Erros previstos**
-- [erro previsto]
-
 **Prioridade:** media
+
+**Critérios de aceitação**
+- [critério de sucesso]
+- [critério de falha]
 
 ---
 
@@ -129,10 +143,10 @@ Acessibilidade
 
 ## Dependências
 
-### [externa|organizacional|pré-requisito]: [título]
-[Quem precisa entregar o quê, por quê e o que trava enquanto não chega.]
+### DEP-1 [externa|organizacional|pré-requisito]: [título]
+[Quem precisa entregar o quê, por quê e o que trava enquanto não chega. O RF que ela trava a cita no próprio 'Depende de'.]
 
-### [tipo]: [título 2]
+### DEP-2 [tipo]: [título 2]
 [descrição]
 
 ---
@@ -158,9 +172,13 @@ Acessibilidade
 
 ## Critérios de aceitação
 
-- [critério 1, verificável por alguém de fora do time]
-- [critério 2]
-- [critério 3]
+Critérios de cada RF ficam no próprio RF. Aqui ficam só os transversais.
+
+Integração entre requisitos
+- RF-001 → RF-002: [o dado criado em RF-001 chega correto em RF-002. Um critério por item 'dado' de 'Depende de']
+
+Transversais
+- [critério que vale para o sistema todo, derivado de meta ou requisito não funcional, verificável por alguém de fora do time]
 
 ---
 
@@ -173,30 +191,3 @@ Tipos de validação obrigatórios
 
 Estratégia de validação
 - [ex: roteiro de aceitação executado com usuários reais antes de liberar; validação exploratória interna por sprint]
-
----
-
-## Mapa de dependências e paralelismo
-
-Aresta A → B significa: B não pode ser construído ou validado sem A. Rótulo: dado, fluxo ou regra.
-
-```mermaid
-graph LR
-  RF001["RF-001 Nome curto"]
-  RF002["RF-002 Nome curto"]
-  RF003["RF-003 Nome curto"]
-  DEP1{{"DEP-1 Nome da dependência externa"}}
-  RF001 -->|dado| RF002
-  RF001 -->|regra| RF003
-  DEP1 -->|fluxo| RF003
-```
-
-| Onda | Requisitos (paralelos entre si) | Depende de |
-| --- | --- | --- |
-| 1 | RF-001 | nenhum |
-| 2 | RF-002, RF-003 | RF-001, DEP-1 |
-
-Caminho crítico: RF-001 → RF-003 (2 ondas).
-
-Dependências externas no mapa
-- DEP-1: [título da dependência na seção Dependências, e o que ela destrava]

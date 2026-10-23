@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Valida a estrutura de um PRD gerado pela skill prd-writer.
 
-Uso: python3 validate.py docs/PRD.md
+Uso: python3 validate.py docs/product/prd.md
 
 Checa o que é mecânico: seções obrigatórias na ordem do template, requisitos funcionais
-completos, placeholders esquecidos, mapa de dependências coerente (arestas para nós
-existentes, sem ciclo, ondas respeitando predecessores). Sai com código 1 quando há erro.
-Avisos não derrubam. Só biblioteca padrão.
+completos (com critérios de aceitação próprios), placeholders esquecidos, blocos 'Depende
+de' coerentes (citam RFs e DEPs existentes, motivo dado|fluxo|regra, sem ciclo, prioridade
+herdada para trás) e cada dependência 'dado' com critério de integração. Grafo, ondas e
+caminho crítico não ficam no PRD: roadmap.py os gera destes mesmos blocos. Sai com código 1
+quando há erro. Avisos não derrubam. Só biblioteca padrão. roadmap.py importa os parsers
+daqui.
 """
 import re
 import sys
@@ -24,11 +27,14 @@ REQUIRED_SECTIONS = [
     "Riscos e mitigação",
     "Critérios de aceitação",
     "Validação",
-    "Mapa de dependências e paralelismo",
 ]
+# Seção de versões antigas do template; mapa e ondas agora são do roadmap.
+OLD_MAP_SECTION = "Mapa de dependências e paralelismo"
 NFR_REQUIRED = ["Performance", "Disponibilidade"]
 PRIORITIES = {"alta", "media", "média", "baixa"}
+RANK = {"alta": 3, "media": 2, "baixa": 1}
 EDGE_LABELS = {"dado", "fluxo", "regra"}
+DEP_TYPES = {"externa", "organizacional", "pré-requisito"}
 STACK_WORDS = re.compile(
     r"\b(postgres\w*|mysql|mongodb|redis|kafka|rabbitmq|react|vue|angular|django|rails|"
     r"spring|node\.?js|typescript|python|java|golang|kotlin|docker|kubernetes|aws|azure|gcp|"
@@ -87,7 +93,10 @@ def check_sections(sections):
     order = [t for t in titles if t in REQUIRED_SECTIONS]
     if order != present:
         err("seções obrigatórias fora da ordem do template")
-    extra = [t for t in titles if t not in REQUIRED_SECTIONS]
+    if OLD_MAP_SECTION in titles:
+        err(f"'## {OLD_MAP_SECTION}' não fica mais no PRD: declare '**Depende de**' em cada RF "
+            "e rode roadmap.py, que gera grafo, ondas e caminho crítico")
+    extra = [t for t in titles if t not in REQUIRED_SECTIONS and t != OLD_MAP_SECTION]
     for t in extra:
         warn(f"seção fora do template: '## {t}'")
 
@@ -116,9 +125,62 @@ def check_goals(body):
             warn(f"meta sem número: '{cells[2][:50]}'")
 
 
+def rf_blocks(body):
+    """Retorna lista (id, nome, bloco) dos '### RF-NNN Nome' da seção de requisitos."""
+    out = []
+    for b in re.split(r"^### ", body, flags=re.MULTILINE)[1:]:
+        m = re.match(r"(RF-\d{3})\s+(.+)", b.splitlines()[0].strip())
+        out.append((m.group(1), m.group(2).strip(), b) if m else (None, b.splitlines()[0].strip(), b))
+    return out
+
+
+def bullets_after(block, title):
+    """Itens '- ...' logo abaixo de '**title**'; None se o bloco não existe."""
+    m = re.search(rf"^\*\*{re.escape(title)}\*\*\n((?:- .*\n?)*)", block, re.MULTILINE)
+    if not m:
+        return None
+    return [l[2:].strip() for l in m.group(1).strip().splitlines() if l.startswith("- ")]
+
+
+DEPENDS_ITEM = re.compile(r"((?:RF|DEP)-?\d+)\s*\((\w+)\)\s*:\s*(\S.*)")
+
+
+def parse_depends(block):
+    """Itens de '**Depende de**': lista (origem, motivo, o quê); None se o bloco não existe.
+
+    Item fora do padrão '- RF-NNN (dado|fluxo|regra): o quê' volta como (None, None, item).
+    """
+    items = bullets_after(block, "Depende de")
+    if items is None:
+        return None
+    out = []
+    for item in items:
+        m = DEPENDS_ITEM.match(item)
+        out.append((norm_id(m.group(1)), m.group(2).lower(), m.group(3)) if m else (None, None, item))
+    return out
+
+
+def parse_dep_headings(body):
+    """Cabeçalhos '### DEP-N tipo: título' da seção Dependências: lista (id, tipo, título, cabeçalho)."""
+    out = []
+    for b in re.split(r"^### ", body, flags=re.MULTILINE)[1:]:
+        head = b.splitlines()[0].strip()
+        m = re.match(r"(DEP-?\d+)\s+([\wé-]+):\s*(\S.*)", head)
+        out.append((norm_id(m.group(1)), m.group(2).lower(), m.group(3).strip(), head) if m else (None, None, None, head))
+    return out
+
+
+def parse_priority(block):
+    pm = re.search(r"\*\*Prioridade:\*\*\s*(\S+)", block)
+    if not pm:
+        return None
+    p = pm.group(1).lower().strip("*")
+    return "media" if p == "média" else p
+
+
 def check_rfs(body):
     blocks = re.split(r"^### ", body, flags=re.MULTILINE)[1:]
-    ids, prios = [], {}
+    ids, prios, edges = [], {}, []
     if not blocks:
         err("nenhum requisito funcional (### RF-NNN Nome)")
     for b in blocks:
@@ -134,6 +196,28 @@ def check_rfs(body):
         desc = [l for l in b.splitlines()[1:] if l.strip() and not l.startswith("**")]
         if not desc or desc[0].startswith("-"):
             err(f"{rid} sem descrição em uma frase antes do fluxo")
+        if not re.search(r"^\*\*Para quem:\*\* \S", b, re.MULTILINE):
+            err(f"{rid} sem '**Para quem:** <público e ganho>'")
+        if bullets_after(b, "Usa de") is not None:
+            err(f"{rid} usa '**Usa de**', de versão antiga; troque por '**Depende de**' com '- RF-NNN (dado): o quê'")
+        deps = parse_depends(b)
+        if deps is not None:
+            if not deps:
+                err(f"{rid} tem '**Depende de**' vazio; remova o bloco ou liste '- RF-NNN (dado|fluxo|regra): o quê'")
+            for src, lbl, what in deps:
+                if src is None:
+                    err(f"{rid} 'Depende de' fora do padrão '- RF-NNN (dado|fluxo|regra): o quê': '{what[:50]}'")
+                elif lbl not in EDGE_LABELS:
+                    err(f"{rid} depende de {src} com motivo '{lbl}'; use dado, fluxo ou regra")
+                else:
+                    edges.append((src, lbl, rid))
+        crit = bullets_after(b, "Critérios de aceitação")
+        if crit is None:
+            err(f"{rid} sem '**Critérios de aceitação**' com itens")
+        elif len(crit) < 2:
+            err(f"{rid} com {len(crit)} critério(s) de aceitação; mínimo 2 (sucesso e falha)")
+        elif len(crit) > 5:
+            warn(f"{rid} com {len(crit)} critérios de aceitação (orçamento: 2 a 5)")
         fm = re.search(r"\*\*Fluxo principal\*\*\n((?:- .*\n?)+)", b)
         if not fm:
             err(f"{rid} sem '**Fluxo principal**' com passos")
@@ -141,23 +225,23 @@ def check_rfs(body):
             n = len(fm.group(1).strip().splitlines())
             if n < 3 or n > 8:
                 warn(f"{rid} fluxo principal com {n} passos (orçamento: 3 a 8)")
-        for sec in ("Fluxos alternativos e exceções", "Erros previstos"):
-            if f"**{sec}**" not in b:
-                err(f"{rid} sem '**{sec}**'")
-        pm = re.search(r"\*\*Prioridade:\*\*\s*(\S+)", b)
-        if not pm:
+        if "**Fluxos alternativos e exceções**" not in b:
+            err(f"{rid} sem '**Fluxos alternativos e exceções**'")
+        # Erros previstos é condicional (só RF que mexe em dado, dinheiro, permissão ou é
+        # irreversível); o critério é de julgamento, então o validador não cobra.
+        p = parse_priority(b)
+        if p is None:
             err(f"{rid} sem '**Prioridade:** alta|media|baixa'")
+        elif p not in PRIORITIES:
+            err(f"{rid} prioridade inválida '{p}'")
         else:
-            p = pm.group(1).lower().strip("*")
-            if p not in PRIORITIES:
-                err(f"{rid} prioridade inválida '{p}'")
-            prios[rid] = "media" if p == "média" else p
+            prios[rid] = p
     if len(ids) > 15:
         warn(f"{len(ids)} RFs; acima de 15 costuma ser mais de uma entrega")
     seq = [int(i[3:]) for i in ids]
     if seq != sorted(seq):
         warn("RFs fora de ordem numérica")
-    return ids, prios
+    return ids, prios, edges
 
 
 def check_nfr(body):
@@ -191,42 +275,40 @@ def check_decisions(body):
                 err(f"decisão '{name}' sem '**{field}:**'")
 
 
-def check_map(body, rf_ids, prios):
-    m = re.search(r"```mermaid\n(.*?)```", body, re.DOTALL)
-    if not m:
-        err("mapa sem bloco ```mermaid")
-        return
-    mer = m.group(1)
-    if not re.search(r"^\s*(graph|flowchart)\s+(LR|TD|TB|RL|BT)", mer, re.MULTILINE):
-        err("bloco mermaid deve começar com 'graph LR' (ou flowchart)")
-    nodes, edges = set(), []
-    for line in mer.splitlines():
-        line = line.strip()
-        if not line or line.startswith(("graph", "flowchart", "%%")):
+def check_dependencies(body):
+    """Cabeçalhos da seção Dependências com id; devolve os DEP-N declarados."""
+    ids = []
+    for did, typ, _, head in parse_dep_headings(body):
+        if did is None:
+            err(f"dependência fora do padrão '### DEP-N tipo: título': '{head[:50]}'")
             continue
-        em = re.match(r"([A-Za-z]+-?\d+)\s*--+>\s*(?:\|([^|]*)\|\s*)?([A-Za-z]+-?\d+)", line)
-        if em:
-            a, lbl, b = norm_id(em.group(1)), (em.group(2) or "").strip().lower(), norm_id(em.group(3))
-            edges.append((a, b))
-            nodes.update([a, b])
-            if lbl not in EDGE_LABELS:
-                err(f"aresta {a} → {b} sem rótulo dado|fluxo|regra (tem '{lbl}')")
-            continue
-        nm = re.match(r"([A-Za-z]+-?\d+)\s*[\[\{\(]", line)
-        if nm:
-            nodes.add(norm_id(nm.group(1)))
-    rf_set = set(rf_ids)
-    for n in nodes:
-        if n.startswith("RF-") and n not in rf_set:
-            err(f"mapa cita {n}, que não existe nos requisitos funcionais")
-    for rid in rf_ids:
-        if rid not in nodes:
-            err(f"{rid} não aparece no mapa de dependências")
-    if len(edges) != len(set(edges)):
-        err("aresta duplicada no mapa")
+        if typ not in DEP_TYPES:
+            err(f"{did} com tipo '{typ}'; use externa, organizacional ou pré-requisito")
+        if did in ids:
+            err(f"{did} duplicado em Dependências")
+        ids.append(did)
+    return ids
+
+
+def check_graph(rf_ids, prios, edges, dep_ids):
+    """Coerência das arestas declaradas nos blocos 'Depende de'."""
+    rf_set, dep_set = set(rf_ids), set(dep_ids)
+    for a, _, b in edges:
+        if a == b:
+            err(f"{b} depende de si mesmo")
+        elif a.startswith("RF-") and a not in rf_set:
+            err(f"{b} depende de {a}, que não existe nos requisitos funcionais")
+        elif a.startswith("DEP-") and a not in dep_set:
+            err(f"{b} depende de {a}, que não está em Dependências como '### {a} tipo: título'")
+    pairs = [(a, b) for a, _, b in edges]
+    for p in sorted({p for p in pairs if pairs.count(p) > 1}):
+        err(f"{p[1]} cita {p[0]} mais de uma vez em 'Depende de'; um item por origem")
+    used_deps = {a for a, _, _ in edges if a.startswith("DEP-")}
+    for d in sorted(dep_set - used_deps):
+        warn(f"{d} não trava nenhum RF; se trava, cite-o no 'Depende de' do RF")
     # ciclos e arestas transitivas
     succ = {}
-    for a, b in edges:
+    for a, b in pairs:
         succ.setdefault(a, set()).add(b)
 
     def reach(start):
@@ -239,48 +321,35 @@ def check_map(body, rf_ids, prios):
                     stack.append(y)
         return seen
 
-    for n in nodes:
+    for n in sorted(succ):
         if n in reach(n):
-            err(f"ciclo no mapa envolvendo {n}")
+            err(f"ciclo nas dependências envolvendo {n}: os RFs são um só ou um deles precisa ser dividido")
             break
-    for a, b in edges:
+    for a, b in sorted(set(pairs)):
         others = succ[a] - {b}
         if any(b in reach(o) for o in others):
-            warn(f"aresta transitiva {a} → {b} (já alcançável por outro caminho)")
+            warn(f"{b} depende de {a} diretamente e também por outro caminho; deixe só a dependência direta")
     # prioridade herda para trás
-    for a, b in edges:
+    for a, b in sorted(set(pairs)):
         pa, pb = prios.get(a), prios.get(b)
-        rank = {"alta": 3, "media": 2, "baixa": 1}
-        if pa and pb and rank[pa] < rank[pb]:
+        if pa and pb and RANK[pa] < RANK[pb]:
             err(f"{b} ({pb}) depende de {a} ({pa}): a prioridade de {a} precisa subir")
-    # ondas
-    rows = [l for l in body.splitlines() if l.startswith("|")]
-    waves = {}
-    for r in rows:
-        cells = [c.strip() for c in r.strip().strip("|").split("|")]
-        if len(cells) >= 2 and re.fullmatch(r"\d+", cells[0]):
-            for rid in re.findall(r"RF-\d{3}", cells[1]):
-                if rid in waves:
-                    err(f"{rid} aparece em mais de uma onda")
-                waves[rid] = int(cells[0])
-    if not waves:
-        err("tabela de ondas ausente ou sem linhas numeradas")
-        return
+    # nós atípicos: questionar, não proibir
     for rid in rf_ids:
-        if rid not in waves:
-            err(f"{rid} não está em nenhuma onda")
-    for a, b in edges:
-        if a in waves and b in waves and waves[a] >= waves[b]:
-            err(f"{b} está na onda {waves[b]} mas depende de {a} na onda {waves[a]}")
-    pred = {}
-    for a, b in edges:
-        pred.setdefault(b, set()).add(a)
-    for rid, w in waves.items():
-        rf_pred = {p for p in pred.get(rid, ()) if p.startswith("RF-")}
-        if not rf_pred and w != 1 and not any(p.startswith("DEP-") for p in pred.get(rid, ())):
-            warn(f"{rid} não tem predecessor mas está na onda {w}")
-    if "Caminho crítico:" not in body:
-        err("mapa sem linha 'Caminho crítico: ...'")
+        ins = {a for a, b in pairs if b == rid}
+        outs = {b for a, b in pairs if a == rid}
+        if not ins and not outs and len(rf_ids) > 1:
+            warn(f"{rid} sem dependência nenhuma; confirme que não lê nem alimenta nenhum outro RF")
+        if len(ins) >= 4:
+            warn(f"{rid} com {len(ins)} dependências; confira se todas são dado, fluxo ou regra de verdade")
+
+
+def check_integration(body, edges):
+    """Cada dependência 'dado' precisa de um critério transversal citando os dois lados."""
+    lines = [l for l in body.splitlines() if l.startswith("- ")]
+    for a, lbl, b in edges:
+        if lbl == "dado" and not any(a in l and b in l for l in lines):
+            err(f"critérios de aceitação sem item de integração citando {a} e {b}")
 
 
 def check_style(text):
@@ -288,10 +357,15 @@ def check_style(text):
         warn(f"{text.count('—')} travessão(ões) '—' no texto; a regra do PRD é não usar")
     hyp = len(re.findall(r"\(hipótese\)", text))
     if hyp > 30:
-        warn(f"{hyp} hipóteses; acima de 30 o documento está decidindo demais pelo usuário")
+        warn(f"{hyp} hipóteses; acima de 30 o documento está decidindo demais pelo usuário "
+             "(a mesma hipótese marcada em vários RFs conta várias vezes: uma marca por decisão)")
+    variants = re.findall(r"\(hipótese[:,]? [^)]{1,60}\)", text)
+    if variants:
+        warn(f"{len(variants)} marca(s) na forma '(hipótese ...)', ex.: {variants[0]!r}; "
+             "use a forma literal '(hipótese)' no fim da linha, que é a que o validador conta")
     lines = text.count("\n")
-    if lines > 500:
-        warn(f"{lines} linhas; orçamento do PRD é 250 a 500")
+    if lines > 1000:
+        warn(f"{lines} linhas; orçamento do PRD é 250 a 1000")
     body_no_code = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
     for m in STACK_WORDS.finditer(body_no_code):
         warn(f"termo de stack no PRD: '{m.group(0)}' (vai para ADR, salvo integração obrigatória)")
@@ -312,19 +386,22 @@ def main():
     check_sections(sections)
     check_placeholders(text)
     by_title = dict(sections)
-    rf_ids, prios = [], {}
+    rf_ids, prios, edges, dep_ids = [], {}, [], []
     if "Objetivos e métricas" in by_title:
         check_goals(by_title["Objetivos e métricas"])
     if "Requisitos funcionais" in by_title:
-        rf_ids, prios = check_rfs(by_title["Requisitos funcionais"])
+        rf_ids, prios, edges = check_rfs(by_title["Requisitos funcionais"])
     if "Requisitos não funcionais" in by_title:
         check_nfr(by_title["Requisitos não funcionais"])
+    if "Dependências" in by_title:
+        dep_ids = check_dependencies(by_title["Dependências"])
+    check_graph(rf_ids, prios, edges, dep_ids)
     if "Decisões de produto e trade-offs" in by_title:
         check_decisions(by_title["Decisões de produto e trade-offs"])
     if "Riscos e mitigação" in by_title:
         check_risks(by_title["Riscos e mitigação"])
-    if "Mapa de dependências e paralelismo" in by_title:
-        check_map(by_title["Mapa de dependências e paralelismo"], rf_ids, prios)
+    if "Critérios de aceitação" in by_title:
+        check_integration(by_title["Critérios de aceitação"], edges)
     hyp = check_style(text)
 
     for w in warnings:

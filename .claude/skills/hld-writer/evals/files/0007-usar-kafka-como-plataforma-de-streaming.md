@@ -1,7 +1,6 @@
 ---
 status: accepted
 date: 2026-10-10
-layer: stack
 title: "Usar Kafka como plataforma de streaming"
 description: "Por que Kafka em vez de fila tradicional, em uma frase: retenção e reprocessamento por partição."
 supersedes:
@@ -16,9 +15,9 @@ A telemetria chega em volume alto e contínuo e precisa ser consumida por mais d
 
 ## Opções consideradas
 
-- **Kafka** — log particionado com retenção configurável
-- **RabbitMQ** — fila com roteamento, sem retenção para reprocessar
-- **Serviço gerenciado de streaming do provedor** — menos operação, maior acoplamento
+- **Kafka**: log particionado com retenção configurável
+- **RabbitMQ**: fila com roteamento, sem retenção para reprocessar
+- **Serviço gerenciado de streaming do provedor**: menos operação, maior acoplamento
 
 ## Decisão
 
