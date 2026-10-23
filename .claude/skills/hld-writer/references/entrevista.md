@@ -2,9 +2,15 @@
 
 Perguntas por etapa, alternativas para oferecer, defaults e checagens antes de gerar. Use como base; adapte ao vocabulário do usuário. Uma ideia por pergunta. Em cada etapa, feche com resumo de 3 a 6 linhas e confirmação.
 
+Conteúdo
+- Antes da etapa 1: o que ler do PRD e dos ADRs
+- Etapas 1 a 11, uma por seção do template
+- Rastreabilidade, derivada depois da etapa 11
+- Antes de gerar: checagem de consistência
+
 As perguntas abaixo são o assunto, não o formato. Toda pergunta sai como em "Como perguntar" no `SKILL.md`: 2 a 4 alternativas concretas com o que cada uma implica, a recomendada primeiro com o porquê, e o contexto dentro da própria pergunta. As alternativas e os defaults de cada etapa são a matéria-prima dessas opções; o default é a recomendação quando nada no que o usuário disse aponta para outra, nunca a resposta já escolhida. Default só vira `(hipótese)` quando o usuário não decidiu (respondeu "não sei" e aceitou seguir, ou modo Direto).
 
-Antes da etapa 1, leia `docs/product/prd.md` e `docs/architecture/adr/index.md` se existirem. Metade das perguntas abaixo já tem resposta lá: use isso como alternativa recomendada em vez de perguntar do zero, citando a origem na própria pergunta ("Que disponibilidade a API externa precisa entregar? 99.9 por cento mensal, como pede o PRD (Recomendado) / 99.5 por cento, mais barato, exige rever o PRD / ..."). ADR `accepted` não vira pergunta: é cenário dado, e só se cita.
+Antes da etapa 1, leia `docs/product/prd.md` e o front-matter dos ADRs em `docs/architecture/adr/*.md` se existirem (não o `index.md`, que é gerado e pode faltar). Metade das perguntas abaixo já tem resposta lá: use isso como alternativa recomendada em vez de perguntar do zero, citando a origem na própria pergunta ("Que disponibilidade a API externa precisa entregar? 99.9 por cento mensal, como pede o PRD (Recomendado) / 99.5 por cento, mais barato, exige rever o PRD / ..."). ADR `accepted` não vira pergunta: é cenário dado, e só se cita. ADR `proposed` vira pergunta com o que ele propõe como alternativa recomendada ("O ADR-0009 propõe Redis para cache; segue com ele (Recomendado) / espera a decisão e deixa cache como pendente / ..."). ADR `superseded` só entra pelo sucessor; `rejected` e `deprecated` não entram.
 
 ## Etapa 1: contexto e objetivo técnico
 
@@ -21,7 +27,7 @@ Alternativas para os sistemas conectados (seleção múltipla): identidade e ace
 Perguntas
 - Como o sistema se divide em alto nível: um serviço só, poucos serviços, muitos microsserviços, pipeline de dados, agentes?
 - Onde roda: cloud (qual), on-premises, híbrido? Há restrição de dados que obriga um lugar?
-- Quais tecnologias já estão decididas (linguagem, banco, mensageria, framework)? Para cada uma: há ADR em `docs/architecture/adr/`? Se não, vira "pendente de ADR".
+- Quais tecnologias já estão decididas (linguagem, banco, mensageria, framework)? Para cada uma: há ADR em `docs/architecture/adr/`? Com ADR `accepted`, entra com o número e não se pergunta. Com ADR `proposed`, entra como `ADR-NNNN (proposed)`. Sem ADR, vira "pendente de ADR". Tecnologia que o usuário cita e que contradiz um ADR aceito não entra no HLD: diga que isso pede ADR novo com `supersedes`, via `/adr-writer`.
 - Que padrões arquiteturais fazem sentido aqui e por quê: camadas, hexagonal, event-driven, CQRS, REST, gRPC, BFF, saga?
 
 Alternativas de topologia, recomendando pela escala e pelo time que o usuário descreveu:
@@ -112,8 +118,8 @@ Ofereça como seleção múltipla os riscos típicos do que foi coletado, recome
 
 ## Etapa 11: ADRs e próximos passos
 
-- Quais ADRs já cobrem decisões deste HLD? Liste por número e título a partir de `docs/architecture/adr/index.md`.
-- Que decisões ficaram pendentes (toda tecnologia marcada "pendente de ADR" na etapa 2 entra aqui)? Para cada uma: opções em jogo e critério de escolha. As opções são as que o usuário viu na pergunta; o critério, ofereça como alternativas.
+- Quais ADRs já cobrem decisões deste HLD? Liste por número e título a partir do inventário lido em `docs/architecture/adr/`, só os `accepted` (e os `proposed`, marcados). ADR aceito que não entrou em nenhuma linha do HLD vira pergunta: ele se aplica a este sistema (cite onde) ou está fora do escopo (diga no relatório)? O validador avisa quando um aceito fica sem citação.
+- Que decisões ficaram pendentes (toda tecnologia marcada "pendente de ADR" na etapa 2 entra aqui, e ADR `proposed` entra como "em discussão")? Para cada uma: opções em jogo e critério de escolha. As opções são as que o usuário viu na pergunta; o critério, ofereça como alternativas. Essa lista é o que o `/adr-writer` lê depois para escrever os ADRs.
 - Quais são os próximos passos técnicos até a implementação: prova de conceito, ADRs a escrever, detalhamento de componente, contrato de interface a publicar?
 
 ## Rastreabilidade
@@ -126,7 +132,8 @@ Confirme cada item; o que falhar volta para a etapa correspondente.
 
 - Objetivo técnico fala de como, não de por quê; cita RFs em vez de recontar regra de negócio.
 - A arquitetura geral sustenta os requisitos não funcionais do PRD (ou os declarados na etapa 7).
-- Toda tecnologia da tabela tem ADR associado ou está em "Decisões pendentes de ADR".
+- Toda tecnologia da tabela tem ADR associado ou está em "Decisões pendentes de ADR". Nenhum ADR citado está superseded, rejected ou deprecated; nenhuma tecnologia pendente tem ADR aceito no acervo.
+- A versão do PRD no cabeçalho é a versão atual do `docs/product/prd.md`.
 - Todo componente da tabela aparece no diagrama, e vice-versa.
 - Todo componente tem responsabilidades e dependências explícitas.
 - Cada fluxo vai do gatilho ao efeito observável em 3 a 8 passos e só cita componentes da tabela.

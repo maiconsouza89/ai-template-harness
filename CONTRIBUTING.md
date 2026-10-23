@@ -12,7 +12,7 @@ Como trabalhar neste repositório: ambiente, verificações, fluxo, commits e re
 | shellcheck | opcional | lint dos scripts em `make check-shell`; sem ele, só a sintaxe é validada |
 | actionlint | opcional | valida os workflows em `make check-actions`; sem ele, pula com aviso |
 | gitleaks | opcional | procura segredos em `make check-secrets`; sem ele, pula com aviso |
-| python3 | opcional | auditoria dos ADRs em `make check-adr`; sem ele, pula com aviso |
+| python3 | opcional | validação de ADRs, PRD e HLD em `make check-adr`, `check-prd` e `check-hld`; sem ele, pulam com aviso |
 
 As ferramentas opcionais são obrigatórias na CI (`CI=true make check` reproduz isso localmente).
 No Windows, use WSL ou Git Bash (ambos trazem `sh`; `make` vem via WSL, Chocolatey ou Scoop).
@@ -135,3 +135,8 @@ infraestrutura, contrato técnico) vira um ADR em `docs/architecture/adr/`, cria
 `/adr-writer`, que também monta a pasta e suas regras na primeira vez. Regra de negócio não é ADR;
 vai para o `docs/product/prd.md`. Depois de criar ou mudar um ADR, rode `make check-adr` e inclua
 o `index.md` regenerado no commit.
+
+PRD e HLD seguem a mesma regra: `make check-prd` valida o `docs/product/prd.md` e falha se o
+`docs/product/roadmap.md` regenerado diferir do versionado; `make check-hld` valida o
+`docs/architecture/hld.md` contra o PRD e os ADRs (RF que não existe, ADR superseded citado,
+tecnologia pendente que já tem ADR aceito). Os três rodam em `make check`.

@@ -45,7 +45,7 @@ Tecnologias principais
 
 | Tecnologia | Papel | Decisão |
 | --- | --- | --- |
-| [tecnologia 1] | [para que serve neste sistema] | [ADR-NNNN | pendente de ADR] |
+| [tecnologia 1] | [para que serve neste sistema] | [ADR-NNNN | ADR-NNNN (proposed) | pendente de ADR] |
 | [tecnologia 2] | [papel] | [ADR-NNNN | pendente de ADR] |
 
 Padrões adotados

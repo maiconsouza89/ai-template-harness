@@ -15,9 +15,9 @@ superseded-by:
 
 ## Opções consideradas
 
-- **Opção A** — <o que é, em uma linha>
-- **Opção B** — <o que é, em uma linha>
-- **Opção C** — <o que é, em uma linha>
+- **Opção A**: <o que é, em uma linha>
+- **Opção B**: <o que é, em uma linha>
+- **Opção C**: <o que é, em uma linha>
 
 ## Decisão
 
@@ -31,8 +31,8 @@ Escolhida a **Opção A**, porque <o que fez ela ganhar das outras>.
 ## Referências
 
 <Seção opcional: apague-a se a decisão não se apoiou em nenhum fato externo.
-Se ficar, comece pela data — fato externo envelhece.>
+Se ficar, comece pela data, porque fato externo envelhece.>
 
 Consultado em AAAA-MM-DD.
 
-- [<título da fonte>](<url>) — <o que ela sustenta nesta decisão, em uma linha>
+- [<título da fonte>](<url>): <o que ela sustenta nesta decisão, em uma linha>

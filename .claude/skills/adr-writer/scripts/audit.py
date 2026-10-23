@@ -95,7 +95,7 @@ def render_index(adrs):
     """Índice em ordem numérica, derivado só do front-matter.
 
     Gerado em vez de mantido à mão porque um índice manual descola do acervo no
-    primeiro ADR que alguém esquece de listar — e um índice que mente é pior que
+    primeiro ADR que alguém esquece de listar, e um índice que mente é pior que
     índice nenhum, já que ninguém confere.
     """
     lines = ["# ADRs", "", INDEX_MARKER, "", "| # | decisão | status | data |", "|---|---|---|---|"]
@@ -149,7 +149,7 @@ def main():
 
         status = fm.get("status", "")
         if status not in STATUSES:
-            err(name, f"status `{status}` inválido — use um de: {', '.join(sorted(STATUSES))}")
+            err(name, f"status `{status}` inválido; use um de: {', '.join(sorted(STATUSES))}")
 
         date = fm.get("date", "")
         if date and not DATE_RE.match(date):
@@ -171,7 +171,7 @@ def main():
         by_number.setdefault(number, []).append(name)
         adrs[number] = {"name": name, "fm": fm, "status": status, "text": text, "h1_title": h1_title}
 
-        # Orçamento de tamanho — aviso, não erro: o limite é de leitura, não de sintaxe.
+        # Orçamento de tamanho: aviso, não erro: o limite é de leitura, não de sintaxe.
         # As seções são localizadas por nome, nunca por posição: o template pode
         # ganhar seções novas (Referências) sem que o orçamento passe a medir a errada.
         ctx_h = CONTEXT if CONTEXT in sections else sections[0]
@@ -181,7 +181,7 @@ def main():
         ctx = section_body(text, ctx_h, sections)
         n_sentences = len([s for s in re.split(r"[.!?]\s", ctx.strip()) if s.strip()])
         if n_sentences > 5:
-            warn(name, f"Contexto com ~{n_sentences} frases (orçamento: 5) — decisões embaralhadas?")
+            warn(name, f"Contexto com ~{n_sentences} frases (orçamento: 5); decisões embaralhadas?")
         for heading, limit, label in ((opt_h, 4, "opções"), (con_h, 5, "consequências")):
             bullets = len(re.findall(r"^\s*[-*]\s+\S", section_body(text, heading, sections), re.MULTILINE))
             if bullets > limit:
@@ -192,16 +192,22 @@ def main():
             refs = section_body(text, REFERENCES, sections)
             bullets = re.findall(r"^\s*[-*]\s+\S.*$", refs, re.MULTILINE)
             if not bullets:
-                err(name, "seção `## Referências` sem nenhuma fonte — cite as fontes ou apague a seção")
+                err(name, "seção `## Referências` sem nenhuma fonte; cite as fontes ou apague a seção")
             for b in bullets:
                 if not URL_RE.search(b):
                     err(name, f"referência sem URL: {b.strip()[:60]}")
             if not CONSULTED_RE.search(refs):
-                warn(name, "`## Referências` sem `Consultado em AAAA-MM-DD` — fato externo envelhece")
+                warn(name, "`## Referências` sem `Consultado em AAAA-MM-DD`: fato externo envelhece")
+
+        # Travessão: a regra das três skills de documentação (PRD, HLD, ADR) é não usar.
+        # Aviso, não erro: registros antigos não quebram por estilo.
+        n_dash = text.count("—")
+        if n_dash:
+            warn(name, f"{n_dash} travessão(ões) '—' no texto; use dois-pontos, vírgula ou ponto")
 
     for number, names in sorted(by_number.items()):
         if len(names) > 1:
-            err(", ".join(names), f"número {number} duplicado — números nunca se repetem")
+            err(", ".join(names), f"número {number} duplicado; números nunca se repetem")
 
     # Cadeias de supersede: os dois lados ou nenhum.
     for number, adr in sorted(adrs.items()):
@@ -210,7 +216,7 @@ def main():
         sups = fm.get("supersedes", "")
 
         if status == "superseded" and not sup_by:
-            err(name, "status `superseded` sem `superseded-by` — a cadeia fica sem saída")
+            err(name, "status `superseded` sem `superseded-by`; a cadeia fica sem saída")
         if sup_by and status != "superseded":
             err(name, f"tem `superseded-by: {sup_by}` mas status é `{status}`, deveria ser `superseded`")
         if sup_by:
@@ -249,9 +255,9 @@ def main():
         else:
             print("index.md já estava atualizado\n")
     elif current is None:
-        warn(INDEX_NAME, "não existe — rode `audit.py <dir> --index`")
+        warn(INDEX_NAME, "não existe; rode `audit.py <dir> --index`")
     elif current != expected:
-        warn(INDEX_NAME, "desatualizado em relação ao front-matter — rode `audit.py <dir> --index`")
+        warn(INDEX_NAME, "desatualizado em relação ao front-matter; rode `audit.py <dir> --index`")
 
     print(f"{len(files)} ADR(s) em {adr_dir}\n")
     for label, items in (("ERROS", errors), ("AVISOS", warnings)):

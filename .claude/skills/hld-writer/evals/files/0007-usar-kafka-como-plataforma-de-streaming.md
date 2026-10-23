@@ -15,9 +15,9 @@ A telemetria chega em volume alto e contínuo e precisa ser consumida por mais d
 
 ## Opções consideradas
 
-- **Kafka** — log particionado com retenção configurável
-- **RabbitMQ** — fila com roteamento, sem retenção para reprocessar
-- **Serviço gerenciado de streaming do provedor** — menos operação, maior acoplamento
+- **Kafka**: log particionado com retenção configurável
+- **RabbitMQ**: fila com roteamento, sem retenção para reprocessar
+- **Serviço gerenciado de streaming do provedor**: menos operação, maior acoplamento
 
 ## Decisão
 

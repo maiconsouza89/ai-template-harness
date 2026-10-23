@@ -1,13 +1,15 @@
 ---
 name: adr-writer
-description: Escreve e mantém Architecture Decision Records (ADRs) em formato MADR-minimal na pasta `docs/architecture/adr/` da raiz — cria a pasta do zero, redige registros novos, move um registro pelo ciclo proposed/accepted/rejected/superseded/deprecated, e audita o acervo em busca de numeração quebrada, cadeia de supersede sem saída ou front-matter fora do formato. Cobre só decisões de arquitetura e tecnologia; regra de negócio vai para o PRD. Use esta skill sempre que o usuário pedir para registrar, escrever ou atualizar uma decisão de arquitetura ("cria um ADR pra escolha do Zod", "registra essa decisão", "documenta por que a gente escolheu X"), pedir para revisar ou consertar registros existentes ("os ADRs estão consistentes?", "audita a pasta docs/architecture/adr"), pedir para aceitar/rejeitar/supersedir/depreciar um deles, ou montar a pasta de ADRs pela primeira vez. Consulte também quando uma decisão de arquitetura cara de reverter estiver sendo tomada na conversa sem registro nenhum — a skill cobre como oferecer o ADR em uma linha sem atrapalhar o trabalho em andamento.
+description: Escreve e mantém Architecture Decision Records (ADRs) em formato MADR-minimal em `docs/architecture/adr/`. Cria a pasta do zero, redige registros novos, move um registro pelo ciclo proposed/accepted/rejected/superseded/deprecated, audita o acervo (numeração, cadeia de supersede, front-matter) e, quando `docs/architecture/hld.md` existe, lê as "Decisões pendentes de ADR" como fila de trabalho e fecha a pendência no HLD ao aceitar o ADR. Só decisões de arquitetura e tecnologia; regra de negócio vai para o PRD. Use sempre que o usuário pedir para registrar ou documentar uma decisão técnica ("cria um ADR pra escolha do Zod", "documenta por que a gente escolheu X"), revisar ou consertar registros ("os ADRs estão consistentes?"), aceitar, rejeitar, supersedir ou depreciar um deles, montar a pasta de ADRs pela primeira vez, ou quando uma decisão cara de reverter estiver sendo tomada na conversa sem registro.
 ---
 
 # ADR Writer
 
 Um ADR responde uma pergunta para quem chegar daqui a seis meses: **por que está assim, e o que mais foi tentado?**
 
-Tudo abaixo serve a isso. Registro que só diz o que foi escolhido é meio inútil — o leitor repropõe as opções descartadas, porque nada contou a ele que elas já foram pesadas e recusadas.
+Tudo abaixo serve a isso. Registro que só diz o que foi escolhido é meio inútil: o leitor repropõe as opções descartadas, porque nada contou a ele que elas já foram pesadas e recusadas.
+
+Neste repositório a divisão de trabalho é **PRD diz o quê, HLD diz como, ADR diz por quê**. O HLD (`docs/architecture/hld.md`, skill `/hld-writer`) cita cada tecnologia com o número do ADR que a sustenta ou a marca `pendente de ADR`; essas pendências são a fila natural desta skill, e fechar a pendência no HLD faz parte de aceitar um ADR.
 
 ## Modos
 
@@ -21,7 +23,7 @@ Tudo abaixo serve a isso. Registro que só diz o que foi escolhido é meio inút
 
 Os modos se compõem. Bootstrap → Novo ADR é a primeira execução normal. Rodar a auditoria antes de somar a um acervo que você não viu é barato e pega um número duplicado antes de você criar um.
 
-## Passo 0 — resolver o diretório (todos os modos)
+## Passo 0: resolver o diretório e ler o HLD (todos os modos)
 
 O acervo deste repositório é **`docs/architecture/adr/` na raiz**. Um registro arquivado em outro lugar é pior que registro nenhum: parte o acervo em dois e metade dele deixa de ser encontrada.
 
@@ -31,13 +33,15 @@ O acervo deste repositório é **`docs/architecture/adr/` na raiz**. Um registro
 
 Não há sub-pasta por status ou por ano: o diretório plano **é** o acervo, e o `index.md` gerado lista tudo em ordem numérica. Pasta por status obrigaria a mover o arquivo a cada transição, quebrando link e histórico à toa.
 
+Depois, leia **`docs/architecture/hld.md`** se existir: a tabela "Tecnologias principais" (coluna Decisão) e a lista "Decisões pendentes de ADR". É de lá que vêm as decisões que esperam registro, já com as opções em jogo e o critério de escolha que o usuário discutiu com o `/hld-writer`. Se o pedido é vago ("escreve os ADRs que faltam"), essa lista é o pedido. Sem HLD, siga só com o que a conversa traz.
+
 ---
 
 ## As regras
 
 ### Nome e numeração
 
-`NNNN-titulo-com-hifens.md` — quatro dígitos, sequencial, **nunca reutilizado**, mesmo que um ADR seja apagado. Buraco na numeração não faz mal; número repetido destrói toda referência cruzada. Próximo número = maior existente + 1.
+`NNNN-titulo-com-hifens.md`: quatro dígitos, sequencial, **nunca reutilizado**, mesmo que um ADR seja apagado. Buraco na numeração não faz mal; número repetido destrói toda referência cruzada. Próximo número = maior existente + 1.
 
 O título é a decisão em voz ativa, não o tema. Quem roda `ls` tem que ler decisões, não títulos de capítulo:
 
@@ -57,11 +61,11 @@ superseded-by:
 ---
 ```
 
-- `status` — um dos cinco abaixo, minúsculo.
-- `date` — ISO, data em que o registro chegou ao status **atual**. Atualiza a cada mudança de status.
-- `title` — só a decisão, sem prefixo numérico (o número já está no nome do arquivo e no `# NNNN.` do corpo).
-- `description` — uma frase, "por que X em vez de Y". É o que uma pessoa — ou um agente — lê ao escanear o acervo sem abrir cada arquivo; sem ela, escanear vira abrir tudo.
-- `supersedes` / `superseded-by` — número do outro ADR como string de 4 dígitos (`"0003"`), vazio quando não se aplica. As duas chaves ficam sempre no arquivo, mesmo vazias, para a cadeia continuar greppável.
+- `status`: um dos cinco abaixo, minúsculo.
+- `date`: ISO, data em que o registro chegou ao status **atual**. Atualiza a cada mudança de status.
+- `title`: só a decisão, sem prefixo numérico (o número já está no nome do arquivo e no `# NNNN.` do corpo).
+- `description`: uma frase, "por que X em vez de Y". É o que uma pessoa, ou um agente, lê ao escanear o acervo sem abrir cada arquivo; é também o que o validador do HLD usa para casar uma tecnologia pendente com um ADR que já a decidiu. Sem ela, escanear vira abrir tudo.
+- `supersedes` / `superseded-by`: número do outro ADR como string de 4 dígitos (`"0003"`), vazio quando não se aplica. As duas chaves ficam sempre no arquivo, mesmo vazias, para a cadeia continuar greppável.
 
 As chaves e os valores de `status` ficam em inglês; o conteúdo, em português. É a mesma divisão do `CLAUDE.md`: formato é código, texto é comunicação.
 
@@ -71,11 +75,11 @@ As chaves e os valores de `status` ficam em inglês; o conteúdo, em português.
 |---|---|---|
 | `proposed` | Escrito, em discussão. Único estado livremente editável. | `accepted`, `rejected` |
 | `accepted` | Vale hoje. Texto congelado. | `superseded`, `deprecated` |
-| `rejected` | Discutido e recusado. Fica no repo — o valor é o motivo registrado. | — |
-| `superseded` | Trocado por uma decisão mais nova. Exige `superseded-by`. | — |
-| `deprecated` | Não vale mais e nada substituiu (o problema deixou de existir). | — |
+| `rejected` | Discutido e recusado. Fica no repo; o valor é o motivo registrado. | nenhum |
+| `superseded` | Trocado por uma decisão mais nova. Exige `superseded-by`. | nenhum |
+| `deprecated` | Não vale mais e nada substituiu (o problema deixou de existir). | nenhum |
 
-Qualquer outra transição é erro. Sinalize e pergunte em vez de executar — um ADR `rejected` que volta à mesa é uma decisão **nova**, que o supersede, não uma edição.
+Qualquer outra transição é erro. Sinalize e pergunte em vez de executar: um ADR `rejected` que volta à mesa é uma decisão **nova**, que o supersede, não uma edição.
 
 ### Imutabilidade do `accepted`
 
@@ -90,7 +94,7 @@ Sempre os dois lados:
 - ADR novo: `supersedes: "0003"`, e o **Contexto** abre dizendo o que mudou desde o 0003.
 - ADR antigo: `status: superseded`, `superseded-by: "0011"`, `date` atualizada.
 
-Cadeia de um lado só é beco sem saída: alguém cai no 0003, acredita, e nunca encontra o 0011.
+Cadeia de um lado só é beco sem saída: alguém cai no 0003, acredita, e nunca encontra o 0011. E o HLD que citava o 0003 passa a citar o 0011 na mesma mudança (ver "Fechar a pendência no HLD").
 
 ### Quando uma decisão merece um ADR
 
@@ -98,21 +102,35 @@ Escreva quando a decisão for **cara de reverter** ou quando **alguém vai quest
 
 O acervo é só de **arquitetura e tecnologia do repositório**: stack, ferramentas, infraestrutura, integração, formato de contratos técnicos. Regra de negócio (o que o sistema faz, para quem, sob que condição) não vira ADR; ela vai para o PRD (`docs/product/prd.md`, skill `/prd-writer`); se o pedido de ADR é na verdade uma regra de produto, diga isso em uma linha e ofereça o PRD. Misturar as duas faz o acervo responder perguntas que não são dele e esconde as decisões técnicas no meio das de produto.
 
-Não escreva para decisão trivialmente reversível, para "como fazer X" (isso é `CLAUDE.md` ou README), nem para escolha que não teve alternativa real — sem deliberação, não há o que registrar. Na dúvida, pergunte. Acervo inflado deixa de ser lido, o que custa mais caro que uma entrada faltando.
+Não escreva para decisão trivialmente reversível, para "como fazer X" (isso é `CLAUDE.md` ou README), nem para escolha que não teve alternativa real: sem deliberação, não há o que registrar. Na dúvida, pergunte. Acervo inflado deixa de ser lido, o que custa mais caro que uma entrada faltando.
 
 ---
 
 ## Modo: Novo ADR
 
-1. **Grep o acervo pelo tema primeiro.** Se já está coberto, isto é um **supersede**, não um registro novo e independente — trabalho diferente, contabilidade diferente.
+1. **Grep o acervo pelo tema primeiro.** Se já está coberto, isto é um **supersede**, não um registro novo e independente: trabalho diferente, contabilidade diferente. Se o tema está em "Decisões pendentes de ADR" do HLD, as opções em jogo e o critério já estão lá: parta deles, diga que partiu, e confirme com o usuário só o que o HLD deixou em aberto.
 2. **Pegue as alternativas reais.** Se o usuário nomeou só o vencedor, pergunte o que mais estava na mesa. Nunca invente opções plausíveis: deliberação fabricada é pior que um registro honesto de opção única, porque engana exatamente o leitor futuro para quem o ADR existe. Se de fato não havia alternativa, diga isso em uma linha e reconsidere se isto é um ADR.
-3. **Colete as fontes.** Toda afirmação sobre o mundo externo — versão de framework, issue aberta, "sem manutenção há dois anos", benchmark — precisa de link em `## Referências`, com a data de consulta. Pesquise nesta ordem: `docs/` do projeto, context7, doc oficial, web; as fontes do ADR são as dessa pesquisa, citadas enquanto você escreve e não de memória depois. Nada externo em jogo → apague a seção.
+3. **Colete as fontes.** Toda afirmação sobre o mundo externo (versão de framework, issue aberta, "sem manutenção há dois anos", benchmark) precisa de link em `## Referências`, com a data de consulta. Pesquise nesta ordem: `docs/` do projeto, context7, doc oficial, web; as fontes do ADR são as dessa pesquisa, citadas enquanto você escreve e não de memória depois. Nada externo em jogo → apague a seção.
 4. **Escreva a partir do template da skill.** Leia `assets/template.md` e crie o registro direto em `docs/architecture/adr/NNNN-titulo.md`, preenchido. Não copie o template para `docs/architecture/adr/`: a cópia viraria uma segunda fonte de verdade que descola da skill, e é do `assets/template.md` que a auditoria deriva seções e chaves obrigatórias.
-5. **Status inicial:** `proposed` quando o time ainda tem que concordar; `accepted` quando a decisão já foi tomada e está valendo. Escrever o ADR depois do fato é normal — não encene uma fase `proposed` falsa para uma decisão que já entrou.
+5. **Status inicial:** `proposed` quando o time ainda tem que concordar; `accepted` quando a decisão já foi tomada e está valendo. Escrever o ADR depois do fato é normal: não encene uma fase `proposed` falsa para uma decisão que já entrou.
 6. **Regenere o índice:** `python3 <skill-dir>/scripts/audit.py docs/architecture/adr --index`.
-7. Reporte caminho e número de volta.
+7. **Feche a pendência no HLD** (seção abaixo), se o HLD existe e cita esta decisão.
+8. Reporte caminho e número de volta, e o que mudou no HLD.
 
-## Estilo de escrita — o ponto de verdade
+## Fechar a pendência no HLD
+
+Aceitar um ADR que o HLD esperava e deixar o HLD dizendo `pendente de ADR` é a forma mais comum de o ciclo ficar aberto: ninguém volta para trocar uma célula de tabela. Por isso a troca é parte do trabalho desta skill, não da `/hld-writer`.
+
+Quando `docs/architecture/hld.md` existe e a decisão aparece nele:
+
+- ADR **novo `accepted`** para uma tecnologia `pendente de ADR`: na tabela "Tecnologias principais", troque `pendente de ADR` por `ADR-NNNN`; tire o item de "Decisões pendentes de ADR"; acrescente em "ADRs associados" (`- ADR-NNNN Título: o que ele fixa neste HLD`).
+- ADR **novo `proposed`**: a célula vira `ADR-NNNN (proposed)` e o item de pendência passa a dizer "em discussão no ADR-NNNN". Quando for aceito (Mudança de status), complete a troca acima.
+- **Supersede**: toda citação de `ADR-<antigo>` no HLD (coluna Decisão, "ADRs associados", texto) passa a `ADR-<novo>`.
+- **Rejeitar ou depreciar** um ADR que o HLD cita: a linha não pode ficar apontando para decisão que não vale. Pergunte ao usuário o que entra no lugar (outra tecnologia com ADR, ou `pendente de ADR` de novo) em vez de escolher.
+
+Em todos os casos: suba a versão de patch do HLD no cabeçalho (`0.1.0` → `0.1.1`, a regra da `/hld-writer` para ajuste de texto) e a data, e rode `python3 .claude/skills/hld-writer/scripts/validate.py docs/architecture/hld.md` até sair sem erro. É o validador do HLD que confirma que nenhuma pendência ficou com ADR aceito e nenhum ADR citado está superseded. Edite só essas linhas: componente, fluxo e rastreabilidade são da `/hld-writer`, em modo Revisão.
+
+## Estilo de escrita: o ponto de verdade
 
 Um ADR é lido uma vez, rápido, por alguém sob pressão. Tamanho não é rigor; é o principal motivo de acervo de ADR ser abandonado.
 
@@ -138,24 +156,27 @@ Dois hábitos fazem quase todo o trabalho:
 > ✓ Bom: env inválida derruba o boot, então erro de configuração aparece no deploy e não em produção às 3h.
 > ✓ Ruim: cada variável nova tem que ser declarada em dois lugares (schema + `.env.example`); esquecer um passa no build.
 
-Mesma régua para as opções: uma linha dizendo o que a opção **é** e por que perdeu — não um parágrafo, não uma lista de features.
+Mesma régua para as opções: uma linha dizendo o que a opção **é** e por que perdeu. Não um parágrafo, não uma lista de features.
 
 **Cite toda fonte externa, com data.** `## Referências` é opcional como seção, mas obrigatória no instante em que o raciocínio se apoia em algo fora do repositório:
 
 > ✗ "A biblioteca X está sem manutenção."
 > ✓ "A biblioteca X está sem release há mais de dois anos" + link, sob `Consultado em 2026-09-05.`
 
-A data é o ponto. "Issue continua aberta" e "sem manutenção" eram verdade **naquele dia** — sem a data, o leitor daqui a um ano não tem como saber se a premissa ainda vale, e premissa vencida é o jeito mais comum de um ADR aceito virar mentira em silêncio. Cada bullet também diz o que aquela fonte sustenta **nesta** decisão; link solto obriga o leitor a abrir a página para descobrir por que ele está ali.
+A data é o ponto. "Issue continua aberta" e "sem manutenção" eram verdade **naquele dia**; sem a data, o leitor daqui a um ano não tem como saber se a premissa ainda vale, e premissa vencida é o jeito mais comum de um ADR aceito virar mentira em silêncio. Cada bullet também diz o que aquela fonte sustenta **nesta** decisão; link solto obriga o leitor a abrir a página para descobrir por que ele está ali.
 
-Nunca cite fonte que você não leu, e nunca vista uma lembrança de citação — link errado é pior que link nenhum, porque parece conferido.
+Nunca cite fonte que você não leu, e nunca vista uma lembrança de citação: link errado é pior que link nenhum, porque parece conferido.
+
+Sem travessão "—" no texto: a regra vale para as três skills de documentação deste repositório e para o que elas geram. Use dois-pontos, vírgula ou ponto.
 
 ## Modo: Mudança de status
 
 1. Leia o ADR e confirme que a transição é permitida pela tabela acima.
 2. Troque `status`, atualize `date`.
 3. Supersedir também significa: criar o ADR novo (modo Novo ADR), pôr `supersedes` nele, pôr `superseded-by` no antigo. Os dois, na mesma mudança.
-4. Se o pedido é "consertar" um ADR `accepted`, diga qual é a regra e ofereça o caminho do supersede — curto, uma vez, e depois faça o que o usuário decidir.
+4. Se o pedido é "consertar" um ADR `accepted`, diga qual é a regra e ofereça o caminho do supersede: curto, uma vez, e depois faça o que o usuário decidir.
 5. Regenere o índice (`--index`): status e data aparecem lá.
+6. Feche a pendência no HLD (seção acima): aceitar completa a troca, supersedir renumera a citação, rejeitar ou depreciar pergunta o que entra no lugar.
 
 ## Modo: Auditoria
 
@@ -165,21 +186,21 @@ Rode o script; ele checa tudo que é mecânico, de forma determinística:
 python3 <skill-dir>/scripts/audit.py docs/architecture/adr
 ```
 
-Ele reporta nome de arquivo fora do padrão, front-matter ausente/inválido, status desconhecido, número duplicado, divergência entre o número do arquivo e o do `# NNNN.`, seção obrigatória faltando, cadeia de supersede de um lado só, `index.md` desatualizado e — quando `## Referências` existe — bullet sem URL (erro) ou sem `Consultado em AAAA-MM-DD` (aviso). Sai com código 1 quando há erro.
+Ele reporta nome de arquivo fora do padrão, front-matter ausente/inválido, status desconhecido, número duplicado, divergência entre o número do arquivo e o do `# NNNN.`, seção obrigatória faltando, cadeia de supersede de um lado só, `index.md` desatualizado, travessão no texto e, quando `## Referências` existe, bullet sem URL (erro) ou sem `Consultado em AAAA-MM-DD` (aviso). Sai com código 1 quando há erro. No repositório, `make check-adr` roda o mesmo e falha se o índice versionado estiver desatualizado.
 
 As seções e chaves obrigatórias saem de `assets/template.md` desta skill, não de uma cópia no acervo: mudar o formato é mudar um arquivo só. Sem o template, o script cai no conjunto padrão.
 
 Seções em `OPTIONAL_SECTIONS` (hoje `## Referências`) só são checadas quando presentes, então acrescentar uma seção ao template não quebra retroativamente todo registro existente.
 
-Depois leia o que o script não alcança: registros que descolaram da realidade (um ADR `accepted` descrevendo algo que o código não faz mais) e registros acima do orçamento de tamanho. Reporte agrupado em **erros** (quebram as regras) e **suspeitas** (precisam de decisão humana). Corrija os erros sob pedido; nunca reescreva o corpo de um `accepted` para "consertar" o descolamento — isso é supersede.
+Depois leia o que o script não alcança: registros que descolaram da realidade (um ADR `accepted` descrevendo algo que o código não faz mais), registros acima do orçamento de tamanho e, se o HLD existe, o lado dele: `python3 .claude/skills/hld-writer/scripts/validate.py docs/architecture/hld.md` (ou `make check-hld`) aponta tecnologia pendente com ADR aceito e citação de ADR superseded. Reporte agrupado em **erros** (quebram as regras) e **suspeitas** (precisam de decisão humana). Corrija os erros sob pedido; nunca reescreva o corpo de um `accepted` para "consertar" o descolamento: isso é supersede.
 
 ## Modo: Bootstrap
 
 Quando `docs/architecture/adr/` não existe, crie exatamente estes arquivos e nada além:
 
-- `README.md` — cópia de `assets/README.md`, as regras em forma legível.
-- `0001-usar-adrs-para-decisoes-de-arquitetura.md` — cópia de `assets/0001-usar-adrs-para-decisoes-de-arquitetura.md`, já `accepted`, servindo também de exemplo preenchido. Troque `AAAA-MM-DD` pela data de hoje.
-- `index.md` — **gerado**, nunca escrito à mão: `python3 <skill-dir>/scripts/audit.py docs/architecture/adr --index`.
+- `README.md`: cópia de `assets/README.md`, as regras em forma legível.
+- `0001-usar-adrs-para-decisoes-de-arquitetura.md`: cópia de `assets/0001-usar-adrs-para-decisoes-de-arquitetura.md`, já `accepted`, servindo também de exemplo preenchido. Troque `AAAA-MM-DD` pela data de hoje.
+- `index.md`: **gerado**, nunca escrito à mão: `python3 <skill-dir>/scripts/audit.py docs/architecture/adr --index`.
 
 Nada de scaffolding extra (sem pasta por status, sem `CHANGELOG`, sem `index` manual). Cada arquivo a mais é mais uma coisa para manter em sincronia, e o acervo já tem a fonte de verdade de que precisa: o front-matter dos registros. O template **não** é copiado: ele fica em `assets/template.md` e é lido de lá a cada ADR novo.
 
@@ -187,9 +208,11 @@ Ajuste os caminhos do README se o acervo, por algum motivo, não ficar em `docs/
 
 ## Modo: Oferta
 
-Quando uma decisão cara de reverter está sendo tomada na conversa e não existe registro, ofereça uma vez, em uma linha, numa pausa natural — depois que o trabalho entrega, não no meio dele:
+Quando uma decisão cara de reverter está sendo tomada na conversa e não existe registro, ofereça uma vez, em uma linha, numa pausa natural, depois que o trabalho entrega e não no meio dele:
 
 > "Isso bate nos critérios de ADR (caro de reverter). Quer que eu registre em `docs/architecture/adr`?"
+
+O mesmo vale quando o trabalho em andamento toca uma linha `pendente de ADR` do HLD: "O HLD deixou essa escolha pendente de ADR; registro agora?".
 
 Se a resposta for não, deixe pra lá e não levante de novo para aquela decisão. Interromper a entrega para fazer campanha por documentação é como documentação vira motivo de rejeição.
 

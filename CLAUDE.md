@@ -36,7 +36,8 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
   requisitos `RF-NNN`, sem stack, e `docs/product/roadmap.md`, andamento por RF gerado do PRD),
   `/hld-writer` (`docs/architecture/hld.md`, o como técnico entre o PRD e os ADRs) e `/adr-writer`
   (ADRs em `docs/architecture/adr/`, só arquitetura e tecnologia; monta a pasta na primeira vez e
-  `make check-adr` audita). Cada skill valida a própria estrutura.
+  `make check-adr` audita). Cada skill valida a própria estrutura; `make check-prd` e
+  `make check-hld` rodam essas validações e cruzam HLD com PRD e ADRs.
 
 ## Onde colocar o quê
 
