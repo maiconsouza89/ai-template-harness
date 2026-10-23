@@ -1,11 +1,11 @@
 ---
 name: prd-writer
-description: Conduz uma entrevista estruturada (em blocos por etapa) e gera o PRD do sistema em `docs/product/prd.md`, em português, com regras de produto, requisitos funcionais numerados (RF-001...) cada um com público, fluxo e critérios de aceitação próprios, requisitos não funcionais como metas observáveis, riscos e um mapa de dependências entre requisitos (Mermaid) com ondas de implementação dizendo o que pode ser desenvolvido em paralelo. Junto do PRD mantém o roadmap vivo em `docs/product/roadmap.md`, com o grafo colorido por status e o que está liberado para começar. O PRD não fala de stack; decisões técnicas são encaminhadas para ADRs. Use esta skill sempre que o usuário quiser escrever, montar, revisar ou atualizar um PRD, "documento de requisitos", "spec do produto", "definir o que o sistema faz", "levantar requisitos", "mapear o que depende do quê" ou "o que dá pra fazer em paralelo", mesmo que não diga a palavra PRD; também quando ele colar um brief ou uma ideia de sistema e pedir para "estruturar isso" antes de implementar, quando o PRD já existir e ele quiser mudar um requisito, escopo ou critério, ou quando quiser registrar andamento ("marca o RF-003 como feito", "RF-004 travou esperando o fornecedor", "atualiza o roadmap", "o que dá pra pegar agora?").
+description: Conduz uma entrevista estruturada (em blocos por etapa) e gera o PRD do sistema em `docs/product/prd.md`, em português, com regras de produto, requisitos funcionais numerados (RF-001...) cada um com público, fluxo e critérios de aceitação próprios, requisitos não funcionais como metas observáveis, riscos e, em cada RF, do que ele depende. Junto do PRD mantém o roadmap vivo em `docs/product/roadmap.md`, o único lugar com o mapa de dependências (Mermaid) colorido por status, as ondas do que pode ser desenvolvido em paralelo, o caminho crítico e o que está liberado para começar. O PRD não fala de stack; decisões técnicas são encaminhadas para ADRs. Use esta skill sempre que o usuário quiser escrever, montar, revisar ou atualizar um PRD, "documento de requisitos", "spec do produto", "definir o que o sistema faz", "levantar requisitos", "mapear o que depende do quê" ou "o que dá pra fazer em paralelo", mesmo que não diga a palavra PRD; também quando ele colar um brief ou uma ideia de sistema e pedir para "estruturar isso" antes de implementar, quando o PRD já existir e ele quiser mudar um requisito, escopo ou critério, ou quando quiser registrar andamento ("marca o RF-003 como feito", "RF-004 travou esperando o fornecedor", "atualiza o roadmap", "o que dá pra pegar agora?").
 ---
 
 # PRD Writer
 
-O PRD responde quatro perguntas para quem vai construir e para quem vai conferir depois: **por que o sistema existe, o que ele precisa fazer, como saberemos que está pronto e em que ordem construir**. O roadmap responde a quinta, que muda toda semana: **onde estamos**. Tudo nesta skill serve a isso.
+O PRD responde quatro perguntas para quem vai construir e para quem vai conferir depois: **por que o sistema existe, o que ele precisa fazer, como saberemos que está pronto e do que cada requisito depende**. O roadmap responde o que é derivado disso ou muda toda semana: **em que ordem construir, o que dá para fazer em paralelo e onde estamos**. Tudo nesta skill serve a isso.
 
 O PRD fala de **produto**: regras, fluxos, metas observáveis, riscos. Não fala de stack. Linguagem, banco, framework, protocolo, hospedagem e arquitetura ficam fora, porque o PRD precisa continuar verdadeiro quando a stack mudar, e porque essas escolhas já têm casa neste repositório: ADRs via `/adr-writer` e o HLD via `/hld-writer`. Isso inclui o trabalho de fundação (estrutura inicial do projeto, banco, autenticação): não é RF, é do HLD. Quando o usuário disser "vamos usar X" no meio da entrevista, anote como **decisão pendente de ADR** no relatório final e não no PRD. A exceção é quando a tecnologia é o próprio produto ou uma restrição imposta de fora (integração obrigatória com o ERP da empresa, por exemplo): aí ela entra como dependência externa ou requisito, descrita pelo que faz, não por como é feita.
 
@@ -28,7 +28,7 @@ Antes da primeira pergunta, faça uma **leitura leve do repositório**: README, 
 
 ## Modo: Entrevista
 
-Oito etapas. Em cada uma: faça **um bloco de perguntas** (não uma por vez e não trinta de uma vez), use `AskUserQuestion` quando as respostas são enumeráveis (prioridade, tipo de público, probabilidade de risco) e texto livre quando não são, depois **resuma em 3 a 6 linhas** o que entendeu e peça confirmação antes de seguir. O resumo é o que evita descobrir na etapa 7 que a etapa 1 foi mal entendida.
+Oito etapas. Em cada uma: faça **um bloco de perguntas** (não uma por vez e não trinta de uma vez), todas no formato de "Como perguntar" abaixo, depois **resuma em 3 a 6 linhas** o que entendeu e peça confirmação antes de seguir. O resumo é o que evita descobrir na etapa 7 que a etapa 1 foi mal entendida, e ele só contém o que o usuário disse ou escolheu: se você completou algo, isso é pergunta, não linha do resumo.
 
 | Etapa | O que precisa sair dela |
 |---|---|
@@ -43,18 +43,26 @@ Oito etapas. Em cada uma: faça **um bloco de perguntas** (não uma por vez e n�
 
 Os critérios de aceitação de um RF saem **junto com o RF**, na etapa 4, porque é ali que o fluxo e os erros estão frescos: cada erro previsto costuma virar um critério de falha. Deixar para o fim produz uma lista genérica que ninguém consegue ligar a um requisito.
 
-Depois da etapa 8 vem o **mapa de dependências**, que você deriva do que foi coletado e apresenta para confirmação (ver abaixo). Não pergunte "do que RF-003 depende?"; proponha "RF-003 depende de RF-001 porque lê os serviços que RF-001 cadastra. Confere?". O usuário corrige melhor do que inventa.
+Depois da etapa 8 vêm as **dependências entre requisitos** (ver abaixo). Não pergunte "do que RF-003 depende?" do zero: derive do que foi coletado e pergunte com alternativas, cada uma dizendo a dependência por extenso ("RF-003 depende de RF-001 (dado): lê os serviços que RF-001 cadastra"). O usuário corrige melhor do que inventa, desde que veja o que está corrigindo.
+
+### Como perguntar
+
+O usuário decide; você recomenda. Valem para toda pergunta da skill, em qualquer modo e etapa:
+
+- **Toda pergunta vem com alternativas e uma recomendação.** Use `AskUserQuestion` com 2 a 4 opções concretas, a recomendada primeiro com "(Recomendado)" no rótulo e, na descrição, uma linha de por quê. Pergunta aberta também tem alternativas: as leituras plausíveis do que o usuário já disse, ordens de grandeza, os defaults de `references/entrevista.md`. Ele sempre pode responder outra coisa; as opções existem para ele reagir em vez de redigir do zero, e a recomendação para saber o que você faria e por quê. Até a confirmação do resumo de uma etapa tem alternativas: seguir (recomendado quando nada ficou em aberto) e as correções mais prováveis.
+- **A pergunta se explica sozinha.** Quem responde vê a caixa da pergunta, não necessariamente o texto acima dela. Se a pergunta se refere a algo que você propôs, ela mesma (ou a opção) diz o quê. Não "Confere a proposta?", mas "RF-005 Ver agenda do dia depende só de RF-002 (dado): marcações do dia. Mantém assim?". Nada de "isso", "a proposta acima", "o item 2".
+- **Decisão é do usuário, mesmo quando você tem opinião forte.** Onde há mais de um caminho razoável (dividir um RF, acrescentar um RF que ele não pediu, uma prioridade, uma regra de produto, uma dependência discutível), pergunte com alternativas em vez de decidir e pedir "confere?". Uma confirmação de sim ou não esconde a escolha que você fez.
+- **Hipótese é o que o usuário não decidiu.** Escolheu uma alternativa, é decisão dele e vai sem marca. Respondeu "não sei" e aceitou a recomendação para seguir, ou o modo é Direto sem ninguém para perguntar, a linha leva `(hipótese)`. Nunca preencha em silêncio.
 
 Regras da conversa:
 
-- **Quando o usuário não sabe, ofereça 2 ou 3 opções plausíveis** e marque a escolhida como `(hipótese)`. Os defaults de `references/entrevista.md` existem para isso. Nunca preencha em silêncio.
 - **Inconsistência para a entrevista.** Fora de escopo que contradiz um requisito, meta sem métrica, requisito "alta" que depende de um "baixa": aponte e peça correção antes de continuar.
 - **Não invente detalhes.** Se o usuário não deu, é lacuna ou hipótese, nunca fato.
 - Perguntas simples, uma ideia por pergunta, sem travessão "—" no texto. A regra do travessão vale também para o PRD gerado.
 
 ## Modo: Direto
 
-Quando o brief já veio, não encene a entrevista. Mapeie o brief sobre as oito etapas, preencha o que está lá, marque `(hipótese)` o que você completou com os defaults e **liste as lacunas no relatório final** em vez de perguntar uma a uma. Se houver uma ou duas perguntas cuja resposta muda o PRD inteiro (quem é o público, se o sistema é novo ou substitui um existente), faça só essas, e só se houver alguém para responder.
+Quando o brief já veio, não encene a entrevista. Mapeie o brief sobre as oito etapas, preencha o que está lá, marque `(hipótese)` o que você completou com os defaults e **liste as lacunas no relatório final** em vez de perguntar uma a uma. Se houver uma ou duas perguntas cuja resposta muda o PRD inteiro (quem é o público, se o sistema é novo ou substitui um existente), faça só essas, no formato de "Como perguntar", e só se houver alguém para responder. No relatório, cada hipótese que muda o produto vem com as alternativas que você descartou, para o usuário poder trocar a escolha sem reabrir a conversa.
 
 **Brief vago não vira PRD.** Se o pedido tem poucas frases sem domínio claro ("um sistema para gerenciar coisas", menos de umas 20 palavras sobre o produto), pergunte o domínio e o público antes de qualquer etapa, mesmo que o usuário tenha pedido para não ser entrevistado. Um PRD inteiro de hipóteses parece pronto e não é: é pior do que nenhum. Sem ninguém para responder, pare e explique o que falta.
 
@@ -62,7 +70,7 @@ Quando o brief já veio, não encene a entrevista. Mapeie o brief sobre as oito 
 
 1. Leia o `docs/product/prd.md` atual inteiro antes de perguntar qualquer coisa.
 2. Altere só o que o pedido toca. Requisito novo recebe o próximo `RF-NNN` livre; número nunca é reutilizado, mesmo que um requisito saia, porque issues, commits e o roadmap já podem citá-lo. Requisito removido fica listado em "Fora de escopo" com uma linha de motivo.
-3. Refaça o mapa de dependências e as ondas: quase toda mudança de requisito muda a ordem de construção.
+3. Revise o bloco **Depende de** dos RFs tocados e dos RFs que dependem deles: quase toda mudança de requisito muda a ordem de construção, e o `sync` recalcula ondas e caminho crítico no roadmap a partir desses blocos.
 4. Suba a versão no cabeçalho (`0.1.0` → `0.2.0` para requisito novo ou removido, `0.1.1` para ajuste de texto) e a data.
 5. Valide, sincronize o roadmap (o script marca como `removido` o RF que saiu e põe como `pendente` o que entrou) e reporte o que mudou.
 
@@ -77,25 +85,27 @@ O pedido é "marca o RF-003 como feito", "RF-004 está travado esperando o forne
 
 O roadmap também aceita edição manual da coluna Status; o próximo `sync` preserva o que a pessoa escreveu e recolore o grafo.
 
-## Mapa de dependências e paralelismo
+## Dependências entre requisitos
 
-É a seção que transforma o PRD em plano de execução sem falar de stack. Regras para derivá-lo:
+O PRD guarda só **do que cada RF depende**, no bloco **Depende de** do próprio RF. O mapa (grafo Mermaid), as ondas de paralelismo e o caminho crítico ficam **só no roadmap**, gerados por `scripts/roadmap.py` desses blocos. A dependência é do produto ("marcar horário lê os serviços cadastrados") e muda quando o requisito muda, por isso mora no RF. Ordem e paralelismo são derivados e consultados durante a execução, junto do status: repetidos no PRD, envelhecem na primeira mudança e incham o documento que só deveria mudar quando o produto muda.
 
-- **Nó** = requisito funcional (`RF-NNN`). Dependência externa relevante para a ordem entra como nó `DEP-N` com forma diferente.
-- **Aresta A → B** quando B não pode ser construído ou validado sem A. Três motivos, e só esses: **dado** (B lê ou altera algo que A cria), **fluxo** (B é passo posterior obrigatório da mesma jornada) e **regra** (B aplica uma regra que A define). Ponha o motivo no rótulo da aresta. "Faz sentido fazer depois" não é dependência; é preferência, e preferência não vai no grafo.
-- **Aresta `dado` e `Usa de` são a mesma informação.** Toda aresta `A -->|dado| B` tem, no RF B, a linha `- A: <qual dado>` no bloco **Usa de**, e vice-versa; o validador cruza os dois. Cada item de `Usa de` vira um critério de integração na seção global de critérios ("o serviço criado em RF-001 aparece na marcação de RF-002 com a duração certa"). É onde costuma quebrar quando dois RFs são feitos em paralelo por pessoas diferentes.
-- **Só dependências diretas.** Se A → B e B → C, não desenhe A → C. Aresta transitiva polui e esconde o caminho crítico.
+Regras para derivar o bloco:
+
+- **Formato do item**: `- RF-NNN (motivo): o quê` ou `- DEP-N (motivo): o quê`. Sem dependência, o RF não tem o bloco.
+- **Três motivos, e só esses**: **dado** (o RF lê ou altera algo que o outro cria), **fluxo** (o RF é passo posterior obrigatório da mesma jornada) e **regra** (o RF aplica uma regra que o outro define). "Faz sentido fazer depois" não é dependência; é preferência, e preferência não entra no bloco.
+- **Dependência de fora é `DEP-N`.** O número vem do cabeçalho na seção Dependências (`### DEP-1 externa: canal de mensagens`). O RF que ela trava a cita no próprio bloco; é assim que ela aparece no grafo do roadmap.
+- **Cada item `dado` vira critério de integração** na seção global de critérios ("RF-001 → RF-002: o serviço criado aparece na marcação com a duração certa"). É onde costuma quebrar quando dois RFs são feitos em paralelo por pessoas diferentes; o validador cobra.
+- **Só dependências diretas.** Se RF-003 depende de RF-002 e RF-002 de RF-001, RF-003 não cita RF-001. Dependência transitiva polui e esconde o caminho crítico.
 - **Sem ciclos.** Ciclo significa que dois requisitos são um só ou que um deles precisa ser dividido. Resolva antes de escrever.
-- **Nós atípicos se questionam.** RF isolado (sem aresta nenhuma) ou com 4 ou mais predecessores quase sempre é mapa mal derivado. Pergunte ao propor o mapa; o validador avisa.
-- **Ondas**: onda 1 são os RFs sem predecessor; um RF entra na onda n quando todos os seus predecessores estão em ondas menores que n. Tudo que está na mesma onda pode ser desenvolvido em paralelo. Dentro da onda, liste por prioridade (alta, media, baixa) e depois por número: é a ordem em que alguém sozinho pegaria. Diga também o **caminho crítico** (a cadeia mais longa), porque é ele que define o prazo mínimo.
-- **Prioridade herda para trás.** Se um RF de prioridade alta depende de um RF de prioridade baixa, o de baixa não é baixa. Sinalize e corrija na etapa de requisitos.
-- **Parte essencial e parte melhoria viram dois RFs.** Se um RF tem um núcleo sem o qual a entrega não serve e um acréscimo que pode esperar (exportar em mais formatos, filtros avançados), divida: o acréscimo vira outro RF, de prioridade menor, com aresta `fluxo` ou `regra` partindo do núcleo. Assim ele aparece nas ondas e no roadmap em vez de ficar escondido dentro de um RF "alta". O critério é **prioridade diferente**, não "dá para separar": um requisito que o usuário pediu como um só, com tudo na mesma prioridade, fica um só, mesmo que tenha dois momentos de uso. Na Revisão isso pesa mais, porque o usuário descreveu a mudança; dividir sem motivo de prioridade é reescrever o pedido dele.
+- **RFs atípicos se questionam.** RF sem dependência nenhuma (nem de nem para) ou com 4 ou mais quase sempre é derivação errada. Pergunte; o validador avisa.
+- **Prioridade herda para trás.** Se um RF de prioridade alta depende de um de prioridade baixa, o de baixa não é baixa. Sinalize e corrija na etapa de requisitos.
+- **Parte essencial e parte melhoria podem virar dois RFs.** Se um RF tem um núcleo sem o qual a entrega não serve e um acréscimo que pode esperar (exportar em mais formatos, filtros avançados), dividir faz o acréscimo aparecer nas ondas e no roadmap em vez de ficar escondido dentro de um RF "alta". O critério é **prioridade diferente**, não "dá para separar". Na Entrevista, pergunte com as duas alternativas (dividir em RF-NNN núcleo e RF-NNN acréscimo, ou manter um só) e a recomendação; no Direto, divida só com prioridade claramente diferente e marque `(hipótese)`. Na Revisão isso pesa mais, porque o usuário descreveu a mudança; dividir sem motivo de prioridade é reescrever o pedido dele.
 
-Formato: um bloco Mermaid `graph LR` seguido da tabela de ondas, exatamente como no template. Mermaid porque renderiza no GitHub e ainda é texto greppável para quem não renderiza.
+Ondas, para o relatório e para conferir o roadmap: onda 1 são os RFs sem dependência de outro RF; um RF entra na onda n quando todas as suas dependências estão em ondas menores. RFs da mesma onda podem ser desenvolvidos em paralelo, e o caminho crítico (a cadeia mais longa) define o prazo mínimo. Quem calcula é o `roadmap.py`; não escreva ondas no PRD.
 
 ## Roadmap vivo
 
-`docs/product/roadmap.md` é gerado por `scripts/roadmap.py` a partir do PRD e nunca é escrito à mão do zero. Ele tem a situação atual (concluídos, onda atual, liberados para começar, em andamento, bloqueados, caminho crítico restante), o grafo do PRD com os nós coloridos por status e a tabela de ondas com as colunas Status e Observação. O PRD é a fonte de **o que** e **em que ordem**; o roadmap é a fonte de **onde estamos**. Por isso eles são arquivos separados: o PRD só muda quando o produto muda, e sua versão continua significando algo.
+`docs/product/roadmap.md` é gerado por `scripts/roadmap.py` a partir do PRD e nunca é escrito à mão do zero. Ele tem a situação atual (concluídos, onda atual, liberados para começar, em andamento, bloqueados, caminho crítico restante), o grafo de dependências com os nós coloridos por status e a tabela de ondas com as colunas Status, Observação e Depende de. O PRD é a fonte de **o que** e **do que depende**; o roadmap é a fonte de **em que ordem**, **o que em paralelo** e **onde estamos**. Por isso eles são arquivos separados: o PRD só muda quando o produto muda, e sua versão continua significando algo.
 
 Todo PRD criado ou revisado termina com `python3 <skill-dir>/scripts/roadmap.py sync` (o padrão é `--prd docs/product/prd.md`). O sync preserva os status existentes, põe RF novo como `pendente` e marca como `removido` o RF que saiu, mantendo a linha como histórico. A saída é determinística: rodar duas vezes sem mudança não altera o arquivo.
 
@@ -123,12 +133,12 @@ Alguns hábitos fazem quase todo o trabalho:
 
 **Hipótese é marcada, sempre, e só quando muda o produto.** Tudo que você completou sem o usuário dizer leva `(hipótese)` no fim da linha. Quem lê precisa separar o que o negócio decidiu do que o documento sugeriu. Mas hipótese é para regra de negócio que alguém precisa confirmar (o que conta como falta, quem aprova, acesso expira ou não), não para detalhe de implementação que o time decide sozinho (tamanho de grade de horário, formato de arquivo, limite de upload). Detalhe desse tipo nem entra no PRD. Passou de 30 marcações, você está decidindo demais pelo usuário: corte. O relatório final lista todas as hipóteses juntas, as que mais mudam o produto primeiro.
 
-**Requisito que o usuário não pediu é exceção, e vem avisado.** Às vezes falta um RF sem o qual uma meta não se mede (um painel de indicadores) ou um fluxo não fecha (cadastrar antes de listar). Acrescente, marque `(hipótese)` no nome e destaque no relatório final em uma lista própria, "requisitos que eu adicionei", para o usuário aprovar ou cortar. Requisito inventado sem aviso é a forma mais cara de hipótese: vira trabalho.
+**Requisito que o usuário não pediu é exceção, e vem avisado.** Às vezes falta um RF sem o qual uma meta não se mede (um painel de indicadores) ou um fluxo não fecha (cadastrar antes de listar). Na Entrevista, pergunte com alternativas (acrescentar o RF, dizendo qual e que meta ou fluxo ele fecha; deixar a meta sem medição; tirar a meta) e a sua recomendação. No Direto, acrescente, marque `(hipótese)` no nome e destaque no relatório final em uma lista própria, "requisitos que eu adicionei", para o usuário aprovar ou cortar. Requisito inventado sem aviso é a forma mais cara de hipótese: vira trabalho.
 
 ## Finalizar
 
 1. Rode a checagem de consistência de `references/entrevista.md` (seção "Antes de gerar").
 2. Preencha `assets/template.md` sem mudar títulos, ordem ou negritos: o validador, o roadmap e quem lê dependem dessa estrutura. Seção sem conteúdo real não fica com placeholder; fica com uma linha dizendo que não se aplica e por quê.
-3. Valide: `python3 <skill-dir>/scripts/validate.py docs/product/prd.md`. Ele checa seções, requisitos incompletos (inclusive critérios de aceitação), placeholders esquecidos, arestas para RFs inexistentes, ciclos, ondas incoerentes ou fora de ordem, `Usa de` sem aresta `dado` (e o contrário) e critério de integração faltando. Corrija até sair sem erro.
+3. Valide: `python3 <skill-dir>/scripts/validate.py docs/product/prd.md`. Ele checa seções, requisitos incompletos (inclusive critérios de aceitação), placeholders esquecidos, `Depende de` fora do formato ou citando RF ou DEP inexistente, ciclos, prioridade que não herda para trás e critério de integração faltando para dependência `dado`. Corrija até sair sem erro.
 4. Sincronize o roadmap: `python3 <skill-dir>/scripts/roadmap.py sync`.
-5. Reporte: caminhos do PRD e do roadmap, quantidade de RFs por onda com o caminho crítico, requisitos que você adicionou sem o usuário pedir, hipóteses (as que mais mudam o produto primeiro), lacunas abertas e decisões de stack que apareceram e precisam virar ADR.
+5. Reporte: caminhos do PRD e do roadmap, quantidade de RFs por onda com o caminho crítico (lidos do roadmap gerado), requisitos que você adicionou sem o usuário pedir, hipóteses (as que mais mudam o produto primeiro), lacunas abertas e decisões de stack que apareceram e precisam virar ADR.

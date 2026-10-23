@@ -7,7 +7,7 @@ description: Conduz uma entrevista estruturada (em blocos por etapa) e gera o HL
 
 O HLD responde quatro perguntas para quem vai implementar e para quem vai operar: **como a solução se divide em componentes, como eles conversam, onde o dado vive e o que garante que isso escala, resiste, é seguro e é observável**. Tudo nesta skill serve a isso.
 
-Ele fala do **como** técnico. Não reconta a regra de negócio: isso é o PRD em `docs/product/prd.md`, e o HLD o cita por `RF-NNN`. Também não é o lugar de justificar cada escolha de tecnologia: isso é ADR em `docs/architecture/adr/`, e o HLD aponta para o número. A divisão de trabalho neste repositório é **PRD diz o quê, HLD diz como, ADR diz por quê**. Quando o usuário trouxer uma tecnologia na entrevista, ela entra no HLD com a coluna "Decisão" preenchida: o ADR que já existe, ou `pendente de ADR` com a decisão listada no fim do documento e no relatório final. Tecnologia sem decisão registrada é a primeira coisa que o leitor de daqui a seis meses vai questionar.
+Ele fala do **como** técnico. Não reconta a regra de negócio: isso é o PRD em `docs/product/prd.md`, e o HLD o cita por `RF-NNN`. Também não é o lugar de justificar cada escolha de tecnologia: isso é ADR em `docs/architecture/adr/`, e o HLD aponta para o número. A divisão de trabalho neste repositório é **PRD diz o quê, HLD diz como, ADR diz por quê**. Quem escolhe a arquitetura é o usuário; a skill traz as alternativas, recomenda uma e registra a escolha. Quando o usuário trouxer uma tecnologia na entrevista, ela entra no HLD com a coluna "Decisão" preenchida: o ADR que já existe, ou `pendente de ADR` com a decisão listada no fim do documento e no relatório final. Tecnologia sem decisão registrada é a primeira coisa que o leitor de daqui a seis meses vai questionar.
 
 ## Modos
 
@@ -30,7 +30,7 @@ Antes de perguntar qualquer coisa, leia o que já existe:
 
 ## Modo: Entrevista
 
-Onze etapas, uma por seção do template. Em cada uma: faça **um bloco de perguntas** (não uma por vez e não trinta de uma vez), use `AskUserQuestion` quando as respostas são enumeráveis (ambiente de implantação, exposição de interface, probabilidade de risco) e texto livre quando não são, depois **resuma em 3 a 6 linhas** o que entendeu e peça confirmação antes de seguir. O resumo é o que evita descobrir na etapa 10 que a etapa 2 foi mal entendida.
+Onze etapas, uma por seção do template. Em cada uma: faça **um bloco de perguntas** (não uma por vez e não trinta de uma vez), todas no formato de "Como perguntar" abaixo, depois **resuma em 3 a 6 linhas** o que entendeu e peça confirmação antes de seguir. O resumo é o que evita descobrir na etapa 10 que a etapa 2 foi mal entendida, e ele só contém o que o usuário disse ou escolheu: se você completou algo, isso é pergunta, não linha do resumo.
 
 | Etapa | O que precisa sair dela |
 |---|---|
@@ -46,11 +46,19 @@ Onze etapas, uma por seção do template. Em cada uma: faça **um bloco de pergu
 | 10. Riscos arquiteturais | Probabilidade, impacto, mitigações (lista) e contingência |
 | 11. ADRs e próximos passos | ADRs que já cobrem o HLD, decisões pendentes com critério, próximos passos até implementar |
 
-Depois da etapa 11 vem a **rastreabilidade**, que você deriva e apresenta para confirmação (ver abaixo). Não pergunte "qual componente atende RF-003?"; proponha "RF-003 é atendido pelo Serviço de agenda e pela API pública, no fluxo Cliente agenda. Confere?". O usuário corrige melhor do que inventa.
+Depois da etapa 11 vem a **rastreabilidade** (ver abaixo). Não pergunte "qual componente atende RF-003?" do zero: derive dos componentes e fluxos que o usuário escolheu e escreva o resultado na própria pergunta ("RF-003 Agendar horário: Serviço de agenda e API pública, no fluxo Cliente agenda"). Onde a derivação deixa escolha (RF sem componente, componente sem RF), pergunte com alternativas e recomendação. O usuário corrige melhor do que inventa, desde que veja o que está corrigindo.
+
+### Como perguntar
+
+O usuário decide; você recomenda. Valem para toda pergunta da skill, em qualquer modo e etapa:
+
+- **Decisão é do usuário, mesmo quando você tem opinião forte.** Topologia, ambiente, tecnologia sem ADR, padrão arquitetural, como dividir componentes, síncrono ou assíncrono, consistência, metas e SLAs, mecanismos de segurança, retenção: tudo isso tem mais de um caminho razoável e vira pergunta com alternativas. Não escolha e peça "confere?". Uma confirmação de sim ou não esconde a escolha que você fez e transforma o usuário em revisor do seu desenho, quando o desenho é dele.
+- **Toda pergunta vem com alternativas e uma recomendação.** Use `AskUserQuestion` com 2 a 4 opções concretas, a recomendada primeiro com "(Recomendado)" no rótulo e, na descrição de cada opção, o que ela implica e o que custa em uma frase. A recomendação diz o porquê ligado ao que o usuário já disse (volume, time, meta do PRD), não só "é o padrão". Pergunta aberta também tem alternativas: as leituras plausíveis do brief, ordens de grandeza, os defaults de `references/entrevista.md`. Até a confirmação do resumo de uma etapa tem alternativas: seguir (recomendado quando nada ficou em aberto) e as correções mais prováveis.
+- **A pergunta se explica sozinha.** Quem responde vê a caixa da pergunta, não necessariamente o texto acima dela. Se a pergunta se refere a algo que você propôs, ela mesma (ou a opção) diz o quê: o nome do componente e a responsabilidade, a meta com o número, o fluxo com os passos que mudam. Não "Mantém a proposta de topologia?", mas "Como dividir o sistema? Monólito modular com worker separado para filas / Três serviços: API, agenda, notificação / ...". Nada de "isso", "a proposta acima", "o item 2", "o que sugeri".
+- **Hipótese é o que o usuário não decidiu.** Escolheu uma alternativa, é decisão dele e vai sem marca. Respondeu "não sei" e aceitou a recomendação para seguir, ou o modo é Direto sem ninguém para perguntar, a linha leva `(hipótese)`. Nunca preencha em silêncio.
 
 Regras da conversa:
 
-- **Quando o usuário não sabe, ofereça 2 ou 3 opções plausíveis** e marque a escolhida como `(hipótese)`. Os defaults de `references/entrevista.md` existem para isso. Nunca preencha em silêncio.
 - **Inconsistência para a entrevista.** Meta de disponibilidade que a topologia não entrega (um banco sem réplica e 99.99 por cento), componente que aparece num fluxo e não na lista, interface externa sem autenticação: aponte e peça correção antes de continuar.
 - **Não invente detalhes.** Se o usuário não deu, é lacuna ou hipótese, nunca fato.
 - **Não reabra decisão aceita.** ADR `accepted` em `docs/architecture/adr/` é cenário dado. Se o usuário quiser mudar, isso é um ADR novo com `supersedes`, via `/adr-writer`, não uma linha do HLD.
@@ -58,12 +66,12 @@ Regras da conversa:
 
 ## Modo: Direto
 
-Quando o brief ou o PRD já veio, não encene a entrevista. Mapeie o material sobre as onze etapas, preencha o que está lá, marque `(hipótese)` o que você completou com os defaults e **liste as lacunas no relatório final** em vez de perguntar uma a uma. Se houver uma ou duas perguntas cuja resposta muda o HLD inteiro (cloud ou on-premises por restrição legal, um serviço ou vários, dado sensível ou não), faça só essas, e só se houver alguém para responder.
+Quando o brief ou o PRD já veio, não encene a entrevista. Mapeie o material sobre as onze etapas, preencha o que está lá, marque `(hipótese)` o que você completou com os defaults e **liste as lacunas no relatório final** em vez de perguntar uma a uma. Se houver uma ou duas perguntas cuja resposta muda o HLD inteiro (cloud ou on-premises por restrição legal, um serviço ou vários, dado sensível ou não), faça só essas, no formato de "Como perguntar", e só se houver alguém para responder. Tudo que você escolheu no lugar do usuário é `(hipótese)`, e no relatório cada hipótese que muda a arquitetura vem com as alternativas descartadas, para ele trocar a escolha sem reabrir a conversa.
 
 ## Modo: Revisão
 
 1. Leia o `docs/architecture/hld.md` atual inteiro, e o `docs/product/prd.md` se existir, antes de perguntar qualquer coisa.
-2. Altere só o que o pedido toca. Componente ou interface removida sai da tabela, do diagrama, dos fluxos e da rastreabilidade de uma vez: meia remoção é pior que nenhuma.
+2. Altere só o que o pedido toca. Se a mudança pedida obriga outras escolhas (para onde vai a responsabilidade do componente que sai, que meta vale agora), pergunte cada uma com alternativas em vez de resolver sozinho. Componente ou interface removida sai da tabela, do diagrama, dos fluxos e da rastreabilidade de uma vez: meia remoção é pior que nenhuma.
 3. Refaça a rastreabilidade: quase toda mudança de componente ou interface muda quem atende qual RF.
 4. Se a mudança troca uma tecnologia ou padrão com ADR `accepted`, pare e diga que isso pede ADR novo (`/adr-writer`), e só então atualize o HLD apontando para ele.
 5. Suba a versão no cabeçalho (`0.1.0` → `0.2.0` para componente, interface ou tecnologia que entra ou sai; `0.1.1` para ajuste de texto ou meta) e a data.
@@ -95,7 +103,7 @@ Três hábitos fazem quase todo o trabalho:
 
 **Mensurável ou fora.** "Altamente disponível" e "escala bem" não são meta. "99.9 por cento mensal na API externa, RTO de 1 hora, RPO de 15 minutos" é. Mesma régua para SLA de interface (p95 em milissegundos, vazão), para observabilidade (que métrica, que limiar dispara alerta) e para segurança (qual mecanismo, onde).
 
-**Hipótese é marcada, sempre, e na linha em que ocorre.** Tudo que você completou sem o usuário dizer leva `(hipótese)` no fim da linha, nessa forma literal, porque é ela que o validador conta e que o leitor procura; variantes como "(hipótese sobre o volume)" se perdem. Vale para número que você inventou (SLA, limite, retenção) e vale em dobro quando o HLD muda algo que o brief ou o PRD disse: reordenar o pipeline, trocar síncrono por assíncrono, dividir um componente. Mudança dessas é hipótese marcada no próprio texto, não só no relatório, porque quem lê o HLD daqui a um mês não vai ler o relatório. Quem lê precisa separar o que o time decidiu do que o documento sugeriu. Passou de 30 marcações, você está desenhando demais pelo usuário: corte ou pergunte. O relatório final lista todas as hipóteses, agrupadas por seção, as que mais mudam a arquitetura primeiro.
+**Hipótese é marcada, sempre, e na linha em que ocorre.** Tudo que você completou sem o usuário dizer leva `(hipótese)` no fim da linha, nessa forma literal, porque é ela que o validador conta e que o leitor procura; variantes como "(hipótese sobre o volume)" se perdem. Vale para número que o usuário não escolheu (SLA, limite, retenção) e vale em dobro quando o HLD muda algo que o brief ou o PRD disse: reordenar o pipeline, trocar síncrono por assíncrono, dividir um componente. Na Entrevista, mudança dessas nunca é hipótese: é pergunta, com o que o brief diz como uma alternativa e a sua mudança como outra. No Direto, é hipótese marcada no próprio texto, não só no relatório, porque quem lê o HLD daqui a um mês não vai ler o relatório. Quem lê precisa separar o que o time decidiu do que o documento sugeriu. Passou de 30 marcações, você está desenhando demais pelo usuário: pergunte. O relatório final lista todas as hipóteses, agrupadas por seção, as que mais mudam a arquitetura primeiro.
 
 **Toda tecnologia aponta para uma decisão.** A tabela de tecnologias tem a coluna "Decisão" e ela nunca fica vazia: ou é `ADR-NNNN` que existe em `docs/architecture/adr/`, ou é `pendente de ADR` com a decisão repetida em "Decisões pendentes de ADR" com as opções em jogo e o critério de escolha. O HLD não é o lugar de argumentar por que PostgreSQL e não outro banco; é o lugar de dizer que o banco é PostgreSQL e onde está o argumento.
 

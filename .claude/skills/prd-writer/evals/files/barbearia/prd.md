@@ -83,8 +83,8 @@ O cliente escolhe serviço, barbeiro, dia e horário livre e confirma com nome e
 
 **Para quem:** cliente final, para marcar sem depender de mensagem.
 
-**Usa de**
-- RF-001: serviços com duração e preço, barbeiros e horários de trabalho
+**Depende de**
+- RF-001 (dado): serviços com duração e preço, barbeiros e horários de trabalho
 
 **Fluxo principal**
 - Cliente abre o link da barbearia
@@ -112,8 +112,9 @@ O sistema avisa o cliente 24 horas e 2 horas antes do horário, com opção de c
 
 **Para quem:** cliente final, para não esquecer; dono, para reduzir falta.
 
-**Usa de**
-- RF-002: horário marcado, nome e telefone do cliente
+**Depende de**
+- RF-002 (dado): horário marcado, nome e telefone do cliente
+- DEP-1 (fluxo): canal pelo qual o lembrete chega ao cliente
 
 **Fluxo principal**
 - Sistema identifica marcações a 24 horas e a 2 horas
@@ -139,8 +140,8 @@ O cliente cancela ou muda o horário até 2 horas antes.
 
 **Para quem:** cliente final, para não precisar ligar; dono, para liberar o horário a tempo.
 
-**Usa de**
-- RF-002: marcação existente com horário e cliente
+**Depende de**
+- RF-002 (dado): marcação existente com horário e cliente
 
 **Fluxo principal**
 - Cliente abre o link do lembrete ou da confirmação
@@ -167,8 +168,8 @@ O dono vê a agenda do dia de todos os barbeiros e marca horários manualmente.
 
 **Para quem:** dono da barbearia, para organizar o dia e atender quem liga.
 
-**Usa de**
-- RF-002: marcações do dia com cliente, serviço e barbeiro
+**Depende de**
+- RF-002 (dado): marcações do dia com cliente, serviço e barbeiro
 
 **Fluxo principal**
 - Dono abre a agenda
@@ -206,7 +207,7 @@ Disponibilidade
 
 ## Dependências
 
-### externa: canal de mensagens ao cliente
+### DEP-1 externa: canal de mensagens ao cliente
 Serviço de terceiro que entrega mensagem no celular do cliente. Sem ele, RF-003 não funciona.
 
 ---
@@ -244,37 +245,3 @@ Tipos de validação obrigatórios
 
 Estratégia de validação
 - Piloto de 2 semanas em uma barbearia antes de liberar
-
----
-
-## Mapa de dependências e paralelismo
-
-Aresta A → B significa: B não pode ser construído ou validado sem A. Rótulo: dado, fluxo ou regra.
-
-```mermaid
-graph LR
-  RF001["RF-001 Cadastro"]
-  RF002["RF-002 Marcar"]
-  RF003["RF-003 Lembrete"]
-  RF004["RF-004 Cancelar"]
-  RF005["RF-005 Agenda do dono"]
-  DEP1{{"DEP-1 Canal de mensagens"}}
-  RF001 -->|dado| RF002
-  RF002 -->|dado| RF003
-  RF002 -->|dado| RF004
-  RF002 -->|dado| RF005
-  DEP1 -->|fluxo| RF003
-```
-
-| Onda | Requisitos (paralelos entre si) | Depende de |
-| --- | --- | --- |
-| 1 | RF-001 | nenhum |
-| 2 | RF-002 | RF-001 |
-| 3 | RF-003, RF-004, RF-005 | RF-002, DEP-1 |
-
-Dentro da onda, os RFs vêm por prioridade (alta, media, baixa) e depois por número.
-
-Caminho crítico: RF-001 → RF-002 → RF-003 (3 ondas).
-
-Dependências externas no mapa
-- DEP-1: canal de mensagens ao cliente; destrava RF-003

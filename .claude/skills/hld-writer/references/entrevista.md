@@ -1,18 +1,20 @@
 # Guia da entrevista
 
-Perguntas por etapa, opções para oferecer quando o usuário não sabe, defaults (sempre marcados como hipótese) e checagens antes de gerar. Use como base; adapte ao vocabulário do usuário. Uma ideia por pergunta. Em cada etapa, feche com resumo de 3 a 6 linhas e confirmação.
+Perguntas por etapa, alternativas para oferecer, defaults e checagens antes de gerar. Use como base; adapte ao vocabulário do usuário. Uma ideia por pergunta. Em cada etapa, feche com resumo de 3 a 6 linhas e confirmação.
 
-Antes da etapa 1, leia `docs/product/prd.md` e `docs/architecture/adr/index.md` se existirem. Metade das perguntas abaixo já tem resposta lá: confirme em vez de perguntar do zero ("o PRD pede 99.9 por cento de disponibilidade; a arquitetura precisa entregar isso. Confere?").
+As perguntas abaixo são o assunto, não o formato. Toda pergunta sai como em "Como perguntar" no `SKILL.md`: 2 a 4 alternativas concretas com o que cada uma implica, a recomendada primeiro com o porquê, e o contexto dentro da própria pergunta. As alternativas e os defaults de cada etapa são a matéria-prima dessas opções; o default é a recomendação quando nada no que o usuário disse aponta para outra, nunca a resposta já escolhida. Default só vira `(hipótese)` quando o usuário não decidiu (respondeu "não sei" e aceitou seguir, ou modo Direto).
+
+Antes da etapa 1, leia `docs/product/prd.md` e `docs/architecture/adr/index.md` se existirem. Metade das perguntas abaixo já tem resposta lá: use isso como alternativa recomendada em vez de perguntar do zero, citando a origem na própria pergunta ("Que disponibilidade a API externa precisa entregar? 99.9 por cento mensal, como pede o PRD (Recomendado) / 99.5 por cento, mais barato, exige rever o PRD / ..."). ADR `accepted` não vira pergunta: é cenário dado, e só se cita.
 
 ## Etapa 1: contexto e objetivo técnico
 
 Perguntas
-- Em duas ou três frases, o que este sistema ou módulo precisa fazer tecnicamente? (Se há PRD, proponha a partir do resumo e dos RFs de prioridade alta.)
+- Em duas ou três frases, o que este sistema ou módulo precisa fazer tecnicamente? (Se há PRD, ofereça duas ou três formulações a partir do resumo e dos RFs de prioridade alta, escritas por extenso nas opções.)
 - O que está ruim hoje em termos técnicos: acoplamento, latência, operação manual, falta de rastreio, custo, risco de segurança? Peça um exemplo com número.
 - Com que sistemas, módulos ou features este se conecta, e em que direção o dado flui?
 - É sistema novo, substitui algo ou se encaixa em algo que já existe? O que já existe e não pode mudar?
 
-Se o usuário não sabe os sistemas conectados, ofereça: identidade e acesso; notificação (e-mail, mensagem); pagamento; sistema legado que detém o dado de origem; analytics.
+Alternativas para os sistemas conectados (seleção múltipla): identidade e acesso; notificação (e-mail, mensagem); pagamento; sistema legado que detém o dado de origem; analytics.
 
 ## Etapa 2: arquitetura geral
 
@@ -22,12 +24,12 @@ Perguntas
 - Quais tecnologias já estão decididas (linguagem, banco, mensageria, framework)? Para cada uma: há ADR em `docs/architecture/adr/`? Se não, vira "pendente de ADR".
 - Que padrões arquiteturais fazem sentido aqui e por quê: camadas, hexagonal, event-driven, CQRS, REST, gRPC, BFF, saga?
 
-Se o usuário não sabe a topologia, ofereça pela escala e pelo time:
+Alternativas de topologia, recomendando pela escala e pelo time que o usuário descreveu:
 - time pequeno e domínio ainda em movimento: monólito modular com fronteiras claras, pronto para extrair serviços depois
 - integrações assíncronas e picos de carga: serviços poucos e grossos com fila ou streaming entre eles
 - processamento de dados em volume: pipeline por etapas com armazenamento intermediário
 
-Tecnologia que o usuário nomeia sem justificativa: pergunte "por que essa e não a alternativa óbvia?". A resposta é o conteúdo do ADR.
+Tecnologia ainda não decidida: ofereça 2 ou 3 alternativas para aquele papel (banco, fila, linguagem) com o trade-off de cada uma e a recomendação; a escolha vai para "pendente de ADR" com essas mesmas opções. Tecnologia que o usuário nomeia sem justificativa: pergunte "por que essa e não a alternativa óbvia?", com as justificativas plausíveis como opções. A resposta é o conteúdo do ADR.
 
 ## Etapa 3: componentes e responsabilidades
 
@@ -37,18 +39,19 @@ Para cada componente:
 3. Dependências internas (outros componentes) e externas (sistemas de fora).
 4. Papel nos dados: persiste, cacheia, orquestra, só transforma?
 
-Peça a lista antes de detalhar; depois detalhe um por um. Se um componente depende de outro ainda não listado, registre o novo e volte.
+Antes de detalhar, pergunte pela divisão: ofereça 2 ou 3 decomposições coerentes com a topologia escolhida, cada opção com os nomes dos componentes e a responsabilidade de cada um em poucas palavras, e recomende uma. Depois detalhe um por um. Se um componente depende de outro ainda não listado, registre o novo e volte.
 
-Sinais para dividir: responsabilidades de domínios diferentes no mesmo componente; dois ciclos de deploy distintos; dois donos.
+Sinais para dividir: responsabilidades de domínios diferentes no mesmo componente; dois ciclos de deploy distintos; dois donos. Diante de um sinal, pergunte com as alternativas (dividir, dizendo em quais componentes; manter um só) e recomende uma.
 
 ## Etapa 4: fluxos de requisição e de dados
 
-- Escolha os fluxos que importam: o principal de cada RF de prioridade alta e qualquer um que cruze fronteira assíncrona (fila, evento, stream). Dois a cinco fluxos no total.
+- Quais fluxos entram: ofereça como seleção múltipla o principal de cada RF de prioridade alta e qualquer um que cruze fronteira assíncrona (fila, evento, stream), recomendando dois a cinco.
+- Onde o fluxo tem escolha de desenho (síncrono ou assíncrono, onde validar, quem orquestra), pergunte com alternativas, escrevendo os passos que mudam em cada opção.
 - Para cada fluxo, do gatilho ao efeito observável: quem chama quem, onde valida, onde transforma, onde persiste, onde enfileira, o que responde. 3 a 8 passos.
 - Para cada dado que cruza fronteira de componente: origem, transformação, destino.
 - Onde cada dado grava, como replica e que consistência se promete (forte, eventual, e com que janela).
 
-Se o usuário não sabe a consistência, default: forte dentro do componente que é fonte de verdade; eventual entre componentes, com janela declarada (hipótese).
+Default para recomendar na consistência: forte dentro do componente que é fonte de verdade; eventual entre componentes, com janela declarada. Ofereça também a alternativa forte entre componentes, com o custo dela.
 
 ## Etapa 5: modelo de dados
 
@@ -58,7 +61,7 @@ Se o usuário não sabe a consistência, default: forte dentro do componente que
 - O que é cacheado ou replicado, onde, por quanto tempo e como invalida?
 - Esquemas e contratos são versionados como? Dado fica por quanto tempo e o que acontece depois (apaga, anonimiza, arquiva)?
 
-Defaults (hipótese): cache só de leitura com TTL curto e invalidação por evento; retenção alinhada à exigência legal mais longa que se aplica; contratos de interface versionados por versão maior na URL ou no esquema.
+Defaults para recomendar: cache só de leitura com TTL curto e invalidação por evento; retenção alinhada à exigência legal mais longa que se aplica; contratos de interface versionados por versão maior na URL ou no esquema.
 
 ## Etapa 6: interfaces públicas
 
@@ -67,7 +70,7 @@ Para cada interface que algo de fora do componente consome:
 - Exposição: interna (só dentro do sistema ou da organização) ou externa (cliente, parceiro, internet).
 - SLA e limites: latência alvo (p95), vazão, rate limit, garantia de entrega.
 
-Se o usuário não tem SLA, ofereça por tipo e marque hipótese:
+Alternativas de SLA por tipo (recomende a do tipo da interface e ofereça uma mais e uma menos exigente):
 - API síncrona voltada a pessoa: p95 300 ms
 - API síncrona entre serviços: p95 100 ms
 - fila ou evento: processado em até 1 minuto, entrega ao menos uma vez
@@ -80,7 +83,7 @@ Se o usuário não tem SLA, ofereça por tipo e marque hipótese:
 - Onde entra cache, rate limiting, backpressure, circuit breaker?
 - Metas: disponibilidade mensal por interface, RTO e RPO, capacidade sem mudar arquitetura.
 
-Defaults (hipótese): 99.9 por cento para interfaces externas e 99.5 por cento para internas; RTO 1 hora e RPO 15 minutos; suportar 10 vezes o volume atual só com réplicas. Se o PRD declarou disponibilidade, ela é a meta e não há hipótese.
+Defaults para recomendar: 99.9 por cento para interfaces externas e 99.5 por cento para internas; RTO 1 hora e RPO 15 minutos; suportar 10 vezes o volume atual só com réplicas. Se o PRD declarou disponibilidade, ela é a alternativa recomendada, citada como vinda do PRD.
 
 ## Etapa 8: segurança
 
@@ -90,7 +93,7 @@ Defaults (hipótese): 99.9 por cento para interfaces externas e 99.5 por cento p
 - Criptografia em trânsito e em repouso: onde e com que gestão de chaves?
 - Segredos: onde ficam, como rotacionam, quem acessa?
 
-Defaults (hipótese): autenticação obrigatória em toda interface; autorização por papel; TLS em todo tráfego; dados em repouso criptografados pelo provedor; segredos em cofre gerenciado com rotação; dados pessoais tratados conforme a LGPD, com exclusão sob pedido.
+Defaults para recomendar: autenticação obrigatória em toda interface; autorização por papel; TLS em todo tráfego; dados em repouso criptografados pelo provedor; segredos em cofre gerenciado com rotação; dados pessoais tratados conforme a LGPD, com exclusão sob pedido.
 
 ## Etapa 9: observabilidade
 
@@ -99,23 +102,23 @@ Defaults (hipótese): autenticação obrigatória em toda interface; autorizaç�
 - Tracing: propagação de contexto entre componentes e amostragem.
 - Dashboards e alertas mínimos, ligados às metas da etapa 7.
 
-Defaults (hipótese): logs estruturados em JSON com id de correlação ponta a ponta; taxa de erro e latência p95 por interface; tracing distribuído com amostragem de 10 por cento e 100 por cento em erro; alerta quando a taxa de erro ou a latência ultrapassa a meta por 5 minutos.
+Defaults para recomendar: logs estruturados em JSON com id de correlação ponta a ponta; taxa de erro e latência p95 por interface; tracing distribuído com amostragem de 10 por cento e 100 por cento em erro; alerta quando a taxa de erro ou a latência ultrapassa a meta por 5 minutos.
 
 ## Etapa 10: riscos arquiteturais
 
 Para cada risco: frase única, probabilidade (baixa, media, alta), impacto concreto, mitigações (uma ou mais), plano de contingência se acontecer mesmo assim.
 
-Se o usuário não enxerga riscos, ofereça os típicos do que foi coletado: dependência externa indisponível ou lenta; volume acima do previsto; tecnologia nova para o time; consistência eventual gerando dado divergente visível; migração de dado legado; custo de cloud fora do esperado; único ponto de falha em componente sem réplica.
+Ofereça como seleção múltipla os riscos típicos do que foi coletado, recomendando os que o contexto torna mais prováveis: dependência externa indisponível ou lenta; volume acima do previsto; tecnologia nova para o time; consistência eventual gerando dado divergente visível; migração de dado legado; custo de cloud fora do esperado; único ponto de falha em componente sem réplica.
 
 ## Etapa 11: ADRs e próximos passos
 
 - Quais ADRs já cobrem decisões deste HLD? Liste por número e título a partir de `docs/architecture/adr/index.md`.
-- Que decisões ficaram pendentes (toda tecnologia marcada "pendente de ADR" na etapa 2 entra aqui)? Para cada uma: opções em jogo e critério de escolha.
+- Que decisões ficaram pendentes (toda tecnologia marcada "pendente de ADR" na etapa 2 entra aqui)? Para cada uma: opções em jogo e critério de escolha. As opções são as que o usuário viu na pergunta; o critério, ofereça como alternativas.
 - Quais são os próximos passos técnicos até a implementação: prova de conceito, ADRs a escrever, detalhamento de componente, contrato de interface a publicar?
 
 ## Rastreabilidade
 
-Depois da etapa 11, derive e apresente para confirmação: para cada RF do PRD, que componentes, interfaces e fluxo o atendem; para cada requisito não funcional do PRD, que seção e meta do HLD o cobre. RF sem componente é lacuna da arquitetura; componente sem RF é escopo que ninguém pediu. Pergunte apenas: "Está correto? Falta ou sobra algo?".
+Depois da etapa 11, derive dos componentes, interfaces e fluxos que o usuário escolheu: para cada RF do PRD, o que o atende; para cada requisito não funcional do PRD, que seção e meta do HLD o cobre. Isso é consequência das escolhas dele, não decisão nova, então mostre a tabela escrita na própria pergunta e ofereça seguir (recomendado se não há lacuna) ou corrigir linhas específicas. RF sem componente e componente sem RF são escolhas: pergunte cada um com alternativas (atribuir ao componente X, criar componente, deixar como lacuna declarada; manter o componente como escopo extra, tirar) e recomendação.
 
 ## Antes de gerar
 
@@ -133,5 +136,6 @@ Confirme cada item; o que falhar volta para a etapa correspondente.
 - Segurança e observabilidade têm prática mensurável em cada subseção.
 - Cada risco tem probabilidade, impacto, mitigação e contingência.
 - Cada RF do PRD aparece na rastreabilidade; nenhum RF citado está fora do PRD.
-- Toda hipótese está marcada com `(hipótese)`.
+- Toda hipótese está marcada com `(hipótese)`, e nada que o usuário escolheu está marcado como hipótese.
+- Nenhuma decisão de arquitetura foi tomada por você e apenas apresentada para conferir (na Entrevista).
 - Nenhum travessão "—" no texto.

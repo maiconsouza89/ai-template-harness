@@ -81,8 +81,9 @@ Fora de escopo
 
 **Para quem:** [público e ganho]
 
-**Usa de**
-- RF-001: [dado que este RF lê ou altera e que RF-001 cria. Só quando há aresta 'dado' de RF-001 para este RF no mapa]
+**Depende de**
+- RF-001 (dado): [o que este RF lê ou altera e que RF-001 cria]
+- DEP-1 (fluxo): [o que precisa chegar de fora antes. Motivo: dado, fluxo ou regra. Omita o bloco se o RF não depende de nada]
 
 **Fluxo principal**
 - [passo 1]
@@ -142,10 +143,10 @@ Acessibilidade
 
 ## Dependências
 
-### [externa|organizacional|pré-requisito]: [título]
-[Quem precisa entregar o quê, por quê e o que trava enquanto não chega.]
+### DEP-1 [externa|organizacional|pré-requisito]: [título]
+[Quem precisa entregar o quê, por quê e o que trava enquanto não chega. O RF que ela trava a cita no próprio 'Depende de'.]
 
-### [tipo]: [título 2]
+### DEP-2 [tipo]: [título 2]
 [descrição]
 
 ---
@@ -174,7 +175,7 @@ Acessibilidade
 Critérios de cada RF ficam no próprio RF. Aqui ficam só os transversais.
 
 Integração entre requisitos
-- RF-001 → RF-002: [o dado criado em RF-001 chega correto em RF-002. Um critério por item de 'Usa de']
+- RF-001 → RF-002: [o dado criado em RF-001 chega correto em RF-002. Um critério por item 'dado' de 'Depende de']
 
 Transversais
 - [critério que vale para o sistema todo, derivado de meta ou requisito não funcional, verificável por alguém de fora do time]
@@ -190,32 +191,3 @@ Tipos de validação obrigatórios
 
 Estratégia de validação
 - [ex: roteiro de aceitação executado com usuários reais antes de liberar; validação exploratória interna por sprint]
-
----
-
-## Mapa de dependências e paralelismo
-
-Aresta A → B significa: B não pode ser construído ou validado sem A. Rótulo: dado, fluxo ou regra.
-
-```mermaid
-graph LR
-  RF001["RF-001 Nome curto"]
-  RF002["RF-002 Nome curto"]
-  RF003["RF-003 Nome curto"]
-  DEP1{{"DEP-1 Nome da dependência externa"}}
-  RF001 -->|dado| RF002
-  RF001 -->|regra| RF003
-  DEP1 -->|fluxo| RF003
-```
-
-| Onda | Requisitos (paralelos entre si) | Depende de |
-| --- | --- | --- |
-| 1 | RF-001 | nenhum |
-| 2 | RF-002, RF-003 | RF-001, DEP-1 |
-
-Dentro da onda, os RFs vêm por prioridade (alta, media, baixa) e depois por número.
-
-Caminho crítico: RF-001 → RF-003 (2 ondas).
-
-Dependências externas no mapa
-- DEP-1: [título da dependência na seção Dependências, e o que ela destrava]

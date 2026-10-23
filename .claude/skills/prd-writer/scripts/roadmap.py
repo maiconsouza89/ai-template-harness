@@ -5,9 +5,11 @@ Uso:
   python3 roadmap.py sync [--prd docs/product/prd.md]
   python3 roadmap.py set RF-003 "em andamento" [--motivo "..."] [--prd ...]
 
-O PRD é a fonte do que existe e da ordem (requisitos, prioridades, arestas). O roadmap é a
-fonte do andamento: a coluna Status da tabela, que pessoas podem editar à mão. 'sync'
-regenera grafo, ondas e situação preservando status e observações; RF novo entra como
+O PRD é a fonte do que existe e do que depende de quê (requisitos, prioridades e os blocos
+'Depende de' de cada RF). O mapa de dependências e o paralelismo vivem só aqui: grafo,
+ondas e caminho crítico são derivados desses blocos. O roadmap é também a fonte do
+andamento: a coluna Status da tabela, que pessoas podem editar à mão. 'sync' regenera
+grafo, ondas e situação preservando status e observações; RF novo entra como
 pendente, RF que saiu do PRD vira removido e a linha fica como histórico. 'set' muda um
 status e regenera. A saída não tem data: mesma entrada, mesmo arquivo.
 
@@ -24,7 +26,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from validate import (  # noqa: E402
     RANK,
     norm_id,
-    parse_mermaid,
+    parse_dep_headings,
+    parse_depends,
     parse_priority,
     rf_blocks,
     split_sections,
@@ -52,26 +55,30 @@ def read_prd(path):
     title = re.search(r"^# PRD: (.+)$", text, re.MULTILINE)
     version = re.search(r"^Versão: (\S+)", text, re.MULTILINE)
     sections = dict(split_sections(text))
-    if "Requisitos funcionais" not in sections or "Mapa de dependências e paralelismo" not in sections:
-        fail(f"{path} sem 'Requisitos funcionais' ou 'Mapa de dependências e paralelismo'; rode validate.py")
-    rfs = {}
+    if "Requisitos funcionais" not in sections:
+        fail(f"{path} sem 'Requisitos funcionais'; rode validate.py")
+    # PRD de formato antigo geraria um roadmap sem arestas, com tudo na onda 1.
+    if "Mapa de dependências e paralelismo" in sections or re.search(r"^\*\*Usa de\*\*", text, re.MULTILINE):
+        fail(f"{path} no formato antigo (mapa no PRD ou 'Usa de'); migre para '**Depende de**' em cada RF")
+    rfs, edges = {}, []
     for rid, name, block in rf_blocks(sections["Requisitos funcionais"]):
         if rid:
             rfs[rid] = {"name": name, "prio": parse_priority(block) or "baixa"}
-    parsed = parse_mermaid(sections["Mapa de dependências e paralelismo"])
-    if not parsed:
-        fail("mapa do PRD sem bloco mermaid")
-    _, labels, edges = parsed
-    edges = [(a, lbl, b) for a, lbl, b in edges if (a in rfs or a.startswith("DEP-")) and b in rfs]
-    deps = {n: lbl or n for n, lbl in labels.items() if n.startswith("DEP-")}
-    short = {n: lbl for n, lbl in labels.items() if n in rfs and lbl and lbl != n}
+            edges += [(a, lbl, rid) for a, lbl, _ in parse_depends(block) or [] if a]
+    deps = {
+        did: f"{did} {title}"
+        for did, _, title, _ in parse_dep_headings(sections.get("Dependências", ""))
+        if did
+    }
+    for a, _, b in edges:
+        if a not in rfs and a not in deps:
+            fail(f"{b} depende de {a}, que não existe no PRD; rode validate.py")
     return {
         "title": title.group(1).strip() if title else path.stem,
         "version": version.group(1) if version else "?",
         "rfs": rfs,
         "edges": edges,
         "deps": deps,
-        "short": short,
     }
 
 
@@ -143,6 +150,10 @@ def node_id(n):
     return n.replace("-", "")
 
 
+def quoted(text):
+    return text.replace('"', "#quot;")
+
+
 def render(prd, rows):
     rfs, edges = prd["rfs"], prd["edges"]
     waves, pred = compute_waves(rfs, edges)
@@ -156,12 +167,14 @@ def render(prd, rows):
     order = lambda r: (waves.get(r, 99), -RANK.get(rfs.get(r, {}).get("prio"), 0), r)
     released.sort(key=order)
     ext = {r: sorted(a for a, _, b in edges if b == r and a.startswith("DEP-")) for r in rfs}
+    used_deps = sorted({a for a, _, _ in edges if a.startswith("DEP-")})
 
     out = [f"# Roadmap: {prd['title']}", ""]
     out.append(
         f"Gerado de `prd.md` versão {prd['version']} pela skill prd-writer. Status se muda na coluna "
         "Status da tabela de ondas (pendente, em andamento, feito, bloqueado, removido; bloqueado "
-        "exige motivo em Observação). Grafo, ondas e situação são regenerados a partir do PRD."
+        "exige motivo em Observação). Grafo, ondas e situação são regenerados a partir dos blocos "
+        "'Depende de' de cada RF no PRD; para mudar uma dependência, mude o PRD."
     )
     out += ["", "## Situação", ""]
     pct = round(100 * len(done) / len(active)) if active else 0
@@ -178,11 +191,10 @@ def render(prd, rows):
     out.append(f"- Caminho crítico restante: {' → '.join(cp) + f' ({len(cp)} RFs)' if cp else 'nenhum'}")
 
     out += ["", "## Grafo", "", "Aresta A → B: B não pode ser construído ou validado sem A.", "", "```mermaid", "graph LR"]
-    for d in sorted(prd["deps"]):
-        out.append(f'  {node_id(d)}{{{{"{prd["deps"][d]}"}}}}:::externa')
+    for d in used_deps:
+        out.append(f'  {node_id(d)}{{{{"{quoted(prd["deps"][d])}"}}}}:::externa')
     for r in sorted(rfs, key=order):
-        label = prd["short"].get(r) or f"{r} {rfs[r]['name']}"
-        out.append(f'  {node_id(r)}["{label}"]:::{CLASS_OF[rows[r][0]]}')
+        out.append(f'  {node_id(r)}["{quoted(r + " " + rfs[r]["name"])}"]:::{CLASS_OF[rows[r][0]]}')
     for a, lbl, b in edges:
         out.append(f"  {node_id(a)} -->|{lbl}| {node_id(b)}" if lbl else f"  {node_id(a)} --> {node_id(b)}")
     for name, style in CLASSDEFS.items():
@@ -190,11 +202,21 @@ def render(prd, rows):
     out += ["```", "", "Legenda: cinza pendente, amarelo em andamento, verde feito, vermelho bloqueado, azul dependência externa."]
 
     out += ["", "## Ondas", "", "RFs da mesma onda podem ser desenvolvidos em paralelo.", ""]
-    out += ["| Onda | RF | Nome | Prioridade | Status | Observação |", "| --- | --- | --- | --- | --- | --- |"]
+    out += [
+        "| Onda | RF | Nome | Prioridade | Status | Observação | Depende de |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
+    ]
     for r in sorted(rfs, key=order):
-        out.append(f"| {waves[r]} | {r} | {rfs[r]['name']} | {rfs[r]['prio']} | {rows[r][0]} | {rows[r][1]} |")
+        before = sorted(a for a, _, b in edges if b == r)
+        out.append(
+            f"| {waves[r]} | {r} | {rfs[r]['name']} | {rfs[r]['prio']} | {rows[r][0]} | {rows[r][1]} "
+            f"| {', '.join(before) if before else 'nenhum'} |"
+        )
     for r in sorted(r for r in rows if r not in rfs):
-        out.append(f"| - | {r} | - | - | removido | {rows[r][1]} |")
+        out.append(f"| - | {r} | - | - | removido | {rows[r][1]} | - |")
+    if used_deps:
+        out += ["", "Dependências externas no grafo"]
+        out += [f"- {prd['deps'][d]}" for d in used_deps]
     return "\n".join(out) + "\n"
 
 
