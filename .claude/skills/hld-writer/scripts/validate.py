@@ -41,6 +41,10 @@ ADR_REF = re.compile(r"ADR[- ]?(\d{4})", re.IGNORECASE)
 ADR_FILE_RE = re.compile(r"^(\d{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
 FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 ADR_FM_KEYS = ("status", "title", "description", "superseded_by")
+# Palavras que aparecem em quase todo título de ADR e não identificam a tecnologia.
+GENERIC_WORDS = {"plataforma", "servico", "serviço", "sistema", "banco", "ferramenta", "ferramentas", "provedor",
+                 "linguagem", "framework", "cliente", "dados", "usar", "adotar", "motor", "padrao", "padrão",
+                 "formato", "ambiente", "armazenamento", "cache", "fila", "mensageria", "streaming"}
 
 errors, warnings = [], []
 
@@ -447,7 +451,8 @@ def check_traceability(body, header_prd, prd_path, comp_names, interface_names):
     return rows, nfr
 
 
-def check_adrs(body, techs_pending, adr_dir, acervo, full_text):
+def check_adrs(body, techs_all, adr_dir, acervo, full_text):
+    techs_pending = [t["name"] for t in techs_all if "pendente" in t["decision"].lower()]
     assoc = bullets_under(body, "ADRs associados")
     pending = bullets_under(body, "Decisões pendentes de ADR")
     steps = bullets_under(body, "Próximos passos")
@@ -462,20 +467,37 @@ def check_adrs(body, techs_pending, adr_dir, acervo, full_text):
     if not (adr_dir and adr_dir.is_dir()):
         return assoc, pending, steps
 
-    # Todo ADR citado em qualquer parte do HLD (coluna Decisão, ADRs associados, texto) precisa
-    # existir e ainda valer. Um ADR superseded aponta para o sucessor; é ele que o HLD deve citar.
-    cited = set(ADR_REF.findall(full_text))
-    for num in sorted(cited):
+    # Citação vigente é o primeiro ADR da célula Decisão de cada tecnologia e o primeiro de cada
+    # item de "ADRs associados": esses precisam existir e ainda valer, e um superseded aponta
+    # para o sucessor, que é quem o HLD deve citar. Mencionar o ADR antigo em prosa ("substitui o
+    # ADR-0003") é histórico legítimo e só gera aviso, para o leitor confirmar que é só isso.
+    decisive = set()
+    for tech in techs_all:
+        found = ADR_REF.findall(tech["decision"])
+        if found:
+            decisive.add(found[0])
+    for item in assoc:
+        found = ADR_REF.findall(item)
+        if found:
+            decisive.add(found[0])
+    mentioned = set(ADR_REF.findall(full_text))
+    for num in sorted(mentioned):
         adr = acervo.get(num)
         if adr is None:
             err(f"ADR-{num} citado não existe em {adr_dir}")
-        elif adr["status"] == "superseded":
-            succ = f": cite ADR-{adr['superseded_by']}" if adr["superseded_by"] else ""
-            err(f"ADR-{num} está superseded{succ}")
-        elif adr["status"] in ("rejected", "deprecated"):
-            err(f"ADR-{num} está {adr['status']} e não sustenta decisão do HLD")
-        elif adr["status"] == "proposed":
-            warn(f"ADR-{num} ainda está proposed: decisão em discussão; cite como 'ADR-{num} (proposed)' até ser aceito")
+            continue
+        status = adr["status"]
+        if num in decisive:
+            if status == "superseded":
+                succ = f": cite ADR-{adr['superseded_by']}" if adr["superseded_by"] else ""
+                err(f"ADR-{num} está superseded{succ}")
+            elif status in ("rejected", "deprecated"):
+                err(f"ADR-{num} está {status} e não sustenta decisão do HLD")
+            elif status == "proposed":
+                warn(f"ADR-{num} ainda está proposed: decisão em discussão; cite como 'ADR-{num} (proposed)' até ser aceito")
+        elif status in ("superseded", "rejected", "deprecated"):
+            warn(f"ADR-{num} ({status}) é mencionado no texto; confirme que é só histórico e que a decisão vigente cita o sucessor")
+    cited = mentioned
 
     # Tecnologia pendente que o acervo já decidiu: o HLD deve citar o ADR, não reabrir a decisão.
     accepted = {n: a for n, a in acervo.items() if a["status"] == "accepted"}
@@ -487,12 +509,17 @@ def check_adrs(body, techs_pending, adr_dir, acervo, full_text):
                 err(f"tecnologia '{tech}' está 'pendente de ADR' mas ADR-{num} aceito já decide isso: '{adr['title']}'")
                 break
             # Nome composto ("Fila (RabbitMQ)") contra título curto: um token longo em comum é só suspeita.
-            if any(len(tok) >= 5 and tok in norm(adr["title"]).split() for tok in t.split()):
+            # Palavras genéricas de título ("plataforma", "serviço") não contam, senão tudo casa com tudo.
+            toks = [tok for tok in t.split() if len(tok) >= 5 and tok not in GENERIC_WORDS]
+            if any(tok in norm(adr["title"]).split() for tok in toks):
                 warn(f"tecnologia '{tech}' pendente parece coberta por ADR-{num} aceito: '{adr['title']}'")
                 break
 
-    # ADR aceito que o HLD ignora pode ser escopo de outro sistema; quem lê decide.
+    # ADR aceito que o HLD ignora pode ser escopo de outro sistema; quem lê decide. ADR sobre o
+    # próprio processo de decisão (o 0001 "Usar ADRs...") nunca entra num HLD e não gera aviso.
     for num in sorted(set(accepted) - cited):
+        if re.search(r"\badrs?\b", accepted[num]["title"], re.IGNORECASE):
+            continue
         warn(f"ADR-{num} aceito ('{accepted[num]['title']}') não é citado no HLD; confirme se está fora do escopo")
     return assoc, pending, steps
 
@@ -569,7 +596,7 @@ def main(argv):
     acervo = load_adrs(adr_dir)
     if "ADRs e próximos passos" in by:
         data["adrs"], data["pending"], data["steps"] = check_adrs(
-            by["ADRs e próximos passos"], pending_techs, adr_dir, acervo, text)
+            by["ADRs e próximos passos"], data["techs"], adr_dir, acervo, text)
     hyp = check_style(text)
 
     for w in warnings:
