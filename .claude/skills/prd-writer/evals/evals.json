@@ -85,7 +85,7 @@
         "validate.py sai com 0 erros",
         "roadmap.md mantém RF-001 feito e RF-002 em andamento, tem RF-005 como removido com observação e RF-006 como pendente",
         "Relatório final diz o que mudou no PRD e no roadmap",
-        "O pedido vira um único RF novo (RF-006); RF-007 só existe se o relatório justificar a divisão por prioridade diferente",
+        "O pedido vira um único RF novo (RF-006); RF-007 só existe se o relatório justificar a divisão (prioridade diferente ou ciclo de dependência que um RF só não resolve)",
         "roadmap.md está no formato gerado: rodar roadmap.py sync numa cópia não altera o arquivo",
         "Grafo do roadmap.md reflete os status: RF001 com classe feito, RF002 com classe andamento e RF-005 fora do grafo"
       ]

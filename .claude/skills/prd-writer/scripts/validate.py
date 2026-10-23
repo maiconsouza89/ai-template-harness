@@ -357,7 +357,12 @@ def check_style(text):
         warn(f"{text.count('—')} travessão(ões) '—' no texto; a regra do PRD é não usar")
     hyp = len(re.findall(r"\(hipótese\)", text))
     if hyp > 30:
-        warn(f"{hyp} hipóteses; acima de 30 o documento está decidindo demais pelo usuário")
+        warn(f"{hyp} hipóteses; acima de 30 o documento está decidindo demais pelo usuário "
+             "(a mesma hipótese marcada em vários RFs conta várias vezes: uma marca por decisão)")
+    variants = re.findall(r"\(hipótese[:,]? [^)]{1,60}\)", text)
+    if variants:
+        warn(f"{len(variants)} marca(s) na forma '(hipótese ...)', ex.: {variants[0]!r}; "
+             "use a forma literal '(hipótese)' no fim da linha, que é a que o validador conta")
     lines = text.count("\n")
     if lines > 1000:
         warn(f"{lines} linhas; orçamento do PRD é 250 a 1000")

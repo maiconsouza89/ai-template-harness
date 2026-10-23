@@ -206,7 +206,8 @@ def check_placeholders(text):
         err("data do cabeçalho ainda é AAAA-MM-DD")
     for tag in ("ADR-NNNN", "RF-NNN"):
         if tag in body:
-            err(f"placeholder não preenchido: {tag}")
+            err(f"placeholder não preenchido: {tag} (se for prosa, como 'trocados pelos RF-NNN', "
+                "escreva 'pelos números do PRD'; o validador não distingue prosa de placeholder)")
 
 
 def check_objective(body):
@@ -529,7 +530,12 @@ def check_style(text):
         warn(f"{text.count('—')} travessão(ões) '—' no texto; a regra do HLD é não usar")
     hyp = len(re.findall(r"\(hipótese\)", text))
     if hyp > 30:
-        warn(f"{hyp} hipóteses; acima de 30 o documento está desenhando demais pelo usuário")
+        warn(f"{hyp} hipóteses; acima de 30 o documento está desenhando demais pelo usuário "
+             "(a mesma hipótese marcada em várias seções conta várias vezes: uma marca por decisão)")
+    variants = re.findall(r"\(hipótese[:,]? [^)]{1,60}\)", text)
+    if variants:
+        warn(f"{len(variants)} marca(s) na forma '(hipótese ...)', ex.: {variants[0]!r}; "
+             "use a forma literal '(hipótese)' no fim da linha, que é a que o validador conta")
     lines = text.count("\n")
     if lines > 600:
         warn(f"{lines} linhas; orçamento do HLD é 250 a 600")

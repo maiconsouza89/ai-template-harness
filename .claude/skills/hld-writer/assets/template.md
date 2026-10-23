@@ -181,7 +181,7 @@ Dashboards e alertas
 
 ## Rastreabilidade com o PRD
 
-[sem PRD: abra com uma linha dizendo que não há PRD e que os requisitos vieram do brief, numerados como RB-NN. Com PRD: apague esta linha.]
+[sem PRD: abra com uma linha dizendo que não há PRD, que os requisitos vieram do brief numerados como RB-NN e serão trocados pelos números do PRD quando ele existir (sem escrever RF-NNN literal, que o validador lê como placeholder). Com PRD: apague esta linha.]
 
 | Requisito | Componentes | Interfaces | Fluxo |
 | --- | --- | --- | --- |
