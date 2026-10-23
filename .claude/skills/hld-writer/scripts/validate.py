@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-"""Valida a estrutura de um HLD gerado pela skill hld-writer e, opcionalmente, exporta JSON.
+"""Valida a estrutura de um HLD gerado pela skill hld-writer.
 
-Uso: python3 validate.py docs/HLD.md [--json docs/HLD.json] [--prd docs/PRD.md]
+Uso: python3 validate.py docs/architecture/hld.md [--prd docs/product/prd.md]
 
 Checa o que é mecânico: seções obrigatórias na ordem do template, placeholders esquecidos,
 componentes da tabela presentes no diagrama (e vice-versa), tecnologias sem decisão (ADR ou
 pendência), interfaces sem protocolo ou exposição, metas sem número, riscos incompletos e RFs da
 rastreabilidade que não existem no PRD. Sai com código 1 quando há erro. Avisos não derrubam.
-
-Com --json, escreve o HLD como JSON (chaves em inglês, valores em português, sem campos vazios),
-derivado do Markdown para que os dois nunca divergam. Só biblioteca padrão.
+Só biblioteca padrão.
 """
-import json
 import re
 import sys
 from pathlib import Path
@@ -440,111 +437,11 @@ def check_style(text):
     return hyp
 
 
-# ---------- json ----------
-
-def prune(obj):
-    """Remove campos vazios recursivamente."""
-    if isinstance(obj, dict):
-        return {k: v for k, v in ((k, prune(v)) for k, v in obj.items()) if v not in ("", None, [], {})}
-    if isinstance(obj, list):
-        return [v for v in (prune(x) for x in obj) if v not in ("", None, [], {})]
-    return obj
-
-
-def first_paragraph(body):
-    for para in re.split(r"\n\s*\n", body.strip()):
-        p = para.strip()
-        if p and not p.startswith(("-", "|", "```", "#")) and not re.match(r"^[A-ZÁÉÍÓÚÂÊÔÃÕ][^\n]{0,60}$", p):
-            return p
-    return ""
-
-
-def build_json(text, by, data):
-    meta_m = lambda f: (re.search(rf"^{f}: (.+)$", text, re.MULTILINE) or [None, ""])[1].strip()
-    deploy = bullets_under(by.get("Arquitetura geral", ""), "Ambiente de implantação")
-    deploy_kind = ""
-    if deploy:
-        low = deploy[0].lower()
-        deploy_kind = "hybrid" if "híbrid" in low or "hibrid" in low else "on-premises" if "on-prem" in low else "cloud" if "cloud" in low or "nuvem" in low else ""
-    sec = data["security"]
-    obs = data["observability"]
-    sa = data["scalability"]
-    dm = data["data_model"]
-    doc = {
-        "meta": {
-            "system": (re.search(r"^# HLD: (.+)$", text, re.MULTILINE) or [None, ""])[1].strip(),
-            "hld_owner": meta_m("Responsável"),
-            "version": meta_m("Versão"),
-            "date": meta_m("Data"),
-            "prd": meta_m("PRD"),
-        },
-        "objective": {
-            "technical_goal": first_paragraph(by.get("Objetivo técnico", "")),
-            "problems_addressed": bullets_under(by.get("Objetivo técnico", ""), "Problemas técnicos endereçados"),
-            "linked_systems": bullets_under(by.get("Objetivo técnico", ""), "Sistemas e módulos conectados"),
-        },
-        "architecture": {
-            "topology_overview": first_paragraph(by.get("Arquitetura geral", "")),
-            "component_diagram_mermaid": (mermaid_blocks(by.get("Arquitetura geral", "")) or [""])[0].strip(),
-            "deployment": deploy_kind,
-            "deployment_notes": deploy,
-            "technologies": data["techs"],
-            "patterns": bullets_under(by.get("Arquitetura geral", ""), "Padrões adotados"),
-        },
-        "components": data["components"],
-        "flows": {
-            "request_flows": data["flows"],
-            "data_flow": data["data_flow"],
-            "persistence": data["persistence"],
-        },
-        "data_model": {
-            "entities": dm.get("Entidades principais", []),
-            "relationships": dm.get("Relações", []),
-            "source_of_truth": dm.get("Fonte de verdade", []),
-            "sync_and_cache": dm.get("Sincronização e cache", []),
-            "versioning_and_retention": dm.get("Versionamento e retenção", []),
-        },
-        "interfaces": data["interfaces"],
-        "scalability_availability": {
-            "approach": sa.get("Abordagem geral", []),
-            "techniques": sa.get("Técnicas aplicadas", []),
-            "targets": sa.get("Metas", []),
-        },
-        "security": {
-            "authentication": sec.get("Autenticação", []),
-            "authorization": sec.get("Autorização", []),
-            "data_protection": sec.get("Proteção de dados", []),
-            "secrets_management": sec.get("Gestão de segredos", []),
-        },
-        "observability": {
-            "logs": obs.get("Logs", []),
-            "metrics": obs.get("Métricas", []),
-            "tracing": obs.get("Tracing", []),
-            "dashboards_alerts": obs.get("Dashboards e alertas", []),
-        },
-        "risks": data["risks"],
-        "traceability": {
-            "requirements": data["trace_rows"],
-            "non_functional": data["trace_nfr"],
-        },
-        "adrs_next_steps": {
-            "adrs": data["adrs"],
-            "pending_decisions": data["pending"],
-            "next_steps": data["steps"],
-        },
-    }
-    return prune(doc)
-
-
 # ---------- main ----------
 
 def main(argv):
     args = [a for a in argv[1:]]
-    json_out = prd_arg = None
-    if "--json" in args:
-        i = args.index("--json")
-        json_out = Path(args[i + 1]) if i + 1 < len(args) else None
-        del args[i : i + 2]
+    prd_arg = None
     if "--prd" in args:
         i = args.index("--prd")
         prd_arg = Path(args[i + 1]) if i + 1 < len(args) else None
@@ -557,9 +454,10 @@ def main(argv):
         print(f"arquivo não encontrado: {path}")
         return 2
     text = path.read_text(encoding="utf-8")
-    docs_dir = path.resolve().parent
-    prd_path = prd_arg or (docs_dir / "PRD.md")
-    adr_dir = docs_dir / "ADR"
+    # Layout padrão: docs/architecture/{hld.md, adr/} e docs/product/prd.md.
+    arch_dir = path.resolve().parent
+    prd_path = prd_arg or (arch_dir.parent / "product" / "prd.md")
+    adr_dir = arch_dir / "adr"
 
     check_header(text)
     sections = split_sections(text)
@@ -607,11 +505,6 @@ def main(argv):
     print(f"{path}: {len(data['components'])} componentes, {len(data['interfaces'])} interfaces, "
           f"{len(data['flows'])} fluxos, {len(pending_techs)} tecnologia(s) pendente(s) de ADR, "
           f"{hyp} hipóteses, {len(errors)} erro(s), {len(warnings)} aviso(s)")
-
-    if json_out is not None:
-        doc = build_json(text, by, data)
-        json_out.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        print(f"json: {json_out}")
     return 1 if errors else 0
 
 

@@ -34,7 +34,7 @@ check-actions: ## Valida os workflows do GitHub Actions (actionlint)
 check-secrets: ## Procura segredos no histórico do Git (gitleaks)
 	@sh scripts/checks/check-secrets.sh
 
-check-adr: ## Audita os ADRs em docs/adr e regenera o índice (adr-writer)
+check-adr: ## Audita os ADRs em docs/architecture/adr e regenera o índice (adr-writer)
 	@sh scripts/checks/check-adr.sh
 
 # Contrato de alvos, igual em qualquer stack. Cada projeto gerado implementa scripts/<alvo>.sh;

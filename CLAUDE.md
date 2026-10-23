@@ -31,11 +31,12 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
   `Makefile` e `CLAUDE.md` não mudam.
 - **Release automática.** `CHANGELOG.md` e `.release-please-manifest.json` são gerados pelo
   release-please a partir dos commits; não edite nenhum dos dois.
-- **Documentação do projeto** em `docs/`, criada pelas skills: `/adr-writer` (ADRs em
-  `docs/adr/`, só arquitetura e tecnologia; monta a pasta na primeira vez e `make check-adr`
-  audita), `/prd-writer` (`docs/PRD.md`, regras de produto e requisitos `RF-NNN`, sem stack) e
-  `/hld-writer` (`docs/HLD.md`, o como técnico entre o PRD e os ADRs). Cada skill valida a
-  própria estrutura.
+- **Documentação do projeto** em `docs/product/` (o quê e quando) e `docs/architecture/` (como e
+  por quê), criada pelas skills: `/prd-writer` (`docs/product/prd.md`, regras de produto e
+  requisitos `RF-NNN`, sem stack, e `docs/product/roadmap.md`, andamento por RF gerado do PRD),
+  `/hld-writer` (`docs/architecture/hld.md`, o como técnico entre o PRD e os ADRs) e `/adr-writer`
+  (ADRs em `docs/architecture/adr/`, só arquitetura e tecnologia; monta a pasta na primeira vez e
+  `make check-adr` audita). Cada skill valida a própria estrutura.
 
 ## Onde colocar o quê
 
@@ -48,9 +49,10 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
 | Comando que pessoa ou agente executa | Alvo no `Makefile` chamando `scripts/*.sh` | Uma porta de entrada, lógica testável em sh |
 | Verificação automática | `scripts/checks/check-*.sh` e alvo `check-*` | `make check` agrega tudo; a CI roda o mesmo |
 | Implementação de lint, format, test, build da stack | `scripts/<alvo>.sh` no projeto gerado | O contrato do `Makefile` não muda |
-| Decisão de arquitetura ou tecnologia | `docs/adr/NNNN-*.md` | Histórico com alternativas descartadas |
-| Regras de produto e requisitos | `docs/PRD.md` | Regra de negócio não é ADR |
-| Desenho técnico do sistema | `docs/HLD.md` | Liga requisitos do PRD aos ADRs |
+| Decisão de arquitetura ou tecnologia | `docs/architecture/adr/NNNN-*.md` | Histórico com alternativas descartadas |
+| Regras de produto e requisitos | `docs/product/prd.md` | Regra de negócio não é ADR |
+| Andamento da implementação por requisito | `docs/product/roadmap.md` (via `/prd-writer`) | O PRD só muda quando o produto muda |
+| Desenho técnico do sistema | `docs/architecture/hld.md` | Liga requisitos do PRD aos ADRs |
 | Arquivo de comunidade (`CONTRIBUTING`, `SECURITY`, `CODE_OF_CONDUCT`) | Raiz | Reconhecido pelo GitHub; `LICENSE` só é detectado na raiz |
 
 ## Regras

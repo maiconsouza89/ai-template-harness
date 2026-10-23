@@ -9,5 +9,5 @@
 
 - [ ] `make check` passa localmente.
 - [ ] Documentos afetados atualizados (`CONTRIBUTING.md`, `README.md`, `CLAUDE.md`, `docs/`).
-- [ ] Se toma uma decisão de arquitetura ou tecnologia cara de reverter: ADR novo em `docs/adr/`.
+- [ ] Se toma uma decisão de arquitetura ou tecnologia cara de reverter: ADR novo em `docs/architecture/adr/`.
 - [ ] Se este é o repositório do template: a mudança continua agnóstica de stack.

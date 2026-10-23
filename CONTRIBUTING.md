@@ -131,7 +131,7 @@ chore!: exige commits assinados
 ## Decisões
 
 Decisão de arquitetura ou tecnologia do projeto cara de reverter (stack, ferramenta,
-infraestrutura, contrato técnico) vira um ADR em `docs/adr/`, criado com a skill `/adr-writer`,
-que também monta a pasta e suas regras na primeira vez. Regra de negócio não é ADR; vai para o
-`docs/PRD.md`. Depois de criar ou mudar um ADR, rode `make check-adr` e inclua o `index.md`
-regenerado no commit.
+infraestrutura, contrato técnico) vira um ADR em `docs/architecture/adr/`, criado com a skill
+`/adr-writer`, que também monta a pasta e suas regras na primeira vez. Regra de negócio não é ADR;
+vai para o `docs/product/prd.md`. Depois de criar ou mudar um ADR, rode `make check-adr` e inclua
+o `index.md` regenerado no commit.

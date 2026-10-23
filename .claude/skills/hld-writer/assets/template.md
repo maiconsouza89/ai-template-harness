@@ -3,7 +3,7 @@
 Versão: 0.1.0
 Data: AAAA-MM-DD
 Responsável: [responsável técnico]
-PRD: [docs/PRD.md versão X.Y.Z | não há PRD]
+PRD: [docs/product/prd.md versão X.Y.Z | não há PRD]
 
 ---
 

@@ -16,7 +16,7 @@ Formato: [MADR](https://adr.github.io/madr/) minimal. Ponto de partida: o `asset
 
 Escreva quando a decisão for **cara de reverter** ou quando **alguém vai questioná-la em seis meses**: a escolha de uma ferramenta ou de uma parte da stack, o formato de um contrato entre componentes, estratégia de auth/persistência/erro, ou a escolha deliberada da opção não óbvia.
 
-O acervo é só de **arquitetura e tecnologia do repositório**: stack, ferramentas, infraestrutura, integração, formato de contratos técnicos. Regra de negócio (o que o sistema faz, para quem, sob que condição) não vira ADR; ela vai para o PRD (`docs/PRD.md`). Misturar as duas faz o acervo responder perguntas que não são dele e esconde as decisões técnicas no meio das de produto.
+O acervo é só de **arquitetura e tecnologia do repositório**: stack, ferramentas, infraestrutura, integração, formato de contratos técnicos. Regra de negócio (o que o sistema faz, para quem, sob que condição) não vira ADR; ela vai para o PRD (`docs/product/prd.md`). Misturar as duas faz o acervo responder perguntas que não são dele e esconde as decisões técnicas no meio das de produto.
 
 Não escreva para decisão trivialmente reversível, para "como fazer X" (isso é `CLAUDE.md`/README), nem para escolha que não teve alternativa real — sem deliberação, não há o que registrar. Acervo inflado deixa de ser lido, o que custa mais caro que uma entrada faltando.
 
@@ -114,8 +114,8 @@ Consequência tem que ser **verificável** — algo que alguém possa descobrir 
 
 ```bash
 # audita: nomes, front-matter, numeração, cadeias de supersede, índice
-python3 .claude/skills/adr-writer/scripts/audit.py docs/adr
+python3 .claude/skills/adr-writer/scripts/audit.py docs/architecture/adr
 
 # regenera o index.md a partir do front-matter (rode a cada ADR novo ou mudança de status)
-python3 .claude/skills/adr-writer/scripts/audit.py docs/adr --index
+python3 .claude/skills/adr-writer/scripts/audit.py docs/architecture/adr --index
 ```

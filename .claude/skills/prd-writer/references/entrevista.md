@@ -11,6 +11,8 @@ Perguntas
 - O que está ruim hoje: caro, lento, inseguro, frágil, manual? Peça um exemplo recente com número aproximado (horas perdidas por semana, reais por mês, erros por lote, clientes perdidos).
 - O que já foi tentado e não resolveu?
 
+Se a leitura do repositório no passo 0 já respondeu alguma dessas (sistema existente, público citado no README), confirme em vez de perguntar.
+
 Se o usuário não sabe o público, ofereça: usuário final externo; operador interno; administrador ou gestor. Se não tem número, peça ordem de grandeza (dezenas, centenas, milhares) e registre como hipótese.
 
 ## Etapa 2: objetivos e métricas
@@ -35,14 +37,16 @@ Teste cada item de fora de escopo contra os objetivos e os requisitos já ditos:
 Para cada requisito, nesta ordem:
 1. Nome curto (verbo + objeto: "Cadastrar produto", "Aprovar reembolso").
 2. Descrição em uma frase: o que o sistema faz.
-3. Fluxo principal, passo a passo (3 a 8 passos), do gatilho ao resultado.
-4. Variações comuns e exceções.
-5. Condições de bloqueio ou erro, e o que o usuário vê em cada uma.
-6. Prioridade: alta (sem isso a entrega não serve), media (entrega serve, mas pior), baixa (pode ficar para depois).
+3. Para quem: qual público da etapa 1 usa este RF e o que ganha com ele. Se nenhum público ganha nada, o RF provavelmente é detalhe de implementação ou fundação técnica, e fundação é do HLD.
+4. Fluxo principal, passo a passo (3 a 8 passos), do gatilho ao resultado.
+5. Variações comuns e exceções.
+6. Condições de bloqueio ou erro, e o que o usuário vê em cada uma. Só para RF crítico: cria, altera ou apaga dado, mexe com dinheiro ou permissão, ou é irreversível. RF de consulta pula este item.
+7. Prioridade: alta (sem isso a entrega não serve), media (entrega serve, mas pior), baixa (pode ficar para depois).
+8. Critérios de aceitação: 2 a 5 frases verificáveis, pelo menos uma de sucesso e uma de falha. Cada erro previsto costuma virar um critério de falha. Proponha os critérios a partir do fluxo e peça confirmação; não pergunte "quais são os critérios?" do zero.
 
 Peça a lista de requisitos antes de detalhar; depois detalhe um por um e confirme cada bloco. Se o usuário descreve um requisito que depende de outro ainda não listado, registre o novo e volte.
 
-Sinais para dividir um requisito: fluxo principal com mais de 8 passos; dois gatilhos diferentes; dois públicos com fluxos diferentes.
+Sinais para dividir um requisito: fluxo principal com mais de 8 passos; dois gatilhos diferentes; dois públicos com fluxos diferentes; uma parte essencial e outra que pode esperar (a que pode esperar vira RF de prioridade menor). Fora desses sinais, mantenha o requisito como o usuário o descreveu.
 
 ## Etapa 5: requisitos não funcionais
 
@@ -80,31 +84,35 @@ Para cada risco: frase única, probabilidade (baixa, media, alta), impacto concr
 
 Se o usuário não enxerga riscos, ofereça os típicos do que foi coletado: dependência externa atrasar; adoção baixa pelo público; dado legado pior que o esperado; regra de negócio mudar no meio; volume maior que o previsto.
 
-## Etapa 8: aceitação e validação
+## Etapa 8: aceitação transversal e validação
 
-Critérios de aceitação: uma frase cada, verificável por alguém de fora do time, derivada dos RFs de prioridade alta, das metas e dos NFRs. Exemplo bom: "Toda alteração de preço gera registro com quem alterou, preço anterior e horário". Exemplo ruim: "sistema funciona bem".
+Os critérios de cada RF já saíram na etapa 4. Aqui ficam dois grupos na seção global:
+- Integração entre requisitos: um critério por item de `Usa de`, citando os dois RFs ("RF-001 → RF-002: serviço cadastrado aparece na marcação com a duração certa"). Você deriva esses do mapa; não pergunte.
+- Transversais: o que vale para o sistema todo, derivado das metas e dos NFRs. Uma frase cada, verificável por alguém de fora do time. Exemplo bom: "Toda alteração de preço gera registro com quem alterou, preço anterior e horário". Exemplo ruim: "sistema funciona bem".
 
 Validação: que tipos são obrigatórios (testes automatizados das regras críticas, ponta a ponta do fluxo principal, carga na meta de performance, acessibilidade, segurança de permissões) e qual estratégia (roteiro de aceitação com usuário real, validação exploratória interna, piloto com grupo restrito).
 
 ## Mapa de dependências
 
-Depois da etapa 8, derive e apresente para confirmação, não pergunte do zero. Para cada par de RFs com relação de dado, fluxo ou regra, proponha a aresta com o motivo. Depois monte as ondas e mostre o caminho crítico. Pergunte apenas: "Está correto? Falta ou sobra alguma dependência?".
+Depois da etapa 8, derive e apresente para confirmação, não pergunte do zero. Para cada par de RFs com relação de dado, fluxo ou regra, proponha a aresta com o motivo; nas de dado, diga qual dado ("RF-002 usa de RF-001 os serviços com duração e preço"), porque isso vira a linha `Usa de` e um critério de integração. Aponte RF isolado ou com 4 ou mais predecessores e pergunte se é isso mesmo. Depois monte as ondas, ordenadas por prioridade dentro de cada uma, e mostre o caminho crítico. Pergunte apenas: "Está correto? Falta ou sobra alguma dependência?".
 
 ## Antes de gerar
 
 Confirme cada item; o que falhar volta para a etapa correspondente.
 
 - Cada objetivo tem métrica e meta com número.
-- Cada RF tem nome, descrição, fluxo principal com 3 a 8 passos e prioridade.
+- Cada RF tem nome, descrição, para quem, fluxo principal com 3 a 8 passos, prioridade e 2 a 5 critérios de aceitação (sucesso e falha).
+- Todo RF que cria, altera ou apaga dado, mexe com dinheiro ou permissão, ou é irreversível tem erros previstos.
+- Toda aresta `dado` tem a linha `Usa de` correspondente no RF de destino, e cada uma tem um critério de integração.
 - Requisitos não funcionais incluem performance e disponibilidade, mesmo como hipótese.
 - Nenhum item fora de escopo contradiz um requisito ou objetivo.
 - Toda decisão de produto tem justificativa e trade-off.
 - Cada dependência diz quem entrega o quê.
 - Cada risco tem probabilidade, impacto, mitigação e contingência.
-- Cada critério de aceitação é verificável por alguém de fora.
+- Cada critério de aceitação, do RF ou transversal, é verificável por alguém de fora.
 - Nenhum RF de prioridade alta depende de um RF de prioridade baixa.
 - O grafo não tem ciclo nem aresta transitiva; toda aresta tem rótulo.
-- Cada RF aparece em exatamente uma onda, e nenhum RF está na mesma onda ou antes de um predecessor.
+- Cada RF aparece em exatamente uma onda, nenhum RF está na mesma onda ou antes de um predecessor, e dentro da onda a ordem é prioridade e depois número.
 - Nada no PRD cita linguagem, framework, banco, protocolo ou hospedagem, salvo integração obrigatória descrita pelo que faz.
 - Toda hipótese está marcada com `(hipótese)`.
 - Nenhum travessão "—" no texto.

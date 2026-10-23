@@ -2,8 +2,8 @@
 """Audita um diretório de ADRs (formato MADR minimal).
 
 Uso:
-    python3 audit.py <caminho/para/docs/adr>            # audita
-    python3 audit.py <caminho/para/docs/adr> --index    # audita e regenera index.md
+    python3 audit.py <caminho/para/docs/architecture/adr>            # audita
+    python3 audit.py <caminho/para/docs/architecture/adr> --index    # audita e regenera index.md
 
 Verifica só o que é mecânico e determinístico: nome de arquivo, front-matter,
 ciclo de status, numeração e integridade das cadeias de supersede.

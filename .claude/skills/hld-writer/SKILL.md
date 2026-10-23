@@ -1,13 +1,13 @@
 ---
 name: hld-writer
-description: Conduz uma entrevista estruturada (em blocos por etapa) e gera o HLD (High-Level Design) do sistema em `docs/HLD.md`, em português, com objetivo técnico, arquitetura geral e diagrama de componentes (Mermaid), componentes e responsabilidades, fluxos de requisição e de dados, modelo de dados em alto nível, interfaces públicas com protocolo e SLA, escalabilidade e disponibilidade com metas, segurança, observabilidade, riscos arquiteturais, rastreabilidade com os RF-NNN do PRD e ADRs associados ou pendentes. É o documento do "como" técnico que fica entre o PRD (`/prd-writer`) e os ADRs (`/adr-writer`); também exporta o HLD em JSON. Use esta skill sempre que o usuário quiser escrever, montar, revisar ou atualizar um HLD, "desenho da solução", "arquitetura do sistema", "design técnico", "visão de arquitetura", "documento de arquitetura", "como o sistema vai ser construído", "quais componentes e como se integram", "topologia", mesmo que não diga a palavra HLD; também quando ele colar um PRD, um brief técnico ou uma lista de tecnologias e pedir para "desenhar a arquitetura", "estruturar a solução" ou "definir os componentes" antes de implementar, ou quando `docs/HLD.md` já existir e ele quiser mudar componente, interface, fluxo ou meta.
+description: Conduz uma entrevista estruturada (em blocos por etapa) e gera o HLD (High-Level Design) do sistema em `docs/architecture/hld.md`, em português, com objetivo técnico, arquitetura geral e diagrama de componentes (Mermaid), componentes e responsabilidades, fluxos de requisição e de dados, modelo de dados em alto nível, interfaces públicas com protocolo e SLA, escalabilidade e disponibilidade com metas, segurança, observabilidade, riscos arquiteturais, rastreabilidade com os RF-NNN do PRD e ADRs associados ou pendentes. É o documento do "como" técnico que fica entre o PRD (`/prd-writer`) e os ADRs (`/adr-writer`). Use esta skill sempre que o usuário quiser escrever, montar, revisar ou atualizar um HLD, "desenho da solução", "arquitetura do sistema", "design técnico", "visão de arquitetura", "documento de arquitetura", "como o sistema vai ser construído", "quais componentes e como se integram", "topologia", mesmo que não diga a palavra HLD; também quando ele colar um PRD, um brief técnico ou uma lista de tecnologias e pedir para "desenhar a arquitetura", "estruturar a solução" ou "definir os componentes" antes de implementar, ou quando `docs/architecture/hld.md` já existir e ele quiser mudar componente, interface, fluxo ou meta.
 ---
 
 # HLD Writer
 
 O HLD responde quatro perguntas para quem vai implementar e para quem vai operar: **como a solução se divide em componentes, como eles conversam, onde o dado vive e o que garante que isso escala, resiste, é seguro e é observável**. Tudo nesta skill serve a isso.
 
-Ele fala do **como** técnico. Não reconta a regra de negócio: isso é o PRD em `docs/PRD.md`, e o HLD o cita por `RF-NNN`. Também não é o lugar de justificar cada escolha de tecnologia: isso é ADR em `docs/adr/`, e o HLD aponta para o número. A divisão de trabalho neste repositório é **PRD diz o quê, HLD diz como, ADR diz por quê**. Quando o usuário trouxer uma tecnologia na entrevista, ela entra no HLD com a coluna "Decisão" preenchida: o ADR que já existe, ou `pendente de ADR` com a decisão listada no fim do documento e no relatório final. Tecnologia sem decisão registrada é a primeira coisa que o leitor de daqui a seis meses vai questionar.
+Ele fala do **como** técnico. Não reconta a regra de negócio: isso é o PRD em `docs/product/prd.md`, e o HLD o cita por `RF-NNN`. Também não é o lugar de justificar cada escolha de tecnologia: isso é ADR em `docs/architecture/adr/`, e o HLD aponta para o número. A divisão de trabalho neste repositório é **PRD diz o quê, HLD diz como, ADR diz por quê**. Quando o usuário trouxer uma tecnologia na entrevista, ela entra no HLD com a coluna "Decisão" preenchida: o ADR que já existe, ou `pendente de ADR` com a decisão listada no fim do documento e no relatório final. Tecnologia sem decisão registrada é a primeira coisa que o leitor de daqui a seis meses vai questionar.
 
 ## Modos
 
@@ -15,18 +15,18 @@ Ele fala do **como** técnico. Não reconta a regra de negócio: isso é o PRD e
 |---|---|
 | Pedido de HLD sem material, ou com uma ideia em poucas frases | **Entrevista** |
 | Usuário entregou um brief técnico razoavelmente completo (ou há PRD) e pediu para não ser entrevistado, ou está rodando sem interação | **Direto** |
-| `docs/HLD.md` já existe e o pedido é mudar algo | **Revisão** |
+| `docs/architecture/hld.md` já existe e o pedido é mudar algo | **Revisão** |
 
 Em qualquer modo, comece lendo `assets/template.md` (esqueleto obrigatório da saída) e `references/entrevista.md` (perguntas por etapa, opções para oferecer, defaults e checagens). Leia os dois antes da primeira pergunta: a entrevista é guiada pelo que o template vai precisar, não o contrário.
 
 ## Passo 0: destino e insumos
 
-O HLD do sistema vive em **`docs/HLD.md`** na raiz do repositório (`git rev-parse --show-toplevel`). Um só arquivo, um só lugar: é o que ADRs, issues e código vão referenciar. Se o arquivo existe, isto é **Revisão**, não um HLD novo. Se o usuário pediu outro caminho (um HLD por módulo, por exemplo), use e diga que está fora do padrão.
+O HLD do sistema vive em **`docs/architecture/hld.md`** na raiz do repositório (`git rev-parse --show-toplevel`). Um só arquivo, um só lugar: é o que ADRs, issues e código vão referenciar. Se o arquivo existe, isto é **Revisão**, não um HLD novo. Se o usuário pediu outro caminho (um HLD por módulo, por exemplo), use e diga que está fora do padrão.
 
 Antes de perguntar qualquer coisa, leia o que já existe:
 
-- **`docs/PRD.md`**, se existir. É de onde saem os RFs que a arquitetura precisa atender e os requisitos não funcionais que viram metas (disponibilidade, performance, segurança, compliance). Anote a versão para o cabeçalho. O `Responsável` é quem o usuário indicar; sem indicação, use o nome do `git config user.name` marcado `(hipótese)` ou escreva `a definir`. Se não existir, diga em uma linha que `/prd-writer` gera um, e continue: o HLD pode nascer sem PRD, mas a seção de rastreabilidade vai dizer isso em vez de fingir cobertura.
-- **`docs/adr/index.md`**, se existir. Toda tecnologia ou padrão que já tem ADR entra no HLD com o número; o que não tem vira pendência. Não reabra uma decisão `accepted` na entrevista: cite-a.
+- **`docs/product/prd.md`**, se existir. É de onde saem os RFs que a arquitetura precisa atender e os requisitos não funcionais que viram metas (disponibilidade, performance, segurança, compliance). Anote a versão para o cabeçalho. O `Responsável` é quem o usuário indicar; sem indicação, use o nome do `git config user.name` marcado `(hipótese)` ou escreva `a definir`. Se não existir, diga em uma linha que `/prd-writer` gera um, e continue: o HLD pode nascer sem PRD, mas a seção de rastreabilidade vai dizer isso em vez de fingir cobertura.
+- **`docs/architecture/adr/index.md`**, se existir. Toda tecnologia ou padrão que já tem ADR entra no HLD com o número; o que não tem vira pendência. Não reabra uma decisão `accepted` na entrevista: cite-a.
 
 ## Modo: Entrevista
 
@@ -53,7 +53,7 @@ Regras da conversa:
 - **Quando o usuário não sabe, ofereça 2 ou 3 opções plausíveis** e marque a escolhida como `(hipótese)`. Os defaults de `references/entrevista.md` existem para isso. Nunca preencha em silêncio.
 - **Inconsistência para a entrevista.** Meta de disponibilidade que a topologia não entrega (um banco sem réplica e 99.99 por cento), componente que aparece num fluxo e não na lista, interface externa sem autenticação: aponte e peça correção antes de continuar.
 - **Não invente detalhes.** Se o usuário não deu, é lacuna ou hipótese, nunca fato.
-- **Não reabra decisão aceita.** ADR `accepted` em `docs/adr/` é cenário dado. Se o usuário quiser mudar, isso é um ADR novo com `supersedes`, via `/adr-writer`, não uma linha do HLD.
+- **Não reabra decisão aceita.** ADR `accepted` em `docs/architecture/adr/` é cenário dado. Se o usuário quiser mudar, isso é um ADR novo com `supersedes`, via `/adr-writer`, não uma linha do HLD.
 - Perguntas simples, uma ideia por pergunta, sem travessão "—" no texto. A regra do travessão vale também para o HLD gerado.
 
 ## Modo: Direto
@@ -62,7 +62,7 @@ Quando o brief ou o PRD já veio, não encene a entrevista. Mapeie o material so
 
 ## Modo: Revisão
 
-1. Leia o `docs/HLD.md` atual inteiro, e o `docs/PRD.md` se existir, antes de perguntar qualquer coisa.
+1. Leia o `docs/architecture/hld.md` atual inteiro, e o `docs/product/prd.md` se existir, antes de perguntar qualquer coisa.
 2. Altere só o que o pedido toca. Componente ou interface removida sai da tabela, do diagrama, dos fluxos e da rastreabilidade de uma vez: meia remoção é pior que nenhuma.
 3. Refaça a rastreabilidade: quase toda mudança de componente ou interface muda quem atende qual RF.
 4. Se a mudança troca uma tecnologia ou padrão com ADR `accepted`, pare e diga que isso pede ADR novo (`/adr-writer`), e só então atualize o HLD apontando para ele.
@@ -97,12 +97,11 @@ Três hábitos fazem quase todo o trabalho:
 
 **Hipótese é marcada, sempre, e na linha em que ocorre.** Tudo que você completou sem o usuário dizer leva `(hipótese)` no fim da linha, nessa forma literal, porque é ela que o validador conta e que o leitor procura; variantes como "(hipótese sobre o volume)" se perdem. Vale para número que você inventou (SLA, limite, retenção) e vale em dobro quando o HLD muda algo que o brief ou o PRD disse: reordenar o pipeline, trocar síncrono por assíncrono, dividir um componente. Mudança dessas é hipótese marcada no próprio texto, não só no relatório, porque quem lê o HLD daqui a um mês não vai ler o relatório. Quem lê precisa separar o que o time decidiu do que o documento sugeriu. Passou de 30 marcações, você está desenhando demais pelo usuário: corte ou pergunte. O relatório final lista todas as hipóteses, agrupadas por seção, as que mais mudam a arquitetura primeiro.
 
-**Toda tecnologia aponta para uma decisão.** A tabela de tecnologias tem a coluna "Decisão" e ela nunca fica vazia: ou é `ADR-NNNN` que existe em `docs/adr/`, ou é `pendente de ADR` com a decisão repetida em "Decisões pendentes de ADR" com as opções em jogo e o critério de escolha. O HLD não é o lugar de argumentar por que PostgreSQL e não outro banco; é o lugar de dizer que o banco é PostgreSQL e onde está o argumento.
+**Toda tecnologia aponta para uma decisão.** A tabela de tecnologias tem a coluna "Decisão" e ela nunca fica vazia: ou é `ADR-NNNN` que existe em `docs/architecture/adr/`, ou é `pendente de ADR` com a decisão repetida em "Decisões pendentes de ADR" com as opções em jogo e o critério de escolha. O HLD não é o lugar de argumentar por que PostgreSQL e não outro banco; é o lugar de dizer que o banco é PostgreSQL e onde está o argumento.
 
 ## Finalizar
 
 1. Rode a checagem de consistência de `references/entrevista.md` (seção "Antes de gerar").
 2. Preencha `assets/template.md` sem mudar títulos, ordem ou negritos: o validador e quem lê dependem dessa estrutura. Seção sem conteúdo real não fica com placeholder; fica com uma linha dizendo que não se aplica e por quê.
-3. Valide: `python3 <skill-dir>/scripts/validate.py docs/HLD.md`. Ele checa seções, placeholders esquecidos, componentes fora do diagrama (e vice-versa), tecnologias sem decisão, interfaces sem protocolo ou exposição, metas sem número, riscos incompletos e RFs da rastreabilidade que não existem no PRD. Corrija até sair sem erro.
-4. Pergunte ao usuário, em uma linha, se quer o HLD também em JSON (chaves em inglês, valores em português). Se quiser, ou se estiver rodando sem interação e o pedido mencionou JSON: `python3 <skill-dir>/scripts/validate.py docs/HLD.md --json docs/HLD.json`. O script deriva o JSON do Markdown, então os dois nunca divergem. Chaves e enumerações (`deployment`, `probability`) ficam em inglês por contrato do esquema; todo o resto é o texto em português do HLD.
-5. Reporte: caminho do arquivo, componentes e interfaces (quantidade), RFs cobertos e RFs sem componente, componentes sem RF, decisões pendentes de ADR (as que mais travam a implementação primeiro), hipóteses (as que mais mudam a arquitetura primeiro) e lacunas abertas.
+3. Valide: `python3 <skill-dir>/scripts/validate.py docs/architecture/hld.md`. Ele checa seções, placeholders esquecidos, componentes fora do diagrama (e vice-versa), tecnologias sem decisão, interfaces sem protocolo ou exposição, metas sem número, riscos incompletos e RFs da rastreabilidade que não existem no PRD. Corrija até sair sem erro.
+4. Reporte: caminho do arquivo, componentes e interfaces (quantidade), RFs cobertos e RFs sem componente, componentes sem RF, decisões pendentes de ADR (as que mais travam a implementação primeiro), hipóteses (as que mais mudam a arquitetura primeiro) e lacunas abertas.

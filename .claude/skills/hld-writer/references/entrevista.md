@@ -2,7 +2,7 @@
 
 Perguntas por etapa, opções para oferecer quando o usuário não sabe, defaults (sempre marcados como hipótese) e checagens antes de gerar. Use como base; adapte ao vocabulário do usuário. Uma ideia por pergunta. Em cada etapa, feche com resumo de 3 a 6 linhas e confirmação.
 
-Antes da etapa 1, leia `docs/PRD.md` e `docs/adr/index.md` se existirem. Metade das perguntas abaixo já tem resposta lá: confirme em vez de perguntar do zero ("o PRD pede 99.9 por cento de disponibilidade; a arquitetura precisa entregar isso. Confere?").
+Antes da etapa 1, leia `docs/product/prd.md` e `docs/architecture/adr/index.md` se existirem. Metade das perguntas abaixo já tem resposta lá: confirme em vez de perguntar do zero ("o PRD pede 99.9 por cento de disponibilidade; a arquitetura precisa entregar isso. Confere?").
 
 ## Etapa 1: contexto e objetivo técnico
 
@@ -19,7 +19,7 @@ Se o usuário não sabe os sistemas conectados, ofereça: identidade e acesso; n
 Perguntas
 - Como o sistema se divide em alto nível: um serviço só, poucos serviços, muitos microsserviços, pipeline de dados, agentes?
 - Onde roda: cloud (qual), on-premises, híbrido? Há restrição de dados que obriga um lugar?
-- Quais tecnologias já estão decididas (linguagem, banco, mensageria, framework)? Para cada uma: há ADR em `docs/adr/`? Se não, vira "pendente de ADR".
+- Quais tecnologias já estão decididas (linguagem, banco, mensageria, framework)? Para cada uma: há ADR em `docs/architecture/adr/`? Se não, vira "pendente de ADR".
 - Que padrões arquiteturais fazem sentido aqui e por quê: camadas, hexagonal, event-driven, CQRS, REST, gRPC, BFF, saga?
 
 Se o usuário não sabe a topologia, ofereça pela escala e pelo time:
@@ -109,7 +109,7 @@ Se o usuário não enxerga riscos, ofereça os típicos do que foi coletado: dep
 
 ## Etapa 11: ADRs e próximos passos
 
-- Quais ADRs já cobrem decisões deste HLD? Liste por número e título a partir de `docs/adr/index.md`.
+- Quais ADRs já cobrem decisões deste HLD? Liste por número e título a partir de `docs/architecture/adr/index.md`.
 - Que decisões ficaram pendentes (toda tecnologia marcada "pendente de ADR" na etapa 2 entra aqui)? Para cada uma: opções em jogo e critério de escolha.
 - Quais são os próximos passos técnicos até a implementação: prova de conceito, ADRs a escrever, detalhamento de componente, contrato de interface a publicar?
 

@@ -1,13 +1,13 @@
 ---
 name: prd-writer
-description: Conduz uma entrevista estruturada (em blocos por etapa) e gera o PRD do sistema em `docs/PRD.md`, em português, com regras de produto, requisitos funcionais numerados (RF-001...), requisitos não funcionais como metas observáveis, riscos, critérios de aceitação e, no fim, um mapa de dependências entre requisitos (Mermaid) com ondas de implementação dizendo o que pode ser desenvolvido em paralelo. O PRD não fala de stack; decisões técnicas são encaminhadas para ADRs. Use esta skill sempre que o usuário quiser escrever, montar, revisar ou atualizar um PRD, "documento de requisitos", "spec do produto", "definir o que o sistema faz", "levantar requisitos", "mapear o que depende do quê" ou "o que dá pra fazer em paralelo", mesmo que não diga a palavra PRD; também quando ele colar um brief ou uma ideia de sistema e pedir para "estruturar isso" antes de implementar, ou quando `docs/PRD.md` já existir e ele quiser mudar um requisito, escopo ou critério.
+description: Conduz uma entrevista estruturada (em blocos por etapa) e gera o PRD do sistema em `docs/product/prd.md`, em português, com regras de produto, requisitos funcionais numerados (RF-001...) cada um com público, fluxo e critérios de aceitação próprios, requisitos não funcionais como metas observáveis, riscos e um mapa de dependências entre requisitos (Mermaid) com ondas de implementação dizendo o que pode ser desenvolvido em paralelo. Junto do PRD mantém o roadmap vivo em `docs/product/roadmap.md`, com o grafo colorido por status e o que está liberado para começar. O PRD não fala de stack; decisões técnicas são encaminhadas para ADRs. Use esta skill sempre que o usuário quiser escrever, montar, revisar ou atualizar um PRD, "documento de requisitos", "spec do produto", "definir o que o sistema faz", "levantar requisitos", "mapear o que depende do quê" ou "o que dá pra fazer em paralelo", mesmo que não diga a palavra PRD; também quando ele colar um brief ou uma ideia de sistema e pedir para "estruturar isso" antes de implementar, quando o PRD já existir e ele quiser mudar um requisito, escopo ou critério, ou quando quiser registrar andamento ("marca o RF-003 como feito", "RF-004 travou esperando o fornecedor", "atualiza o roadmap", "o que dá pra pegar agora?").
 ---
 
 # PRD Writer
 
-O PRD responde quatro perguntas para quem vai construir e para quem vai conferir depois: **por que o sistema existe, o que ele precisa fazer, como saberemos que está pronto e em que ordem construir**. Tudo nesta skill serve a isso.
+O PRD responde quatro perguntas para quem vai construir e para quem vai conferir depois: **por que o sistema existe, o que ele precisa fazer, como saberemos que está pronto e em que ordem construir**. O roadmap responde a quinta, que muda toda semana: **onde estamos**. Tudo nesta skill serve a isso.
 
-Ele fala de **produto**: regras, fluxos, metas observáveis, riscos. Não fala de stack. Linguagem, banco, framework, protocolo, hospedagem e arquitetura ficam fora, porque o PRD precisa continuar verdadeiro quando a stack mudar, e porque essas escolhas já têm casa neste repositório: `docs/adr/` via `/adr-writer`. Quando o usuário disser "vamos usar X" no meio da entrevista, anote como **decisão pendente de ADR** no relatório final e não no PRD. A exceção é quando a tecnologia é o próprio produto ou uma restrição imposta de fora (integração obrigatória com o ERP da empresa, por exemplo): aí ela entra como dependência externa ou requisito, descrita pelo que faz, não por como é feita.
+O PRD fala de **produto**: regras, fluxos, metas observáveis, riscos. Não fala de stack. Linguagem, banco, framework, protocolo, hospedagem e arquitetura ficam fora, porque o PRD precisa continuar verdadeiro quando a stack mudar, e porque essas escolhas já têm casa neste repositório: ADRs via `/adr-writer` e o HLD via `/hld-writer`. Isso inclui o trabalho de fundação (estrutura inicial do projeto, banco, autenticação): não é RF, é do HLD. Quando o usuário disser "vamos usar X" no meio da entrevista, anote como **decisão pendente de ADR** no relatório final e não no PRD. A exceção é quando a tecnologia é o próprio produto ou uma restrição imposta de fora (integração obrigatória com o ERP da empresa, por exemplo): aí ela entra como dependência externa ou requisito, descrita pelo que faz, não por como é feita.
 
 ## Modos
 
@@ -15,13 +15,16 @@ Ele fala de **produto**: regras, fluxos, metas observáveis, riscos. Não fala d
 |---|---|
 | Pedido de PRD sem material, ou com uma ideia em poucas frases | **Entrevista** |
 | Usuário entregou um brief razoavelmente completo e pediu para não ser entrevistado, ou está rodando sem interação | **Direto** |
-| `docs/PRD.md` já existe e o pedido é mudar algo | **Revisão** |
+| `docs/product/prd.md` já existe e o pedido é mudar requisito, escopo ou critério | **Revisão** |
+| O pedido é registrar andamento de um ou mais RFs, ou saber o que está liberado | **Progresso** |
 
-Em qualquer modo, comece lendo `assets/template.md` (esqueleto obrigatório da saída) e `references/entrevista.md` (perguntas por etapa, opções para oferecer, defaults e checagens). Leia os dois antes da primeira pergunta: a entrevista é guiada pelo que o template vai precisar, não o contrário.
+Nos três primeiros, comece lendo `assets/template.md` (esqueleto obrigatório da saída) e `references/entrevista.md` (perguntas por etapa, opções para oferecer, defaults e checagens). Leia os dois antes da primeira pergunta: a entrevista é guiada pelo que o template vai precisar, não o contrário.
 
-## Passo 0: destino
+## Passo 0: destino e contexto
 
-O PRD do sistema vive em **`docs/PRD.md`** na raiz do repositório (`git rev-parse --show-toplevel`). Um só arquivo, um só lugar: é o que `CLAUDE.md`, ADRs e issues vão referenciar por `RF-NNN`. Se o arquivo existe, isto é **Revisão**, não um PRD novo. Se o usuário pediu outro caminho, use e diga que está fora do padrão.
+O PRD vive em **`docs/product/prd.md`** na raiz do repositório (`git rev-parse --show-toplevel`) e o roadmap ao lado, em `docs/product/roadmap.md`. Um só PRD por repositório: é o que `CLAUDE.md`, HLD, ADRs e issues vão referenciar por `RF-NNN`. Se o arquivo existe, isto é **Revisão**, não um PRD novo. Se existir um PRD no caminho antigo `docs/PRD.md`, proponha movê-lo (com `git mv`) antes de seguir. Se o usuário pediu outro caminho, use e diga que está fora do padrão.
+
+Antes da primeira pergunta, faça uma **leitura leve do repositório**: README, o que houver de HLD e ADRs em `docs/architecture/`, e uma olhada na estrutura do código, se houver código. Diga em uma linha o que encontrou ("sistema novo, sem código" ou "já existe cadastro de clientes e um ADR escolhendo o meio de pagamento"). Isso alimenta a etapa 1 e o contexto de implantação, e evita perguntar o que o repositório já responde. Não transforme isso em auditoria: o objetivo é não fazer pergunta boba, não documentar o código.
 
 ## Modo: Entrevista
 
@@ -32,13 +35,15 @@ Oito etapas. Em cada uma: faça **um bloco de perguntas** (não uma por vez e n�
 | 1. Contexto e problema | Produto, público, contexto de implantação (sistema novo, substitui ou se integra a algo existente), objetivo de negócio, dor atual com números aproximados, o que já foi tentado |
 | 2. Objetivos e métricas | Cada objetivo com métrica e meta alvo. Objetivo sem número vira desejo, não requisito |
 | 3. Escopo | Incluso e fora de escopo. Fora de escopo explícito é o que impede a conversa de "mas eu achei que..." meses depois |
-| 4. Requisitos funcionais | Um por um: nome, descrição em uma frase, fluxo principal passo a passo, variações e exceções, erros previstos, prioridade. É a etapa longa; vá por requisito e confirme cada bloco |
+| 4. Requisitos funcionais | Um por um: nome, descrição em uma frase, para quem, fluxo principal passo a passo, variações e exceções, erros previstos quando o RF é crítico, prioridade e **critérios de aceitação** (sucesso e falha). É a etapa longa; vá por requisito e confirme cada bloco |
 | 5. Requisitos não funcionais | Metas observáveis: tempo de resposta percebido, disponibilidade, quem pode fazer o quê, auditoria, compliance, acessibilidade, compatibilidade (dispositivos, navegadores, idiomas) |
 | 6. Decisões de produto e dependências | Regras já dadas (com justificativa e trade-off) e o que precisa chegar de fora: outro time, política, aprovação, serviço de terceiro |
 | 7. Riscos | Probabilidade, impacto, mitigações (lista) e plano de contingência |
-| 8. Aceitação e validação | Checklist verificável de pronto e tipos de validação obrigatórios |
+| 8. Aceitação transversal e validação | Critérios que valem para o sistema todo (derivados de metas e NFRs) e tipos de validação obrigatórios. Os critérios de cada RF já saíram na etapa 4 |
 
-Depois da etapa 8 vem o **mapa de dependências**, que você deriva do que foi coletado e apresenta para confirmação (ver abaixo). Não pergunte "do que RF-003 depende?"; proponha "RF-003 depende de RF-001 porque edita o cadastro que RF-001 cria. Confere?". O usuário corrige melhor do que inventa.
+Os critérios de aceitação de um RF saem **junto com o RF**, na etapa 4, porque é ali que o fluxo e os erros estão frescos: cada erro previsto costuma virar um critério de falha. Deixar para o fim produz uma lista genérica que ninguém consegue ligar a um requisito.
+
+Depois da etapa 8 vem o **mapa de dependências**, que você deriva do que foi coletado e apresenta para confirmação (ver abaixo). Não pergunte "do que RF-003 depende?"; proponha "RF-003 depende de RF-001 porque lê os serviços que RF-001 cadastra. Confere?". O usuário corrige melhor do que inventa.
 
 Regras da conversa:
 
@@ -51,13 +56,26 @@ Regras da conversa:
 
 Quando o brief já veio, não encene a entrevista. Mapeie o brief sobre as oito etapas, preencha o que está lá, marque `(hipótese)` o que você completou com os defaults e **liste as lacunas no relatório final** em vez de perguntar uma a uma. Se houver uma ou duas perguntas cuja resposta muda o PRD inteiro (quem é o público, se o sistema é novo ou substitui um existente), faça só essas, e só se houver alguém para responder.
 
+**Brief vago não vira PRD.** Se o pedido tem poucas frases sem domínio claro ("um sistema para gerenciar coisas", menos de umas 20 palavras sobre o produto), pergunte o domínio e o público antes de qualquer etapa, mesmo que o usuário tenha pedido para não ser entrevistado. Um PRD inteiro de hipóteses parece pronto e não é: é pior do que nenhum. Sem ninguém para responder, pare e explique o que falta.
+
 ## Modo: Revisão
 
-1. Leia o `docs/PRD.md` atual inteiro antes de perguntar qualquer coisa.
-2. Altere só o que o pedido toca. Requisito novo recebe o próximo `RF-NNN` livre; número nunca é reutilizado, mesmo que um requisito saia, porque issues e commits já podem citá-lo. Requisito removido fica listado em "Fora de escopo" com uma linha de motivo.
+1. Leia o `docs/product/prd.md` atual inteiro antes de perguntar qualquer coisa.
+2. Altere só o que o pedido toca. Requisito novo recebe o próximo `RF-NNN` livre; número nunca é reutilizado, mesmo que um requisito saia, porque issues, commits e o roadmap já podem citá-lo. Requisito removido fica listado em "Fora de escopo" com uma linha de motivo.
 3. Refaça o mapa de dependências e as ondas: quase toda mudança de requisito muda a ordem de construção.
 4. Suba a versão no cabeçalho (`0.1.0` → `0.2.0` para requisito novo ou removido, `0.1.1` para ajuste de texto) e a data.
-5. Valide e reporte o que mudou.
+5. Valide, sincronize o roadmap (o script marca como `removido` o RF que saiu e põe como `pendente` o que entrou) e reporte o que mudou.
+
+## Modo: Progresso
+
+O pedido é "marca o RF-003 como feito", "RF-004 está travado esperando o fornecedor", "o que dá pra pegar agora?", vindo do usuário ou de outra skill que invocou esta.
+
+1. Leia `docs/product/roadmap.md`. Se não existe e o PRD existe, crie com `sync`.
+2. Para cada mudança: `python3 <skill-dir>/scripts/roadmap.py set RF-NNN "<status>"`, com `--motivo "..."` quando o status é `bloqueado`. Status válidos: `pendente`, `em andamento`, `feito`, `bloqueado`. `removido` não se marca à mão; vem de o RF sair do PRD.
+3. **Não toque no PRD.** Andamento não muda o produto. Se a mudança pedida é de escopo ("o RF-005 não vai mais ser feito"), isso é Revisão: o RF sai do PRD e o roadmap acompanha.
+4. Reporte a seção "Situação" do roadmap: onda atual, o que está liberado, o que está bloqueado e o caminho crítico restante. Repasse qualquer aviso do script (RF feito que depende de RF não feito costuma ser status marcado errado).
+
+O roadmap também aceita edição manual da coluna Status; o próximo `sync` preserva o que a pessoa escreveu e recolore o grafo.
 
 ## Mapa de dependências e paralelismo
 
@@ -65,12 +83,21 @@ Quando o brief já veio, não encene a entrevista. Mapeie o brief sobre as oito 
 
 - **Nó** = requisito funcional (`RF-NNN`). Dependência externa relevante para a ordem entra como nó `DEP-N` com forma diferente.
 - **Aresta A → B** quando B não pode ser construído ou validado sem A. Três motivos, e só esses: **dado** (B lê ou altera algo que A cria), **fluxo** (B é passo posterior obrigatório da mesma jornada) e **regra** (B aplica uma regra que A define). Ponha o motivo no rótulo da aresta. "Faz sentido fazer depois" não é dependência; é preferência, e preferência não vai no grafo.
+- **Aresta `dado` e `Usa de` são a mesma informação.** Toda aresta `A -->|dado| B` tem, no RF B, a linha `- A: <qual dado>` no bloco **Usa de**, e vice-versa; o validador cruza os dois. Cada item de `Usa de` vira um critério de integração na seção global de critérios ("o serviço criado em RF-001 aparece na marcação de RF-002 com a duração certa"). É onde costuma quebrar quando dois RFs são feitos em paralelo por pessoas diferentes.
 - **Só dependências diretas.** Se A → B e B → C, não desenhe A → C. Aresta transitiva polui e esconde o caminho crítico.
 - **Sem ciclos.** Ciclo significa que dois requisitos são um só ou que um deles precisa ser dividido. Resolva antes de escrever.
-- **Ondas**: onda 1 são os RFs sem predecessor; um RF entra na onda n quando todos os seus predecessores estão em ondas menores que n. Tudo que está na mesma onda pode ser desenvolvido em paralelo, e isso é a resposta à pergunta "o que dá pra fazer junto". Diga também o **caminho crítico** (a cadeia mais longa), porque é ele que define o prazo mínimo.
+- **Nós atípicos se questionam.** RF isolado (sem aresta nenhuma) ou com 4 ou mais predecessores quase sempre é mapa mal derivado. Pergunte ao propor o mapa; o validador avisa.
+- **Ondas**: onda 1 são os RFs sem predecessor; um RF entra na onda n quando todos os seus predecessores estão em ondas menores que n. Tudo que está na mesma onda pode ser desenvolvido em paralelo. Dentro da onda, liste por prioridade (alta, media, baixa) e depois por número: é a ordem em que alguém sozinho pegaria. Diga também o **caminho crítico** (a cadeia mais longa), porque é ele que define o prazo mínimo.
 - **Prioridade herda para trás.** Se um RF de prioridade alta depende de um RF de prioridade baixa, o de baixa não é baixa. Sinalize e corrija na etapa de requisitos.
+- **Parte essencial e parte melhoria viram dois RFs.** Se um RF tem um núcleo sem o qual a entrega não serve e um acréscimo que pode esperar (exportar em mais formatos, filtros avançados), divida: o acréscimo vira outro RF, de prioridade menor, com aresta `fluxo` ou `regra` partindo do núcleo. Assim ele aparece nas ondas e no roadmap em vez de ficar escondido dentro de um RF "alta". O critério é **prioridade diferente**, não "dá para separar": um requisito que o usuário pediu como um só, com tudo na mesma prioridade, fica um só, mesmo que tenha dois momentos de uso. Na Revisão isso pesa mais, porque o usuário descreveu a mudança; dividir sem motivo de prioridade é reescrever o pedido dele.
 
 Formato: um bloco Mermaid `graph LR` seguido da tabela de ondas, exatamente como no template. Mermaid porque renderiza no GitHub e ainda é texto greppável para quem não renderiza.
+
+## Roadmap vivo
+
+`docs/product/roadmap.md` é gerado por `scripts/roadmap.py` a partir do PRD e nunca é escrito à mão do zero. Ele tem a situação atual (concluídos, onda atual, liberados para começar, em andamento, bloqueados, caminho crítico restante), o grafo do PRD com os nós coloridos por status e a tabela de ondas com as colunas Status e Observação. O PRD é a fonte de **o que** e **em que ordem**; o roadmap é a fonte de **onde estamos**. Por isso eles são arquivos separados: o PRD só muda quando o produto muda, e sua versão continua significando algo.
+
+Todo PRD criado ou revisado termina com `python3 <skill-dir>/scripts/roadmap.py sync` (o padrão é `--prd docs/product/prd.md`). O sync preserva os status existentes, põe RF novo como `pendente` e marca como `removido` o RF que saiu, mantendo a linha como histórico. A saída é determinística: rodar duas vezes sem mudança não altera o arquivo.
 
 ## Estilo e orçamento
 
@@ -78,17 +105,21 @@ O PRD é lido por quem vai implementar sob pressão de prazo. Tamanho não é ri
 
 | Seção | Orçamento |
 |---|---|
-| Documento inteiro | 250 a 500 linhas; acima disso, há requisito que devia ser dividido em outro PRD ou detalhe que é de implementação |
+| Documento inteiro | 250 a 1000 linhas; acima disso, há requisito que devia ser dividido em outro PRD ou detalhe que é de implementação |
 | Requisitos funcionais | 6 a 15. Menos que isso raramente é um sistema; mais que isso é mais de uma entrega |
 | Resumo | até 5 frases |
 | Cada problema priorizado | 1 linha com impacto e prioridade |
+| Para quem, em cada RF | 1 linha: público do Contexto e o que ganha |
 | Fluxo principal de um RF | 3 a 8 passos |
+| Critérios de aceitação de um RF | 2 a 5, pelo menos um de sucesso e um de falha |
 | Cada critério de aceitação | 1 frase verificável |
 | Cada risco | probabilidade, impacto, 1 a 3 mitigações, 1 contingência |
 
-Dois hábitos fazem quase todo o trabalho:
+Alguns hábitos fazem quase todo o trabalho:
 
 **Verificável ou fora.** "Funciona bem" e "deve ser rápido" não são critério nem requisito. "Toda alteração de preço gera registro com quem alterou, valor anterior e horário" é. Mesma régua para metas (número e prazo) e para requisitos não funcionais (um alvo que dê para medir sem saber a stack).
+
+**Erros previstos onde falhar custa caro.** O bloco é obrigatório quando o RF cria, altera ou apaga dado, mexe com dinheiro ou permissão, ou faz algo irreversível. Em RF só de consulta ou exibição, falhar significa recarregar, e o bloco é ruído: omita. Na dúvida, pergunte "se isso falhar em silêncio, alguém perde dado, dinheiro ou acesso?".
 
 **Hipótese é marcada, sempre, e só quando muda o produto.** Tudo que você completou sem o usuário dizer leva `(hipótese)` no fim da linha. Quem lê precisa separar o que o negócio decidiu do que o documento sugeriu. Mas hipótese é para regra de negócio que alguém precisa confirmar (o que conta como falta, quem aprova, acesso expira ou não), não para detalhe de implementação que o time decide sozinho (tamanho de grade de horário, formato de arquivo, limite de upload). Detalhe desse tipo nem entra no PRD. Passou de 30 marcações, você está decidindo demais pelo usuário: corte. O relatório final lista todas as hipóteses juntas, as que mais mudam o produto primeiro.
 
@@ -97,6 +128,7 @@ Dois hábitos fazem quase todo o trabalho:
 ## Finalizar
 
 1. Rode a checagem de consistência de `references/entrevista.md` (seção "Antes de gerar").
-2. Preencha `assets/template.md` sem mudar títulos, ordem ou negritos: o validador e quem lê dependem dessa estrutura. Seção sem conteúdo real não fica com placeholder; fica com uma linha dizendo que não se aplica e por quê.
-3. Valide: `python3 <skill-dir>/scripts/validate.py docs/PRD.md`. Ele checa seções, requisitos incompletos, placeholders esquecidos, arestas para RFs inexistentes, ciclos e ondas incoerentes. Corrija até sair sem erro.
-4. Reporte: caminho do arquivo, quantidade de RFs por onda com o caminho crítico, requisitos que você adicionou sem o usuário pedir, hipóteses (as que mais mudam o produto primeiro), lacunas abertas e decisões de stack que apareceram e precisam virar ADR.
+2. Preencha `assets/template.md` sem mudar títulos, ordem ou negritos: o validador, o roadmap e quem lê dependem dessa estrutura. Seção sem conteúdo real não fica com placeholder; fica com uma linha dizendo que não se aplica e por quê.
+3. Valide: `python3 <skill-dir>/scripts/validate.py docs/product/prd.md`. Ele checa seções, requisitos incompletos (inclusive critérios de aceitação), placeholders esquecidos, arestas para RFs inexistentes, ciclos, ondas incoerentes ou fora de ordem, `Usa de` sem aresta `dado` (e o contrário) e critério de integração faltando. Corrija até sair sem erro.
+4. Sincronize o roadmap: `python3 <skill-dir>/scripts/roadmap.py sync`.
+5. Reporte: caminhos do PRD e do roadmap, quantidade de RFs por onda com o caminho crítico, requisitos que você adicionou sem o usuário pedir, hipóteses (as que mais mudam o produto primeiro), lacunas abertas e decisões de stack que apareceram e precisam virar ADR.

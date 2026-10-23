@@ -1,6 +1,6 @@
 ---
 name: adr-writer
-description: Escreve e mantém Architecture Decision Records (ADRs) em formato MADR-minimal na pasta `docs/adr/` da raiz — cria a pasta do zero, redige registros novos, move um registro pelo ciclo proposed/accepted/rejected/superseded/deprecated, e audita o acervo em busca de numeração quebrada, cadeia de supersede sem saída ou front-matter fora do formato. Cobre só decisões de arquitetura e tecnologia; regra de negócio vai para o PRD. Use esta skill sempre que o usuário pedir para registrar, escrever ou atualizar uma decisão de arquitetura ("cria um ADR pra escolha do Zod", "registra essa decisão", "documenta por que a gente escolheu X"), pedir para revisar ou consertar registros existentes ("os ADRs estão consistentes?", "audita a pasta docs/adr"), pedir para aceitar/rejeitar/supersedir/depreciar um deles, ou montar a pasta de ADRs pela primeira vez. Consulte também quando uma decisão de arquitetura cara de reverter estiver sendo tomada na conversa sem registro nenhum — a skill cobre como oferecer o ADR em uma linha sem atrapalhar o trabalho em andamento.
+description: Escreve e mantém Architecture Decision Records (ADRs) em formato MADR-minimal na pasta `docs/architecture/adr/` da raiz — cria a pasta do zero, redige registros novos, move um registro pelo ciclo proposed/accepted/rejected/superseded/deprecated, e audita o acervo em busca de numeração quebrada, cadeia de supersede sem saída ou front-matter fora do formato. Cobre só decisões de arquitetura e tecnologia; regra de negócio vai para o PRD. Use esta skill sempre que o usuário pedir para registrar, escrever ou atualizar uma decisão de arquitetura ("cria um ADR pra escolha do Zod", "registra essa decisão", "documenta por que a gente escolheu X"), pedir para revisar ou consertar registros existentes ("os ADRs estão consistentes?", "audita a pasta docs/architecture/adr"), pedir para aceitar/rejeitar/supersedir/depreciar um deles, ou montar a pasta de ADRs pela primeira vez. Consulte também quando uma decisão de arquitetura cara de reverter estiver sendo tomada na conversa sem registro nenhum — a skill cobre como oferecer o ADR em uma linha sem atrapalhar o trabalho em andamento.
 ---
 
 # ADR Writer
@@ -14,7 +14,7 @@ Tudo abaixo serve a isso. Registro que só diz o que foi escolhido é meio inút
 | Situação | Modo |
 |---|---|
 | Registrar uma decisão; escrever um ADR | **Novo ADR** |
-| `docs/adr/` não existe ou está vazia | **Bootstrap**, depois Novo ADR |
+| `docs/architecture/adr/` não existe ou está vazia | **Bootstrap**, depois Novo ADR |
 | Aceitar / rejeitar / supersedir / depreciar um registro existente | **Mudança de status** |
 | "Os ADRs estão consistentes?"; ou você vai somar a um acervo que ainda não inspecionou | **Auditoria** |
 | Uma decisão está sendo tomada de passagem, sem registro | **Oferta** |
@@ -23,10 +23,10 @@ Os modos se compõem. Bootstrap → Novo ADR é a primeira execução normal. Ro
 
 ## Passo 0 — resolver o diretório (todos os modos)
 
-O acervo deste repositório é **`docs/adr/` na raiz**. Um registro arquivado em outro lugar é pior que registro nenhum: parte o acervo em dois e metade dele deixa de ser encontrada.
+O acervo deste repositório é **`docs/architecture/adr/` na raiz**. Um registro arquivado em outro lugar é pior que registro nenhum: parte o acervo em dois e metade dele deixa de ser encontrada.
 
 1. Caminho dado explicitamente pelo usuário → use esse, e diga que está fora do padrão.
-2. Senão → `docs/adr/` a partir da raiz do repositório (`git rev-parse --show-toplevel`).
+2. Senão → `docs/architecture/adr/` a partir da raiz do repositório (`git rev-parse --show-toplevel`).
 3. A pasta não existe, ou existe sem nenhum ADR → **Bootstrap** antes de qualquer outra coisa.
 
 Não há sub-pasta por status ou por ano: o diretório plano **é** o acervo, e o `index.md` gerado lista tudo em ordem numérica. Pasta por status obrigaria a mover o arquivo a cada transição, quebrando link e histórico à toa.
@@ -96,7 +96,7 @@ Cadeia de um lado só é beco sem saída: alguém cai no 0003, acredita, e nunca
 
 Escreva quando a decisão for **cara de reverter** ou quando **alguém vai questioná-la em seis meses**: a escolha de uma ferramenta ou de uma parte da stack, o formato de um contrato entre componentes, estratégia de auth/persistência/erro, ou a escolha deliberada da opção não óbvia.
 
-O acervo é só de **arquitetura e tecnologia do repositório**: stack, ferramentas, infraestrutura, integração, formato de contratos técnicos. Regra de negócio (o que o sistema faz, para quem, sob que condição) não vira ADR; ela vai para o PRD (`docs/PRD.md`, skill `/prd-writer`); se o pedido de ADR é na verdade uma regra de produto, diga isso em uma linha e ofereça o PRD. Misturar as duas faz o acervo responder perguntas que não são dele e esconde as decisões técnicas no meio das de produto.
+O acervo é só de **arquitetura e tecnologia do repositório**: stack, ferramentas, infraestrutura, integração, formato de contratos técnicos. Regra de negócio (o que o sistema faz, para quem, sob que condição) não vira ADR; ela vai para o PRD (`docs/product/prd.md`, skill `/prd-writer`); se o pedido de ADR é na verdade uma regra de produto, diga isso em uma linha e ofereça o PRD. Misturar as duas faz o acervo responder perguntas que não são dele e esconde as decisões técnicas no meio das de produto.
 
 Não escreva para decisão trivialmente reversível, para "como fazer X" (isso é `CLAUDE.md` ou README), nem para escolha que não teve alternativa real — sem deliberação, não há o que registrar. Na dúvida, pergunte. Acervo inflado deixa de ser lido, o que custa mais caro que uma entrada faltando.
 
@@ -107,9 +107,9 @@ Não escreva para decisão trivialmente reversível, para "como fazer X" (isso �
 1. **Grep o acervo pelo tema primeiro.** Se já está coberto, isto é um **supersede**, não um registro novo e independente — trabalho diferente, contabilidade diferente.
 2. **Pegue as alternativas reais.** Se o usuário nomeou só o vencedor, pergunte o que mais estava na mesa. Nunca invente opções plausíveis: deliberação fabricada é pior que um registro honesto de opção única, porque engana exatamente o leitor futuro para quem o ADR existe. Se de fato não havia alternativa, diga isso em uma linha e reconsidere se isto é um ADR.
 3. **Colete as fontes.** Toda afirmação sobre o mundo externo — versão de framework, issue aberta, "sem manutenção há dois anos", benchmark — precisa de link em `## Referências`, com a data de consulta. Pesquise nesta ordem: `docs/` do projeto, context7, doc oficial, web; as fontes do ADR são as dessa pesquisa, citadas enquanto você escreve e não de memória depois. Nada externo em jogo → apague a seção.
-4. **Escreva a partir do template da skill.** Leia `assets/template.md` e crie o registro direto em `docs/adr/NNNN-titulo.md`, preenchido. Não copie o template para `docs/adr/`: a cópia viraria uma segunda fonte de verdade que descola da skill, e é do `assets/template.md` que a auditoria deriva seções e chaves obrigatórias.
+4. **Escreva a partir do template da skill.** Leia `assets/template.md` e crie o registro direto em `docs/architecture/adr/NNNN-titulo.md`, preenchido. Não copie o template para `docs/architecture/adr/`: a cópia viraria uma segunda fonte de verdade que descola da skill, e é do `assets/template.md` que a auditoria deriva seções e chaves obrigatórias.
 5. **Status inicial:** `proposed` quando o time ainda tem que concordar; `accepted` quando a decisão já foi tomada e está valendo. Escrever o ADR depois do fato é normal — não encene uma fase `proposed` falsa para uma decisão que já entrou.
-6. **Regenere o índice:** `python3 <skill-dir>/scripts/audit.py docs/adr --index`.
+6. **Regenere o índice:** `python3 <skill-dir>/scripts/audit.py docs/architecture/adr --index`.
 7. Reporte caminho e número de volta.
 
 ## Estilo de escrita — o ponto de verdade
@@ -162,7 +162,7 @@ Nunca cite fonte que você não leu, e nunca vista uma lembrança de citação �
 Rode o script; ele checa tudo que é mecânico, de forma determinística:
 
 ```bash
-python3 <skill-dir>/scripts/audit.py docs/adr
+python3 <skill-dir>/scripts/audit.py docs/architecture/adr
 ```
 
 Ele reporta nome de arquivo fora do padrão, front-matter ausente/inválido, status desconhecido, número duplicado, divergência entre o número do arquivo e o do `# NNNN.`, seção obrigatória faltando, cadeia de supersede de um lado só, `index.md` desatualizado e — quando `## Referências` existe — bullet sem URL (erro) ou sem `Consultado em AAAA-MM-DD` (aviso). Sai com código 1 quando há erro.
@@ -175,21 +175,21 @@ Depois leia o que o script não alcança: registros que descolaram da realidade 
 
 ## Modo: Bootstrap
 
-Quando `docs/adr/` não existe, crie exatamente estes arquivos e nada além:
+Quando `docs/architecture/adr/` não existe, crie exatamente estes arquivos e nada além:
 
 - `README.md` — cópia de `assets/README.md`, as regras em forma legível.
 - `0001-usar-adrs-para-decisoes-de-arquitetura.md` — cópia de `assets/0001-usar-adrs-para-decisoes-de-arquitetura.md`, já `accepted`, servindo também de exemplo preenchido. Troque `AAAA-MM-DD` pela data de hoje.
-- `index.md` — **gerado**, nunca escrito à mão: `python3 <skill-dir>/scripts/audit.py docs/adr --index`.
+- `index.md` — **gerado**, nunca escrito à mão: `python3 <skill-dir>/scripts/audit.py docs/architecture/adr --index`.
 
 Nada de scaffolding extra (sem pasta por status, sem `CHANGELOG`, sem `index` manual). Cada arquivo a mais é mais uma coisa para manter em sincronia, e o acervo já tem a fonte de verdade de que precisa: o front-matter dos registros. O template **não** é copiado: ele fica em `assets/template.md` e é lido de lá a cada ADR novo.
 
-Ajuste os caminhos do README se o acervo, por algum motivo, não ficar em `docs/adr/`.
+Ajuste os caminhos do README se o acervo, por algum motivo, não ficar em `docs/architecture/adr/`.
 
 ## Modo: Oferta
 
 Quando uma decisão cara de reverter está sendo tomada na conversa e não existe registro, ofereça uma vez, em uma linha, numa pausa natural — depois que o trabalho entrega, não no meio dele:
 
-> "Isso bate nos critérios de ADR (caro de reverter). Quer que eu registre em `docs/adr`?"
+> "Isso bate nos critérios de ADR (caro de reverter). Quer que eu registre em `docs/architecture/adr`?"
 
 Se a resposta for não, deixe pra lá e não levante de novo para aquela decisão. Interromper a entrega para fazer campanha por documentação é como documentação vira motivo de rejeição.
 

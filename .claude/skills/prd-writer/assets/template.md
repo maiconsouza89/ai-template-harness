@@ -55,6 +55,8 @@ Fora de escopo
 ### RF-001 [nome do requisito]
 [Uma frase: o que o sistema tem que fazer.]
 
+**Para quem:** [público do Contexto que este RF atende, e o que ganha com ele]
+
 **Fluxo principal**
 - [passo 1]
 - [passo 2]
@@ -64,26 +66,37 @@ Fora de escopo
 - [variação ou exceção 1]
 
 **Erros previstos**
-- [condição que bloqueia ou retorna erro, e o que o usuário vê]
+- [condição que bloqueia ou retorna erro, e o que o usuário vê. Bloco obrigatório só quando o RF cria, altera ou apaga dado, mexe com dinheiro ou permissão, ou é irreversível]
 
 **Prioridade:** alta
+
+**Critérios de aceitação**
+- [resultado verificável do fluxo principal]
+- [resultado verificável de uma falha ou exceção]
 
 ---
 
 ### RF-002 [nome do requisito 2]
 [descrição]
 
+**Para quem:** [público e ganho]
+
+**Usa de**
+- RF-001: [dado que este RF lê ou altera e que RF-001 cria. Só quando há aresta 'dado' de RF-001 para este RF no mapa]
+
 **Fluxo principal**
 - [passo 1]
 - [passo 2]
+- [passo 3]
 
 **Fluxos alternativos e exceções**
 - [variação ou exceção]
 
-**Erros previstos**
-- [erro previsto]
-
 **Prioridade:** media
+
+**Critérios de aceitação**
+- [critério de sucesso]
+- [critério de falha]
 
 ---
 
@@ -158,9 +171,13 @@ Acessibilidade
 
 ## Critérios de aceitação
 
-- [critério 1, verificável por alguém de fora do time]
-- [critério 2]
-- [critério 3]
+Critérios de cada RF ficam no próprio RF. Aqui ficam só os transversais.
+
+Integração entre requisitos
+- RF-001 → RF-002: [o dado criado em RF-001 chega correto em RF-002. Um critério por item de 'Usa de']
+
+Transversais
+- [critério que vale para o sistema todo, derivado de meta ou requisito não funcional, verificável por alguém de fora do time]
 
 ---
 
@@ -195,6 +212,8 @@ graph LR
 | --- | --- | --- |
 | 1 | RF-001 | nenhum |
 | 2 | RF-002, RF-003 | RF-001, DEP-1 |
+
+Dentro da onda, os RFs vêm por prioridade (alta, media, baixa) e depois por número.
 
 Caminho crítico: RF-001 → RF-003 (2 ondas).
 
