@@ -34,10 +34,15 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
 - **Documentação do projeto** em `docs/product/` (o quê e quando) e `docs/architecture/` (como e
   por quê), criada pelas skills: `/prd-writer` (`docs/product/prd.md`, regras de produto e
   requisitos `RF-NNN`, sem stack, e `docs/product/roadmap.md`, andamento por RF gerado do PRD),
-  `/hld-writer` (`docs/architecture/hld.md`, o como técnico entre o PRD e os ADRs) e `/adr-writer`
+  `/hld-writer` (`docs/architecture/hld.md`, o como técnico entre o PRD e os ADRs), `/adr-writer`
   (ADRs em `docs/architecture/adr/`, só arquitetura e tecnologia; monta a pasta na primeira vez e
-  `make check-adr` audita). Cada skill valida a própria estrutura; `make check-prd` e
-  `make check-hld` rodam essas validações e cruzam HLD com PRD e ADRs.
+  `make check-adr` audita), e `/c4-writer` (diagramas C4 em PlantUML em
+  `docs/architecture/diagrams/`, desenhados do HLD e dos ADRs ou de um FDD, com a origem de cada
+  elemento num `.md`). Antes do código, `/spec-writer` gera por RF a spec, o plano e o contrato
+  testável em `docs/features/RF-NNN-nome/` (e a fundação em `docs/features/fundacao/`), sobre o
+  HLD e os ADRs. Cada skill valida a própria estrutura; `make check-prd`, `make check-hld`,
+  `make check-c4` e `make check-spec` rodam essas validações e cruzam HLD com PRD e ADRs,
+  diagramas com a fonte e contratos com os critérios de aceitação do PRD.
 
 ## Onde colocar o quê
 
@@ -54,6 +59,8 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
 | Regras de produto e requisitos | `docs/product/prd.md` | Regra de negócio não é ADR |
 | Andamento da implementação por requisito | `docs/product/roadmap.md` (via `/prd-writer`) | O PRD só muda quando o produto muda |
 | Desenho técnico do sistema | `docs/architecture/hld.md` | Liga requisitos do PRD aos ADRs |
+| Diagramas C4 (PlantUML) | `docs/architecture/diagrams/` (via `/c4-writer`) | Figura derivada do HLD; o HLD continua a fonte |
+| Spec, plano e contrato de um RF | `docs/features/RF-NNN-nome/` (via `/spec-writer`) | O contrato cobre os critérios do PRD; a spec não reabre HLD nem ADR |
 | Arquivo de comunidade (`CONTRIBUTING`, `SECURITY`, `CODE_OF_CONDUCT`) | Raiz | Reconhecido pelo GitHub; `LICENSE` só é detectado na raiz |
 
 ## Regras
@@ -82,4 +89,4 @@ qualquer linguagem e vir com um `check-*` em `make check`.
 | --- | --- |
 | Ambiente, verificações, fluxo de trabalho, commits e versões | `CONTRIBUTING.md` |
 | Uso do template e configuração do GitHub | `README.md` |
-| Regras de ADR, PRD e HLD | `SKILL.md` de cada skill em `.claude/skills/` |
+| Regras de ADR, PRD, HLD, diagramas C4 e specs | `SKILL.md` de cada skill em `.claude/skills/` |

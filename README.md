@@ -46,8 +46,8 @@ verificação automática. O que não está no repositório não existe para o a
 ## O que está incluído
 
 Instruções para agentes (`CLAUDE.md`), `Makefile` com `make check`, hook de commit, CI agnóstica
-de stack, release automática e skills para ADR, PRD e HLD. Onde fica cada coisa está em
-[`CLAUDE.md`](CLAUDE.md); como trabalhar, em [`CONTRIBUTING.md`](CONTRIBUTING.md).
+de stack, release automática e skills para ADR, PRD, HLD, diagramas C4 e specs por requisito. Onde fica cada coisa
+está em [`CLAUDE.md`](CLAUDE.md); como trabalhar, em [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Licença
 
