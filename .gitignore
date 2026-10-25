@@ -22,3 +22,4 @@ tmp/
 
 # Bancada de evals do skill-creator (snapshots, saídas e benchmarks por iteração)
 .claude/skills/*-workspace/
+__pycache__/
