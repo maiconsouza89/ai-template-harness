@@ -154,6 +154,10 @@ edit orquestracao.md 's/^- Status: esgotado$/- Status: terminado/'
 check 1 aval 'status de diário desconhecido'
 
 reset
+edit orquestracao.md 's/^- Status: esgotado$/- Status: precisa de decisão/'
+check 0 aval 'diário com precisa de decisão'
+
+reset
 edit avaliacao.md 's/^- Status: reprovado$/- Status: limpo/'
 check 1 aval 'limpo com critério reprovado'
 

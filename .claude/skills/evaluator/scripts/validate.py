@@ -34,7 +34,7 @@ SECTIONS = ["Critérios", "Gates de qualidade", "Pré-requisitos", "Itens", "Des
             "Limpeza e ambiente", "Avisos"]
 STATUS = re.compile(r"^(limpo|reprovado|pendente|reprovado no gate .+|abortado no passo \d+|abortado no item \S+: .+)$")
 RESULT = {"✓ verificado": "v", "✗ reprovado": "x", "⊘ indeterminado": "u"}
-ORQ_STATUS = re.compile(r"^(em execução|sucesso|manual pendente|travado|esgotado|abortado|pr bloqueado)$")
+ORQ_STATUS = re.compile(r"^(em execução|sucesso|manual pendente|precisa de decisão|travado|esgotado|abortado|pr bloqueado)$")
 VERDICTS = {"passou", "falhou", "bloqueado", "manual", "pulado"}
 OWNERS = {"código", "contrato", "decisão", "ambiente"}
 
