@@ -99,14 +99,24 @@ def contexto_rf(root, rid):
     return (status.group(1) if status else "sem roadmap"), (nome.group(1) if nome else ""), pend, None
 
 
+def passos_do_rodape(valor):
+    """'19-20' ou '3,5-6' -> {19, 20} ou {3, 5, 6}."""
+    out = set()
+    for parte in valor.split(","):
+        a, _, b = parte.strip().partition("-")
+        out.update(range(int(a), int(b or a) + 1))
+    return out
+
+
 def commits_por_fase(root, alvo_id):
-    """Fases já commitadas neste branch, pelos rodapés 'Refs: <alvo>' e 'Plan-Phase: N'."""
+    """Fases já commitadas neste branch, pelos rodapés 'Refs: <alvo>' e 'Plan-Phase: N', e os
+    passos de fases commitadas em partes, pelo rodapé 'Plan-Step: a-b'."""
     code, base, _ = run(["git", "merge-base", "HEAD", "main"], root)
     rng = f"{base}..HEAD" if code == 0 and base else "HEAD"
     code, out, _ = run(["git", "log", rng, "--format=%h%x00%B%x01"], root)
-    feitas = {}
+    feitas, partes = {}, []
     if code != 0:
-        return feitas
+        return feitas, partes
     for entry in out.split("\x01"):
         if "\x00" not in entry:
             continue
@@ -114,7 +124,9 @@ def commits_por_fase(root, alvo_id):
         if re.search(rf"^Refs: .*\b{re.escape(alvo_id)}\b", body, re.M):
             for n in re.findall(r"^Plan-Phase: (\d+)$", body, re.M):
                 feitas.setdefault(int(n), sha)
-    return feitas
+            for v in re.findall(r"^Plan-Step: (\d+(?:-\d+)?(?:,\s*\d+(?:-\d+)?)*)$", body, re.M):
+                partes.append((passos_do_rodape(v), sha))
+    return feitas, partes
 
 
 def adrs_aceitos(root):
@@ -208,7 +220,7 @@ def main(argv):
     _, branch, _ = run(["git", "branch", "--show-current"], root)
     _, sujos, _ = run(["git", "status", "--porcelain"], root)
     sujos = [ln for ln in sujos.splitlines() if ln.strip()]
-    feitas = commits_por_fase(root, alvo_id)
+    feitas, partes = commits_por_fase(root, alvo_id)
 
     # plano
     plan_sec = sections(plan, 2)
@@ -266,6 +278,13 @@ def main(argv):
     for n, nome_fase, passos in sorted(fases):
         faixa = f"passos {passos[0]} a {passos[-1]}" if len(passos) > 1 else f"passo {passos[0]}" if passos else "sem passos"
         estado = f"commitada em {feitas[n]}" if n in feitas else "por fazer"
+        if n not in feitas:
+            feitos = [(sorted(ps & set(passos)), sha) for ps, sha in partes if ps & set(passos)]
+            if feitos:
+                ja = sorted({x for ps, _ in feitos for x in ps})
+                falta = [x for x in passos if x not in ja]
+                estado = ("parcial: " + "; ".join(f"passos {','.join(map(str, ps))} em {sha}" for ps, sha in feitos)
+                          + f"; faltam {','.join(map(str, falta)) or 'nenhum'}")
         print(f"- Fase {n}: {nome_fase} ({faixa}) [{estado}]")
     pre_plano = bullets(plan_sec.get("Pré-requisitos", ""))
     if pre_plano:
