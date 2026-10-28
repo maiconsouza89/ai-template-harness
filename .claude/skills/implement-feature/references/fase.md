@@ -10,7 +10,7 @@
 
 ## 1. Briefing do subagente
 
-O subagente só sabe o que o briefing diz. Copie o bloco abaixo, preencha os colchetes e mande inteiro: ele traz as regras da seção 2 para dentro do prompt, porque o subagente não carrega esta skill.
+O subagente só sabe o que o briefing diz e o que ele lê. Copie o bloco abaixo, preencha os colchetes e mande inteiro. As regras (seções 2 e 3) e o formato do retorno (seção 4) ficam neste arquivo, e o subagente os lê daqui: colá-los em cada prompt repetia o mesmo texto a cada fase, e a cópia colada envelhecia quando o arquivo mudava.
 
 ```
 Você implementa a fase [N] de [M] do plano de [RF-NNN Nome | fundação] neste repositório.
@@ -37,9 +37,9 @@ Leia antes de editar:
 5. CLAUDE.md e, quando a fase mexer em comando ou ambiente, CONTRIBUTING.md.
 Abra o código existente sob demanda, quando a fase precisar dele; não varra o repositório.
 
-[As regras da seção 2 de references/fase.md, coladas aqui.]
-
-Responda no formato da seção 4 de references/fase.md, [colado aqui].
+Antes de editar, leia as seções 2, 3 e 4 de .claude/skills/implement-feature/references/fase.md:
+o que você faz e não faz, como tratar falhas e o formato exato da resposta. Elas valem como
+parte deste briefing.
 ```
 
 ## 2. O que o subagente faz
@@ -52,9 +52,13 @@ Responda no formato da seção 4 de references/fase.md, [colado aqui].
 
 **Escreve os testes que a Estratégia de testes da spec pede** junto do código da fase, no lugar e no nível que ela indica. Teste acompanha o passo; não existe fase de testes.
 
-**Valida pelo `Makefile`.** `make lint` e `make test` ao fim da fase; `make build` quando a fase mexe no que é compilado. Na fase que cria os `scripts/<alvo>.sh`, eles passam a valer a partir daí; antes disso o alvo avisa e passa, e isso não é validação. Quando a fase cria uma superfície (rota, migração, comando, worker, tela), exercite-a uma vez de verdade: suba o que for preciso, chame a rota, rode a migração, abra a tela. Tela se confere num navegador, com a ferramenta que o projeto já usa; sem ferramenta de navegador no projeto, registre como pendência, não como feito.
+**Valida pelo `Makefile`.** `make lint` e `make test` ao fim da fase; `make build` quando a fase mexe no que é compilado. Na fase que cria os `scripts/<alvo>.sh`, eles passam a valer a partir daí; antes disso o alvo avisa e passa, e isso não é validação. Quando a fase cria uma superfície (rota, migração, comando, worker, tela), exercite-a uma vez de verdade: suba o que for preciso, chame a rota, rode a migração, abra a tela. Tela se confere num navegador, com a ferramenta da tabela "Verificação por superfície" da spec; sem ferramenta decidida, registre como pendência, não como feito.
 
 **Documentação do repositório.** Se a fase muda um comando, uma variável de ambiente ou o jeito de subir o projeto, atualize `README.md` ou `CONTRIBUTING.md` na mesma fase. Se o que você construiu contradiz o HLD ou um ADR (um componente que precisou existir, uma interface que não cabe), não edite: registre em Pendências com a skill dona (`/hld-writer`, `/adr-writer`).
+
+**Dependência nova se declara.** Toda dependência que entra num manifesto da stack (de produção ou de desenvolvimento: um runner de script conta) vai em "Dependências novas" com o que a sustenta, um ADR aceito ou a seção da spec que a cita. Sem nenhum dos dois, escreva `sem cobertura`: quem orquestra pergunta à pessoa antes do commit. Biblioteca de produção ou ferramenta que muda a arquitetura sem cobertura não se instala: é o caso de `precisa de decisão` abaixo.
+
+**Divergência do contrato se registra, não se contorna.** Quando um item do contrato contradiz o que a ferramenta da stack faz (a CLI gera o que o item diz que não gera, a biblioteca não expõe o que ele exige), não ajuste código nem teste para fingir que passa: registre em "Divergências do contrato" com o ID, o que a ferramenta faz e a evidência (comando e saída), e siga com o resto da fase. Quem orquestra decide com a pessoa na hora, em vez de o item reprovar depois de toda a implementação.
 
 **Pare e devolva, sem improvisar,** quando a fase pedir tecnologia que nenhum ADR aceito nem a spec preveem, quando um passo for impossível como escrito, ou quando faltar decisão de produto. Devolva o status `precisa de decisão` com a pergunta pronta, as alternativas e a sua recomendação.
 
@@ -67,18 +71,21 @@ Responda no formato da seção 4 de references/fase.md, [colado aqui].
 | Real | Lint, tipos ou teste falham por código desta execução | Ler o erro, corrigir, rodar de novo. Até 3 tentativas; depois, status `falhou` com o erro |
 | Do ambiente | A validação não consegue rodar aqui (Docker parado, credencial externa ausente, comando inexistente) | Não conta como tentativa. Registrar com o comando e a mensagem e seguir com o que dá |
 | Anterior | Falha que já existia antes desta execução, em código que ela não tocou | Não conta como tentativa e não se corrige aqui. Registrar com a evidência (falha também sem as mudanças da fase) |
+| Ambiente caiu | Serviço da máquina que funcionava e parou no meio da fase (daemon do Docker, VM, banco local) | Uma checagem (`docker info` ou equivalente). Sem tentar reiniciar e sem esperar: devolva `ambiente caiu` com o comando, a mensagem e o que da fase ficou feito. Recuperar a máquina é da pessoa |
 
 Aviso sem código de saída diferente de zero não é falha.
 
 ## 4. Retorno
 
 ```
-Status: pronta | falhou | precisa de decisão
-Arquivos: <caminhos criados ou alterados, um por linha>
+Status: pronta | falhou | precisa de decisão | ambiente caiu
+Arquivos: <diretórios tocados, com a contagem de arquivos: "apps/api/src/ (14)"; a lista exata sai do git status>
 Pré-requisitos produzidos: <handle ou caminho: onde ficou>
 Validação: <comando: resultado, para cada comando rodado>
 Superfícies exercitadas: <o que foi chamado ou aberto e o que se observou>
 Desvios: <desempates e adaptações, um por linha>
+Dependências novas: <nome@versão: ADR-NNNN | spec, <seção> | sem cobertura>, ou "nenhuma"
+Divergências do contrato: <ID: o que a ferramenta faz de diferente; evidência>, ou "nenhuma"
 Falhas do ambiente: <comando: mensagem>
 Falhas anteriores: <teste: evidência>
 Pendências: <o que ficou por fazer, ou divergência com HLD/ADR e a skill dona>
@@ -99,8 +106,10 @@ Refs: <RF-NNN | fundacao>
 Plan-Phase: <N>
 ```
 
+**Fase em partes.** Quando uma fase precisa ser commitada em mais de um commit (uma decisão parou parte dela, um pedaço independente ficou pronto antes), as partes levam `Plan-Step: <a>-<b>` (ou `3,5-6`) no lugar de `Plan-Phase`, e só o commit que fecha a fase leva `Plan-Phase: <N>`. O `preparar.py` mostra a fase como `parcial` com os passos que faltam, e a retomada despacha só esses.
+
 - **Tipo**: `feat` para o comportamento do RF; na fundação, pelo conteúdo da fase (`build` para monorepo e ferramentas, `feat` para a API que passa a responder, `ci` para workflow).
 - **Escopo**: o componente ou pacote principal da fase, em inglês e minúsculas (`api`, `worker`, `database`, `web`, `monorepo`).
-- **Rodapés**: `Refs:` e `Plan-Phase:` são o que o `preparar.py` lê para pular fases já feitas numa retomada. Sem eles a retomada refaz a fase.
-- Adicione os arquivos pelo nome, a partir da lista do retorno conferida com `git status`. Arquivo alterado que não é desta fase fica fora do commit.
+- **Rodapés**: `Refs:`, `Plan-Phase:` e `Plan-Step:` são o que o `preparar.py` lê para pular fases e passos já feitos numa retomada. Sem eles a retomada refaz a fase.
+- Adicione os arquivos pelo nome, a partir do `git status --porcelain`, conferindo que cada um está num diretório que o retorno declarou. Arquivo fora deles, ou que não é desta fase, fica fora do commit.
 - Hook falhou: corrija a mensagem e faça um commit novo. Nunca use `--no-verify` nem `--amend` num commit que não é desta execução.

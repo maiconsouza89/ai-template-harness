@@ -12,7 +12,7 @@ Como trabalhar neste repositório: ambiente, verificações, fluxo, commits e re
 | shellcheck | opcional | lint dos scripts em `make check-shell`; sem ele, só a sintaxe é validada |
 | actionlint | opcional | valida os workflows em `make check-actions`; sem ele, pula com aviso |
 | gitleaks | opcional | procura segredos em `make check-secrets`; sem ele, pula com aviso |
-| python3 | opcional | validação de ADRs, PRD, HLD, diagramas C4, specs e avaliações em `make check-adr`, `check-prd`, `check-hld`, `check-c4`, `check-spec` e `check-eval`; sem ele, pulam com aviso |
+| python3 | opcional | validação de ADRs, PRD, HLD, diagramas C4, specs e avaliações em `make check-adr`, `check-prd`, `check-hld`, `check-c4`, `check-spec`, `check-eval` e `check-validators`; sem ele, pulam com aviso |
 | plantuml | opcional | sintaxe dos diagramas C4 em `make check-c4` e SVG via skill `/c4-writer`; sem ele, só a estrutura é validada (não é exigido na CI) |
 
 As ferramentas opcionais são obrigatórias na CI (`CI=true make check` reproduz isso localmente).
@@ -51,7 +51,10 @@ Para adicionar uma verificação:
 
 O hook `commit-msg` é POSIX `sh` em `.githooks/`, e não pre-commit, lefthook ou commitlint, para
 não trazer Node nem Python ao template. Ao mudar o hook, acrescente antes o caso em
-`scripts/tests/test-commit-msg.sh`: um aceito e um rejeitado para cada regra nova.
+`scripts/tests/test-commit-msg.sh`: um aceito e um rejeitado para cada regra nova. A mesma regra
+vale para os validadores das skills (`validate.py` da `/spec-writer` e da `/evaluator`): cada
+regra nova ganha os dois casos em `scripts/tests/test-skill-validators.sh`, que `make
+check-validators` roda sobre os fixtures de `scripts/tests/fixtures/skill-validators/`.
 
 Actions em `.github/workflows/` ficam fixadas por SHA completo com comentário da versão
 ([por quê](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions));

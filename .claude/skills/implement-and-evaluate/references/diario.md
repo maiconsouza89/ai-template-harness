@@ -13,7 +13,7 @@ Sem travessão "—" e sem comentário HTML. Seção sem conteúdo fica com `Nen
 
 - Execução: <2026-10-27T17-32-04Z>
 - Branch: <branch>
-- Status: <em execução | sucesso | manual pendente | travado | esgotado | abortado | pr bloqueado>
+- Status: <em execução | sucesso | manual pendente | precisa de decisão | travado | esgotado | abortado | pr bloqueado>
 - Orçamento: <N> ciclos de correção | sem limite
 - Autorizado: commits <sim | não>, fechamento <sim | não>
 - Pedidos: <"pausa entre ciclos", ... | nenhum>
@@ -36,7 +36,7 @@ Sem travessão "—" e sem comentário HTML. Seção sem conteúdo fica com `Nen
 - Status final: <status>
 - Ciclos de correção: <N>
 - Commits: <fases> de fase, <N> de correção, <1> de registro
-- Pendentes no fim: <IDs falhou e bloqueado | Nenhum.>
+- Pendentes no fim: <IDs falhou e bloqueado, com o dono: "CLI-BANCO-03 (contrato)" | Nenhum.>
 - Manuais a revisar: <IDs | Nenhum.>
 
 ## Fechamento
@@ -45,6 +45,7 @@ Sem travessão "—" e sem comentário HTML. Seção sem conteúdo fica com `Nen
 - Reavaliação depois do merge: <limpo | não precisou | <status>>
 - Push: <feito | falhou: <motivo>>
 - PR: <url aberto | url existente atualizado | não aberto: <motivo>>
+- CI: <verde, PR marcado como pronto | verde, merge bloqueado: <o que falta> | vermelha em <job>: <o que se fez> | sem checks | não acompanhada: <motivo>>
 
 ## Avisos
 

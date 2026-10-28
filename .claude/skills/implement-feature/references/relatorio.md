@@ -29,6 +29,11 @@ Desvios
 - spec dizia X, item <ID> exige Y, segui Y
 - <adaptação e porquê>
 
+Decisões tomadas durante a execução
+- dependência <nome@versão> sem cobertura: <o que a pessoa escolheu>
+- divergência <ID>: <seguir | pausar para /spec-writer>
+- achado <origem>: corrigido em <sha> pela /fix-runner modo achado
+
 Falhas do ambiente
 - <comando>: <mensagem>; <o que deixou de ser exercitado>
 

@@ -1,6 +1,6 @@
 # Fechamento: merge, push e PR
 
-Só com avaliação limpa e com o fechamento autorizado no Passo 0. O trabalho já está feito quando isto roda; falha aqui vira aviso no relatório e o status continua sucesso, exceto conflito sem solução (pr bloqueado). Registre cada passo na seção Fechamento do diário.
+Só com avaliação limpa e com o fechamento autorizado no Passo 0. O trabalho já está feito quando isto roda; falha aqui vira aviso no relatório e o status continua sucesso, exceto conflito sem solução e CI vermelha sem orçamento (pr bloqueado). Registre cada passo na seção Fechamento do diário.
 
 ## 1. Branch
 
@@ -55,7 +55,7 @@ Falhou (autenticação, remoto recusou): aviso com o motivo e o comando para rod
 gh pr list --head <branch> --json url,number --limit 1
 ```
 
-Existe: o push já atualizou; registre a URL e termine.
+Existe: o push já atualizou; registre a URL e siga para a seção 8.
 
 ## 7. PR novo
 
@@ -89,7 +89,35 @@ Closes #<N>
 Marque cada item da checklist pelo que de fato aconteceu: `make check` passou como gate na última avaliação; documentos, pelos registros das fases; ADR e agnosticismo, só se a execução tocou nisso. Item que você não conferiu fica desmarcado.
 
 ```
-gh pr create --base main --title "<título>" --body "<corpo>"
+gh pr create --base main --draft --title "<título>" --body "<corpo>"
 ```
 
-Falhou: aviso com o motivo e o comando para rodar à mão.
+Em rascunho, porque a CI ainda não rodou: quem revisa só é chamado quando ela passa. Falhou: aviso com o motivo e o comando para rodar à mão, e termine sem a seção 8.
+
+## 8. CI do PR
+
+A CI roda no GitHub, não no ambiente da avaliação, então é conferida aqui e não no contrato. Espere sem polling, com o comando em segundo plano:
+
+```
+gh pr checks <N> --watch --fail-fast
+```
+
+Se o `gh` disser que ainda não há checks, espere 30 segundos e tente de novo, até 3 vezes; sem check nenhum, registre "CI: sem checks" e termine com o PR em rascunho, para a pessoa conferir.
+
+| Resultado | Próximo |
+|---|---|
+| Verde | `gh pr ready <N>` se o PR está em rascunho, depois confira o merge (abaixo) |
+| Vermelho só em `pr-title` | `gh pr edit <N> --title "<título corrigido>"` no formato do hook, sem ciclo, e espere de novo |
+| Vermelho em outro job, com orçamento | Pegue o run (`gh pr checks <N> --json name,state,link`) e o erro (`gh run view <id> --log-failed`, cortado nas linhas do erro). `ciclo += 1`, `/fix-runner` modo achado com origem "CI do PR #<N>, job <nome>". `corrigido`: `/evaluator`, porque mudou código; limpo, commit de registro, push e de novo esta seção; não limpo, volte ao Passo 2.2 do laço |
+| Vermelho, sem orçamento, ou a `/fix-runner` abortou | **pr bloqueado**: o PR fica em rascunho; diga o job, o erro em uma linha e o link do run |
+| `gh` falhou ao acompanhar | Aviso com o comando para rodar à mão; o PR fica em rascunho |
+
+Verde na lista não basta: o `gh pr checks` só mostra os checks que já reportaram, e um check exigido pelo ruleset que não disparou para o commit atual fica "esperado" para sempre, sem aparecer nela. Depois do verde, confira `gh pr view <N> --json mergeStateStatus` (`UNKNOWN` é cálculo em andamento: espere 10 segundos e tente de novo, até 3 vezes):
+
+| `mergeStateStatus` | Próximo |
+|---|---|
+| `CLEAN`, `HAS_HOOKS` ou `UNSTABLE` | Registre "CI: verde" e termine |
+| `BLOCKED` | Registre "CI: verde, merge bloqueado" e diga à pessoa que falta um check exigido ou uma revisão, com o link do PR |
+| `BEHIND` ou `DIRTY` | A `main` andou depois do merge da seção 2: volte a ela |
+
+Um push novo dispara a CI de novo; nunca `push --force`.

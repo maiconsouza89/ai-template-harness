@@ -119,6 +119,17 @@ O parágrafo de abertura descreve comportamento, não quem executa: nada de "o a
 
 Detecte as superfícies pelo fluxo principal do RF, pelas interfaces da linha dele na rastreabilidade do HLD e pela spec. Cada seção começa com `Modo de verificação: ...`, dizendo como a superfície é exercitada, sem nomear ferramenta ou executor.
 
+**Toda superfície tem mecanismo decidido antes do código.** A ferramenta não entra no contrato; ela mora na tabela `Verificação por superfície` da Estratégia de testes da spec, uma linha por seção de superfície do contrato, com a Decisão que a sustenta:
+
+| Decisão | Quando |
+| --- | --- |
+| `ADR-NNNN` | O mecanismo depende de ferramenta da stack (driver de navegador, cliente de fila) e um ADR aceito a escolheu |
+| `não precisa` | Mecanismo genérico, sem ferramenta a escolher: requisição HTTP, comando, consulta ao banco. Nunca em UI ou E2E: dirigir navegador exige ferramenta |
+| `fundação` | Num RF, a linha da spec da fundação vale para esta superfície |
+| `pendente de ADR` | Ninguém decidiu ainda. O item entra também em "Pendentes de ADR" da spec, e a `/implement-feature` bloqueia até a `/adr-writer` registrar |
+
+Adiar a ferramenta ("escolhida no primeiro RF com tela") e mesmo assim gerar itens da superfície deixa esses itens bloqueados desde o nascimento: foi o que aconteceu com os itens de UI da fundação do viewstore. O `validate.py` recusa superfície sem linha, UI ou E2E com `não precisa` e pendência que não aparece em "Pendentes de ADR".
+
 **Regra de admissão do Serviço.** `## Serviço` não é lugar de testar classe, value object, entidade ou helper: isso é teste unitário, orientado pela Estratégia de testes da spec. Só entra quando um consumidor fora desta feature chama aquilo diretamente.
 
 Subtítulos `###` dentro da superfície usam o **vocabulário da capacidade** ("Contratação de espaço", "Crédito por conflito"), nunca o da entidade da superfície (`### POST /v1/campanhas`, `### Tela /mapa`). O endpoint aparece dentro do item.
@@ -138,6 +149,8 @@ Subtítulos `###` dentro da superfície usam o **vocabulário da capacidade** ("
 - ID `<SUPERFÍCIE>-<CAPACIDADE>-<NN>`, sem número de RF (a pasta já diz qual é). Capacidade em maiúsculas sem acento, uma ou duas palavras. Único no arquivo, e o código da superfície bate com a seção onde o item está.
 - `Dado`, `Quando` e `Então` nessa ordem; `Notas` só quando precisa.
 - `Dado comum:` logo abaixo do `###` evita repetir a mesma condição em todos os itens da capacidade.
+- **Todo item roda no ambiente local efêmero.** Nada no `Dado` ou no `Quando` exige PR, push, run do workflow ou da CI: a `/implement-and-evaluate` só abre o PR depois de uma avaliação limpa, então um item assim nunca passa. A CI é conferida no Fechamento dela; o que o contrato quer garantir do workflow vira item local (`CI=true make check` passa, o arquivo do workflow tem o passo). O `validate.py` recusa.
+- **Comportamento de ferramenta externa se confere antes de virar promessa.** Um `Então` que depende do que uma CLI ou um gerador faz ("nenhuma migração nova é gerada") é conferido na doc oficial ou num teste no scratchpad com a versão do ADR, e a fonte vai em Decisões da spec. Na fundação do viewstore, o Prisma 7.10.1 gerava uma migração vazia, e o item reprovou sem nenhum código errado.
 
 Quatro freios no `Então`:
 
@@ -159,5 +172,8 @@ O contrato da fundação não tem critérios do PRD, porque a fundação não é
 - Linha do manifesto com "Coberto por" vazio, ou critério reescrito em vez de literal.
 - Handle citado num item sem declaração em Pré-requisitos, ou declaração sem item que a use.
 - Pré-requisito que exige RF fora do fecho de dependências.
+- `Dado` ou `Quando` que exige PR, push ou run da CI.
+- `Então` sobre comportamento de ferramenta externa que ninguém conferiu na doc ou num teste.
+- Seção de superfície sem linha em `Verificação por superfície` da spec, ou com ferramenta adiada.
 - Tabela "critério → teste" dentro do spec.md: o manifesto do contrato é a única fonte dessa ligação.
 - Comentário HTML, travessão "—" ou nome de quem executa em qualquer parte do arquivo.
