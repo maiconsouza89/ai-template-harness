@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/maiconsouza89/ai-template-harness/compare/v0.7.0...v0.7.1) (2026-10-28)
+
+
+### Corrigido
+
+* **skills:** ignora "Nenhuma" nos pendentes de ADR do preparar.py ([#38](https://github.com/maiconsouza89/ai-template-harness/issues/38)) ([24bde53](https://github.com/maiconsouza89/ai-template-harness/commit/24bde532ad9e9469079dd654767339a9f4b0e840))
+
 ## [0.7.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.6.0...v0.7.0) (2026-10-28)
 
 
