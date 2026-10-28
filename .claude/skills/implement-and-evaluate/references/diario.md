@@ -45,7 +45,7 @@ Sem travessão "—" e sem comentário HTML. Seção sem conteúdo fica com `Nen
 - Reavaliação depois do merge: <limpo | não precisou | <status>>
 - Push: <feito | falhou: <motivo>>
 - PR: <url aberto | url existente atualizado | não aberto: <motivo>>
-- CI: <verde, PR marcado como pronto | vermelha em <job>: <o que se fez> | sem checks | não acompanhada: <motivo>>
+- CI: <verde, PR marcado como pronto | verde, merge bloqueado: <o que falta> | vermelha em <job>: <o que se fez> | sem checks | não acompanhada: <motivo>>
 
 ## Avisos
 

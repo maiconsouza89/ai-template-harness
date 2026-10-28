@@ -106,10 +106,18 @@ Se o `gh` disser que ainda não há checks, espere 30 segundos e tente de novo, 
 
 | Resultado | Próximo |
 |---|---|
-| Verde | `gh pr ready <N>` se o PR está em rascunho. Registre "CI: verde" e termine |
+| Verde | `gh pr ready <N>` se o PR está em rascunho, depois confira o merge (abaixo) |
 | Vermelho só em `pr-title` | `gh pr edit <N> --title "<título corrigido>"` no formato do hook, sem ciclo, e espere de novo |
 | Vermelho em outro job, com orçamento | Pegue o run (`gh pr checks <N> --json name,state,link`) e o erro (`gh run view <id> --log-failed`, cortado nas linhas do erro). `ciclo += 1`, `/fix-runner` modo achado com origem "CI do PR #<N>, job <nome>". `corrigido`: `/evaluator`, porque mudou código; limpo, commit de registro, push e de novo esta seção; não limpo, volte ao Passo 2.2 do laço |
 | Vermelho, sem orçamento, ou a `/fix-runner` abortou | **pr bloqueado**: o PR fica em rascunho; diga o job, o erro em uma linha e o link do run |
 | `gh` falhou ao acompanhar | Aviso com o comando para rodar à mão; o PR fica em rascunho |
+
+Verde na lista não basta: o `gh pr checks` só mostra os checks que já reportaram, e um check exigido pelo ruleset que não disparou para o commit atual fica "esperado" para sempre, sem aparecer nela. Depois do verde, confira `gh pr view <N> --json mergeStateStatus` (`UNKNOWN` é cálculo em andamento: espere 10 segundos e tente de novo, até 3 vezes):
+
+| `mergeStateStatus` | Próximo |
+|---|---|
+| `CLEAN`, `HAS_HOOKS` ou `UNSTABLE` | Registre "CI: verde" e termine |
+| `BLOCKED` | Registre "CI: verde, merge bloqueado" e diga à pessoa que falta um check exigido ou uma revisão, com o link do PR |
+| `BEHIND` ou `DIRTY` | A `main` andou depois do merge da seção 2: volte a ela |
 
 Um push novo dispara a CI de novo; nunca `push --force`.
