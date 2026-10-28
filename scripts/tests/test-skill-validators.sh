@@ -157,6 +157,23 @@ reset
 edit avaliacao.md 's/^- Status: reprovado$/- Status: limpo/'
 check 1 aval 'limpo com critério reprovado'
 
+reset
+edit avaliacao.md '/^- Dono: código$/d'
+check 1 aval 'item falhou sem Dono'
+
+reset
+edit avaliacao.md 's/^- Dono: código$/- Dono: alguém/'
+check 1 aval 'item com Dono desconhecido'
+
+reset
+edit avaliacao.md 's/^- Veredito: passou$/- Veredito: ok/'
+check 1 aval 'Veredito desconhecido'
+
+reset
+edit avaliacao.md 's/^- Veredito: falhou$/- Veredito: bloqueado: sem ferramenta de navegador no projeto/'
+edit avaliacao.md 's/^- Dono: código$/- Dono: decisão/'
+check 0 aval 'item bloqueado com Dono decisão'
+
 total=$((pass + fail))
 if [ "$fail" -gt 0 ]; then
   echo "erro: validadores das skills: $fail de $total casos falharam" >&2

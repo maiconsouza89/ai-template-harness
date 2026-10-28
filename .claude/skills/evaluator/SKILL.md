@@ -56,6 +56,16 @@ Um por vez, na ordem Serviço, API HTTP, CLI, Worker, Evento, UI, E2E (da base p
 5. **Traduzir o `Então`** com `references/assercoes.md`. O que casa com um padrão vira asserção mecânica. O que não casa é interpretado, executado e marcado com `*`, com a interpretação escrita no relatório. O que não tem interpretação plausível deixa o item `manual`, citando o trecho.
 6. **Exercitar** a superfície com o que o projeto oferece. Em UI e E2E, além dos bullets, rode a base visual de `references/assercoes.md` seção 5: tela que carrega com imagem quebrada ou menu cortado falha o item mesmo que cada bullet passe.
 7. **Veredito**: `passou` só com todos os bullets verdes, `falhou` com qualquer um vermelho. Cada bullet registra esperado e observado. Para cada bullet vermelho, uma linha de causa ancorada na evidência; sem evidência suficiente, escreva "causa: não determinada; veja a evidência" em vez de supor.
+8. **Dono**, em todo item `falhou` ou `bloqueado`: quem resolve, pela causa. É o que deixa a `/implement-and-evaluate` encerrar sem despachar uma correção que não tem o que corrigir.
+
+   | Dono | Quando | Quem resolve |
+   |---|---|---|
+   | `código` | Código, teste, seed, fixture ou configuração do repositório; pré-requisito que a implementação devia produzir | `/fix-runner` |
+   | `contrato` | O item contradiz a ferramenta, a spec ou a si mesmo; nenhum código o faria passar como está escrito | `/spec-writer` (Revisão) |
+   | `decisão` | Falta ADR ou ferramenta no projeto (navegador, cliente de fila) para exercitar o item | `/adr-writer` |
+   | `ambiente` | A máquina: serviço que caiu, Docker parado, credencial externa ausente | a pessoa |
+
+   Na dúvida entre `código` e outro, escolha `código`: uma correção a mais custa menos que um item certo que ninguém tenta corrigir.
 
 **Erro de transporte** (conexão recusada, timeout, processo que caiu; resposta 4xx ou 5xx **não** é erro de transporte) tem uma nova tentativa. Três itens seguidos com o mesmo erro de transporte indicam serviço morto: reinicie o serviço uma vez; se não voltar, aborte e marque os itens restantes `bloqueado: avaliação parou no item <ID>: <serviço> caiu`.
 
@@ -86,7 +96,7 @@ Se 80% ou mais dos itens **exercitados** falharam pelo mesmo padrão (404 em tod
 - `reprovado`, `reprovado no gate` ou `abortado`: `roadmap.py set RF-NNN "em andamento" --motivo "avaliação <status>: <resumo curto>"`.
 - `pendente`: não mexa no status. O que falta é revisão manual ou destravar um pré-requisito.
 
-Termine dizendo o próximo passo: `limpo`, abrir o PR com o `avaliacao.md` e o roadmap; `reprovado`, `/fix-runner <alvo>`; `pendente`, quais itens `manual` a pessoa revisa e quais bloqueios resolver.
+Termine dizendo o próximo passo: `limpo`, abrir o PR com o `avaliacao.md` e o roadmap; `reprovado`, `/fix-runner <alvo>` para os itens com dono `código` e a skill do dono para os outros; `pendente`, quais itens `manual` a pessoa revisa e quais bloqueios resolver.
 
 ## Regras que não se negociam
 

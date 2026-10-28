@@ -63,6 +63,7 @@ Seção sem conteúdo fica com a linha `Nenhum.`, para o arquivo ter sempre as m
 
 #### API-AUTH-03 *
 - Veredito: falhou
+- Dono: código
 - ✓ a resposta é 200 | esperado 200, observado 200
 - ✗ o corpo traz `aal` igual a `aal2` | esperado `aal2`, observado `aal1`
   - causa: <uma linha ancorada na evidência | não determinada; veja a evidência>
@@ -109,7 +110,9 @@ Seção sem conteúdo fica com a linha `Nenhum.`, para o arquivo ter sempre as m
 - Evidência sempre dentro de `<details>` e cortada no que sustenta os bullets.
 - A primeira coluna de Critérios é o texto literal do manifesto: o `make check-eval` compara com o contrato e avisa quando a avaliação ficou para trás.
 - `Commit` é o HEAD avaliado; mudanças fora de commit no momento da avaliação vão em Avisos ("avaliado com N arquivos fora de commit").
+- `Dono` só aparece em item `falhou` ou `bloqueado`, logo abaixo do Veredito, com um dos quatro valores do Passo 4 da skill. O `make check-eval` recusa item reprovado sem ele.
+- Valor de segredo na evidência sai mascarado, mesmo sendo de teste (`sb_secret_<mascarado>`, `eyJ<mascarado>`): o `avaliacao.md` é versionado, e o gitleaks do `make check` varre o histórico e trata o valor como vazamento.
 
 ## Projeção no chat
 
-Só isto, nesta ordem: o título, as linhas de Status, Itens e Critérios, a linha de alerta quando houver, cada critério `✗` ou `⊘` em uma linha, cada item `falhou` ou `bloqueado` em uma linha (ID e causa), o que mudou no roadmap e o caminho do `avaliacao.md`. O resto fica no arquivo.
+Só isto, nesta ordem: o título, as linhas de Status, Itens e Critérios, a linha de alerta quando houver, cada critério `✗` ou `⊘` em uma linha, cada item `falhou` ou `bloqueado` em uma linha (ID, dono e causa: `API-AUTH-03 (código): <causa>`), o que mudou no roadmap e o caminho do `avaliacao.md`. O resto fica no arquivo.

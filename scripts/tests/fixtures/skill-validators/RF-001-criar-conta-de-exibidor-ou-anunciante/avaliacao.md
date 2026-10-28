@@ -41,6 +41,7 @@
 
 #### API-CADASTRO-03
 - Veredito: falhou
+- Dono: código
 - ✗ a resposta é 409 | esperado 409, observado 201
   - causa: a rota não confere o documento antes de gravar
 

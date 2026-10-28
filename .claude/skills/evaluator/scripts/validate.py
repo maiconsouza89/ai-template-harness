@@ -8,7 +8,10 @@ Opções: --raiz <dir> (padrão: diretório atual, a raiz do repositório).
 
 avaliacao.md (skill evaluator): cabeçalho com Execução, Branch, Commit, Status, Itens e
 Critérios; seções fixas na ordem; status conhecido e coerente com a tabela de critérios
-(limpo só com tudo verificado, reprovado com pelo menos um reprovado); sem travessão.
+(limpo só com tudo verificado, reprovado com pelo menos um reprovado); cada item com Veredito
+conhecido, e cada item falhou ou bloqueado com o Dono que resolve (código, contrato, decisão
+ou ambiente), que a implement-and-evaluate usa para decidir se despacha a fix-runner; sem
+travessão.
 Avisa quando os critérios da avaliação não batem com o manifesto do contract.md atual, ou
 seja, quando a avaliação ficou para trás do contrato.
 
@@ -32,6 +35,8 @@ SECTIONS = ["Critérios", "Gates de qualidade", "Pré-requisitos", "Itens", "Des
 STATUS = re.compile(r"^(limpo|reprovado|pendente|reprovado no gate .+|abortado no passo \d+|abortado no item \S+: .+)$")
 RESULT = {"✓ verificado": "v", "✗ reprovado": "x", "⊘ indeterminado": "u"}
 ORQ_STATUS = re.compile(r"^(em execução|sucesso|manual pendente|travado|esgotado|abortado|pr bloqueado)$")
+VERDICTS = {"passou", "falhou", "bloqueado", "manual", "pulado"}
+OWNERS = {"código", "contrato", "decisão", "ambiente"}
 
 
 class Report:
@@ -131,6 +136,8 @@ def check_avaliacao(rep, folder, root):
     if status == "pendente" and ("x" in marks or "u" not in marks):
         rep.err(where, "status 'pendente' exige nenhum reprovado e pelo menos um indeterminado")
 
+    check_itens(rep, where, sec.get("Itens", ""))
+
     contract = folder / "contract.md"
     if contract.is_file() and rows:
         atual = manifest(contract.read_text(encoding="utf-8"))
@@ -139,6 +146,26 @@ def check_avaliacao(rep, folder, root):
             rep.warn(where, "os critérios avaliados não batem com o manifesto atual do contrato; "
                             "a avaliação ficou para trás, rode /evaluator de novo")
     return status
+
+
+def check_itens(rep, where, block):
+    for chunk in re.split(r"^(?=#### )", block, flags=re.M):
+        if not chunk.startswith("#### "):
+            continue
+        iid = chunk.splitlines()[0][5:].strip().rstrip("*").strip()
+        m = re.search(r"^- Veredito: (.+)$", chunk, re.M)
+        if not m:
+            rep.err(where, f"{iid} sem a linha '- Veredito: ...'")
+            continue
+        verdict = m.group(1).split(":")[0].strip()  # 'bloqueado: <motivo>' é a forma do bloqueio
+        if verdict not in VERDICTS:
+            rep.err(where, f"{iid} com veredito '{verdict}'; use {', '.join(sorted(VERDICTS))}")
+        elif verdict in ("falhou", "bloqueado"):
+            d = re.search(r"^- Dono: (.+)$", chunk, re.M)
+            if not d:
+                rep.err(where, f"{iid} {verdict} sem a linha '- Dono: ...' ({', '.join(sorted(OWNERS))})")
+            elif d.group(1).strip() not in OWNERS:
+                rep.err(where, f"{iid} com dono '{d.group(1).strip()}'; use {', '.join(sorted(OWNERS))}")
 
 
 def check_orquestracao(rep, folder, root):

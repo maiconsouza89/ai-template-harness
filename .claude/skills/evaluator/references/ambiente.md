@@ -15,7 +15,7 @@ A skill prescreve a estrutura da avaliação e deixa a tática para a descoberta
 |---|---|---|
 | 1 | `## Pré-requisitos` do contrato | O que precisa existir: serviços, handles, arquivos, configuração, dependências externas |
 | 2 | `CLAUDE.md`, `CONTRIBUTING.md`, `README.md` | Como o projeto quer o ambiente: `make test`, `make build`, Docker Compose |
-| 3 | `docs/features/fundacao/spec.md`, seção "Convenções para as features", e a spec do alvo | Seed e factories, lugar das fixtures, configuração de teste, padrão de mocks |
+| 3 | `docs/features/fundacao/spec.md`, seção "Convenções para as features", e a spec do alvo | Seed e factories, lugar das fixtures, configuração de teste, padrão de mocks; a ferramenta de cada superfície, na tabela "Verificação por superfície" da Estratégia de testes |
 | 4 | Contratos de outras pastas em `docs/features/` | Handles e caminhos já usados, que se reaproveitam |
 | 5 | A stack: `Makefile`, `scripts/*.sh`, `compose.yaml`, manifestos de pacote, configuração do ORM, `.env.test` | Comandos concretos de instalar, migrar, popular, subir |
 | 6 | Defaults da stack detectada | O que sobrou, pelo conhecimento geral da stack |
