@@ -14,7 +14,8 @@
         "contract.md não cita RF-013 nem RF-014",
         "spec.md cita ADR-0007 e o componente Financeiro",
         "plan.md não tem fase cujo nome fale de testes",
-        "docs/product/roadmap.md marca RF-010 como 'em andamento'"
+        "docs/product/roadmap.md marca RF-010 como 'em andamento'",
+        "spec.md tem a tabela 'Verificação por superfície' com uma linha por seção de superfície do contract.md"
       ]
     },
     {
@@ -29,7 +30,9 @@
         "spec.md tem a seção '## Convenções para as features' com as seis linhas de convenção",
         "contract.md não cita nenhum RF-NNN",
         "spec.md lista em 'Pendentes de ADR' ao menos uma decisão de stack que nenhum ADR cobre (ex.: framework de teste ou ORM)",
-        "docs/product/roadmap.md não foi alterado"
+        "docs/product/roadmap.md não foi alterado",
+        "Nenhum item do contract.md da fundação tem Dado ou Quando que exija PR, push ou run da CI; a entrega de CI é coberta por item local",
+        "Se o contrato da fundação tem a seção UI, a linha UI de 'Verificação por superfície' cita um ADR aceito ou está 'pendente de ADR' e listada em 'Pendentes de ADR'"
       ]
     },
     {

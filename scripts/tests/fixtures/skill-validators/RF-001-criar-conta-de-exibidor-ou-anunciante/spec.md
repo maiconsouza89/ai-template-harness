@@ -63,6 +63,12 @@ Tabelas `contas` e `estabelecimentos`, criadas por migração nova.
 
 Testes de unidade ao lado do código e de integração da API em `test/`.
 
+Verificação por superfície
+
+| Superfície | Mecanismo | Decisão |
+| --- | --- | --- |
+| API HTTP | requisições HTTP contra a API em execução | não precisa |
+
 ---
 
 ## Decisões e hipóteses

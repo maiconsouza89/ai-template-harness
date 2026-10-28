@@ -30,6 +30,16 @@ Mesmo template da spec de RF, com três diferenças:
 
 É essa seção que torna os contratos dos RFs consistentes entre si: cada RF reusa o que está aqui, e divergir exige justificativa na spec do RF.
 
+A tabela `Verificação por superfície` da Estratégia de testes da fundação é a que os RFs herdam com a Decisão `fundação`. Se o projeto vai ter tela, a ferramenta de navegador se decide aqui (ADR ou `pendente de ADR`), mesmo que a fundação só tenha uma rota inicial: é ela que fixa o mecanismo de todos os RFs com UI.
+
+**CI.** A entrega "CI" do Escopo é coberta por itens locais: `CI=true make check` passa, o workflow instala o que o projeto exige e só usa actions fixadas por SHA (`make check-actions`). O run de verdade no GitHub fica no Fechamento da `/implement-and-evaluate`, que espera os checks do PR.
+
+## Compatibilidade da stack
+
+A fundação junta, pela primeira vez, todas as ferramentas dos ADRs aceitos, e dois ADRs aceitos juntos podem não funcionar juntos: no viewstore, o ADR-0018 deixou só o TypeScript 7 e o ADR-0021 escolheu um gerador que importa a API do compilador, que o 7 não tem. A falha só apareceu no passo 16 do plano.
+
+Antes de gerar o plano, para cada ferramenta com versão fixada por ADR, leia nos metadados do registro (`npm view <pacote>@<versão> peerDependencies engines`, ou o equivalente da linguagem) o que ela exige e cruze com as versões dos outros ADRs e com as restrições que eles declaram ("ferramenta que importa X fica de fora"). Conflito: pare antes de escrever os três arquivos e aponte a `/adr-writer` (supersede ou ADR de exceção), com a ferramenta, a versão e a exigência que não fecha. Sem conflito, registre em Decisões da spec que a conferência foi feita, com a data.
+
 ## O que a fundação não faz
 
 - Não implementa comportamento de RF nenhum, nem parcial. Tela de login entra só se o HLD a coloca na borda de autenticação como infraestrutura, e mesmo assim sem regra de produto.

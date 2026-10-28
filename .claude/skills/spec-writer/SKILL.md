@@ -88,7 +88,7 @@ Depois do último bloco, resuma as decisões e as hipóteses em até oito linhas
 | Decisões de produto e requisitos não funcionais que tocam o RF | Regras e fluxos |
 | Linha do RF na rastreabilidade do HLD | Componentes e Contratos de interface |
 
-A Estratégia de testes orienta quem implementa (arquivos, funções, níveis) e **não** liga teste a critério de aceitação: essa ligação existe num lugar só, o manifesto do contrato. Duas cópias divergem na primeira mudança. Spec descreve estrutura, não traz código; JSON de exemplo e migração descrita são estrutura.
+A Estratégia de testes orienta quem implementa (arquivos, funções, níveis) e **não** liga teste a critério de aceitação: essa ligação existe num lugar só, o manifesto do contrato. Duas cópias divergem na primeira mudança. Spec descreve estrutura, não traz código; JSON de exemplo e migração descrita são estrutura. A Estratégia de testes também traz a tabela `Verificação por superfície`, uma linha por seção de superfície do contrato com o mecanismo e a decisão que o sustenta (`references/contrato.md` seção 6).
 
 **plan.md.** Preencha `assets/plan-template.md`. Passos numerados de forma contínua entre as fases, no formato `N. **Componente:** o que fazer`, cada um de 1 a 3 frases dizendo **o quê**; o como está na spec. Sem fase de testes (teste acompanha cada passo), sem estimativa de tempo, sem decisão de arquitetura e sem detalhe de implementação (tipo, coluna, método).
 
@@ -97,7 +97,7 @@ A Estratégia de testes orienta quem implementa (arquivos, funções, níveis) e
 ## Passo 4: validar e salvar
 
 1. Faça a checagem de conteúdo de `references/entrevista.md` seção 5.
-2. Escreva os três arquivos em `docs/features/<pasta>/` (a pasta que `contexto.py` indicou) e rode `python3 <skill-dir>/scripts/validate.py docs/features/<pasta>`. Ele confere a forma dos três e cruza com PRD, HLD, ADRs e roadmap: critério do manifesto que não é literal, **critério sem item** (o portão de cobertura), RF fora do fecho, handle sem declaração, ADR superseded, componente fora do HLD, seção de testes no plano.
+2. Escreva os três arquivos em `docs/features/<pasta>/` (a pasta que `contexto.py` indicou) e rode `python3 <skill-dir>/scripts/validate.py docs/features/<pasta>`. Ele confere a forma dos três e cruza com PRD, HLD, ADRs e roadmap: critério do manifesto que não é literal, **critério sem item** (o portão de cobertura), RF fora do fecho, handle sem declaração, ADR superseded, componente fora do HLD, seção de testes no plano, superfície sem mecanismo de verificação decidido e item que exige PR ou CI.
 3. **Portão de cobertura.** Se o validador acusar critério sem item e você não conseguir cobri-lo, apague os três arquivos e reporte a lacuna com o texto literal do critério (formato em `references/contrato.md` seção 2). Os três existem juntos ou nenhum: uma pasta com spec e sem contrato válido parece pronta e não está.
 4. Corrija até sair sem erro. Aviso se resolve corrigindo ou explicando no relatório.
 
@@ -128,6 +128,7 @@ Cada uma existe porque a alternativa já deu errado em algum lugar:
 - **Fecho de dependências é a fronteira.** O contrato só exige o que este RF e o seu fecho entregam. Exigir o login de um RF do qual este não depende faz o contrato só rodar quando outro time terminar; o padrão de preparação resolve isso dentro do próprio RF.
 - **Nada de stack nova sem ADR.** Tecnologia que nenhum ADR aceito cobre vai para "Pendentes de ADR" e para o relatório, e o próximo passo é `/adr-writer`.
 - **Contrato agnóstico.** Ele descreve comportamento, nunca quem o executa, nem com que ferramenta. Assim serve a uma pessoa, a uma suíte de testes ou a um agente.
+- **Contrato verificável antes do código.** Cada superfície tem mecanismo decidido na spec (ou pendente de ADR, que bloqueia a implementação), cada item roda no ambiente local sem PR nem CI, e o que ele promete sobre ferramenta externa foi conferido. Item que nasce impossível de verificar só aparece como reprovado depois de toda a implementação.
 - **Convenções do projeto, não inventadas.** Caminho de fixture, seed, configuração de teste e mocks vêm dos contratos anteriores, da fundação ou do código; divergir exige justificativa na spec.
 - **Nada no spec.md liga teste a critério**, nem anota critério de outro RF como "fora de escopo": a fronteira já está codificada no manifesto.
 - **Sem comentário HTML** no contrato e **sem travessão** nos três arquivos.

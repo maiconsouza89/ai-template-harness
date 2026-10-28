@@ -34,6 +34,32 @@ edit() { # edit <arquivo da pasta do RF> <expressão sed>
   sed "$2" "$f/$1" > "$tmp/editado" && mv "$tmp/editado" "$f/$1"
 }
 
+add_ui() { # add_ui <decisão>: acrescenta a superfície UI ao contrato e a linha dela na tabela da spec
+  edit spec.md "/^| API HTTP |/a\\
+| UI | navegador abrindo o Painel web | $1 |"
+  cat >> "$f/contract.md" <<'UI'
+
+## UI
+
+Modo de verificação: navegador abrindo o Painel web contra a API em execução.
+
+### Cadastro
+
+#### UI-CADASTRO-01
+- **Dado:** nenhuma conta com o documento 98765432100.
+- **Quando:** a pessoa conclui o formulário de cadastro.
+- **Então:**
+  - a tela mostra a conta criada
+UI
+}
+
+fundacao() { # fundacao <decisão da UI>: spec da fundação só com a tabela de verificação
+  mkdir -p "$tmp/raiz/docs/features/fundacao"
+  printf '%s\n' '# Spec: fundação' '' '## Estratégia de testes' '' 'Verificação por superfície' '' \
+    '| Superfície | Mecanismo | Decisão |' '| --- | --- | --- |' "| UI | navegador | $1 |" \
+    > "$tmp/raiz/docs/features/fundacao/spec.md"
+}
+
 check() { # check <0 aceita|1 rejeita> <spec|aval> <descrição>
   expected=$1
   if [ "$2" = spec ]; then
@@ -62,6 +88,62 @@ check 1 spec 'título da spec com outro RF'
 reset
 edit contract.md '/^Modo de verificação: /d'
 check 1 spec 'superfície sem Modo de verificação'
+
+reset
+edit spec.md '/^Verificação por superfície$/,/^| API HTTP |/d'
+check 1 spec 'Estratégia de testes sem a tabela de verificação'
+
+reset
+edit spec.md 's/^| API HTTP | \(.*\) | não precisa |$/| API HTTP | \1 | talvez |/'
+check 1 spec 'decisão de verificação desconhecida'
+
+reset
+edit contract.md 's/^- \*\*Dado:\*\* nenhuma conta com o documento 98765432100\.$/- **Dado:** um PR que contém o cadastro./'
+check 1 spec 'Dado que exige PR'
+
+reset
+edit contract.md 's/^- \*\*Quando:\*\* a conta acrescenta o papel anunciante\.$/- **Quando:** o workflow `ci.yml` roda./'
+check 1 spec 'Quando que exige run da CI'
+
+reset
+edit contract.md 's/^- \*\*Quando:\*\* a conta acrescenta o papel anunciante\.$/- **Quando:** a conta liga a notificação push./'
+check 0 spec 'notificação push não é push do git'
+
+reset
+add_ui 'ADR-0004'
+edit spec.md '/^| UI |/d'
+check 1 spec 'superfície UI sem linha na tabela'
+
+reset
+add_ui 'não precisa'
+check 1 spec 'UI com não precisa'
+
+reset
+add_ui 'ADR-0004'
+check 0 spec 'UI decidida por ADR'
+
+reset
+add_ui 'pendente de ADR'
+check 1 spec 'UI pendente de ADR fora de Pendentes de ADR'
+
+reset
+add_ui 'pendente de ADR'
+edit spec.md '/^Pendentes de ADR$/,/^---$/s/^- nenhuma$/- Ferramenta de navegador para a superfície UI: Playwright ou Cypress./'
+check 0 spec 'UI pendente de ADR e listada'
+
+reset
+add_ui 'fundação'
+check 1 spec 'UI herdada sem spec da fundação'
+
+reset
+add_ui 'fundação'
+fundacao 'ADR-0004'
+check 0 spec 'UI herdada da fundação com ADR'
+
+reset
+add_ui 'fundação'
+fundacao 'pendente de ADR'
+check 1 spec 'UI herdada da fundação pendente de ADR'
 
 # evaluator
 reset

@@ -60,6 +60,12 @@ Fora desta spec
 
 [Arquivos de teste e funções de teste por nível (unidade, integração, interface, ponta a ponta), no framework e na pasta que o código já usa. É orientação para quem implementa: não amarra teste a critério de aceitação, isso é do contract.md.]
 
+Verificação por superfície
+
+| Superfície | Mecanismo | Decisão |
+| --- | --- | --- |
+| [cada superfície do contract.md, com o nome da seção: API HTTP, CLI, UI, Worker...] | [como ela é exercitada: requisições HTTP, comando na raiz, navegador dirigido por ferramenta] | [ADR-NNNN da ferramenta; "não precisa" quando o mecanismo é genérico; "fundação" num RF que herda a linha da fundação; ou "pendente de ADR"] |
+
 ---
 
 ## Decisões e hipóteses

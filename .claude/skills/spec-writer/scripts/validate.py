@@ -11,8 +11,10 @@ ADRs e o roadmap: manifesto com o texto literal de cada critério que entra (os 
 integração em que ele é o destino) e com pelo menos um item existente por critério (o
 portão de cobertura), RF ou DEP citado no contrato fora do fecho de dependências, handles de
 pré-requisito sem declaração ou sem uso, superfícies e IDs de item, ADR citado superseded,
-componente fora do HLD, plano com fase de testes. Avisa quando PRD ou HLD subiram de versão
-depois da spec. Sai com código 1 quando há erro; avisos não derrubam. Só biblioteca padrão.
+componente fora do HLD, plano com fase de testes, superfície do contrato sem mecanismo de
+verificação decidido na tabela 'Verificação por superfície' da spec, e item cujo Dado ou Quando
+exige PR, push ou run da CI (a CI é conferida no Fechamento da implement-and-evaluate, não no
+contrato). Avisa quando PRD ou HLD subiram de versão depois da spec. Sai com código 1 quando há erro; avisos não derrubam. Só biblioteca padrão.
 """
 import re
 import sys
@@ -56,6 +58,10 @@ TIME_WORDS = re.compile(r"\b\d+\s*(?:h|horas?|dias?|semanas?|sprints?)\b", re.IG
 TEST_PHASE = re.compile(r"\b(testes?|qa|validação|homologação)\b", re.IGNORECASE)
 ADR_REF = re.compile(r"ADR-(\d{4})")
 FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
+VERIFY_LABEL = "Verificação por superfície"
+VERIFY_DECISION = re.compile(r"^(ADR-\d{4}|não precisa|fundação|pendente de ADR)$")
+BROWSER_SURFACES = {"UI", "E2E"}
+NEEDS_REMOTE = re.compile(r"\bPR\b|\b(?:na|da) CI\b|(?i:pull request|\bgit push\b|\bworkflow\b.*\broda\b)")
 
 
 class Report:
@@ -92,6 +98,23 @@ def table_rows(body):
             continue
         rows.append(cells)
     return rows  # rows[0] é o cabeçalho
+
+
+def verification_table(strategy):
+    """Linhas da tabela 'Verificação por superfície': {superfície: (mecanismo, decisão)}; None sem a tabela."""
+    lines = strategy.splitlines()
+    try:
+        start = next(i for i, l in enumerate(lines) if l.strip() == VERIFY_LABEL)
+    except StopIteration:
+        return None
+    block = []
+    for l in lines[start + 1:]:
+        if l.startswith("|"):
+            block.append(l)
+        elif block or l.strip():
+            break
+    rows = table_rows("\n".join(block))[1:]
+    return {r[0]: (r[1] if len(r) > 1 else "", r[2] if len(r) > 2 else "") for r in rows if r and r[0]}
 
 
 def version_tuple(v):
@@ -227,7 +250,31 @@ def check_spec(rep, text, ctx):
         rep.warn(f"spec.md: {hyp} hipóteses; acima de 20 a spec está decidindo demais pelo usuário")
     pend = labeled_bullets(by.get("Decisões e hipóteses", ""), "Pendentes de ADR") or []
     pend = [p for p in pend if not p.lower().startswith("nenhum")]
-    return {"complexity": complexity, "included": included, "hyp": hyp, "pending": len(pend)}
+    tools = verification_table(by.get("Estratégia de testes", ""))
+    if "Estratégia de testes" in by and tools is None:
+        rep.err(f"spec.md: 'Estratégia de testes' sem a tabela '{VERIFY_LABEL}' (Superfície, Mecanismo, Decisão)")
+    for surf, (mech, dec) in (tools or {}).items():
+        if surf not in SURFACE_CODE:
+            rep.err(f"spec.md: '{VERIFY_LABEL}' cita '{surf}', que não é superfície do catálogo")
+        if not mech:
+            rep.err(f"spec.md: '{VERIFY_LABEL}' sem mecanismo para {surf}")
+        if not VERIFY_DECISION.match(dec):
+            rep.err(f"spec.md: decisão '{dec}' de {surf} em '{VERIFY_LABEL}'; use ADR-NNNN, não precisa, "
+                    "fundação ou pendente de ADR")
+        elif dec == "fundação" and fund:
+            rep.err(f"spec.md: a fundação não herda de si mesma; decida {surf} por ADR, não precisa ou pendente de ADR")
+        elif dec == "não precisa" and SURFACE_CODE.get(surf) in BROWSER_SURFACES:
+            rep.err(f"spec.md: {surf} com 'não precisa'; dirigir o navegador exige ferramenta, decidida por ADR")
+        elif dec == "pendente de ADR":
+            if not any(re.search(rf"\b{re.escape(surf)}\b", p) or (mech and mech.lower() in p.lower())
+                       for p in pend):
+                rep.err(f"spec.md: {surf} está pendente de ADR em '{VERIFY_LABEL}' e não aparece em "
+                        "'Pendentes de ADR'")
+            else:
+                rep.warn(f"spec.md: {surf} sem mecanismo decidido; a implementação fica bloqueada até o "
+                         "ADR (/adr-writer)")
+    return {"complexity": complexity, "included": included, "hyp": hyp, "pending": len(pend),
+            "tools": tools or {}}
 
 
 # ---------- plan.md ----------
@@ -291,7 +338,7 @@ def parse_items(body):
     return items
 
 
-def check_contract(rep, text, ctx, included):
+def check_contract(rep, text, ctx, included, tools, fund_tools):
     rid, rf, prd = ctx["rid"], ctx["rf"], ctx["prd"]
     fund = rid == FUNDACAO
     want = "# Contrato: fundação" if fund else f"# Contrato: {rid} "
@@ -332,6 +379,17 @@ def check_contract(rep, text, ctx, included):
         body = by[t]
         if not re.search(r"^Modo de verificação: \S", body, re.MULTILINE):
             rep.err(f"contract.md: '## {t}' sem a linha 'Modo de verificação: ...'")
+        if t not in tools:
+            rep.err(f"contract.md: '## {t}' sem linha em '{VERIFY_LABEL}' da spec; diga como a superfície "
+                    "é exercitada e que decisão sustenta a ferramenta")
+        elif tools[t][1] == "fundação":
+            herdado = (fund_tools or {}).get(t)
+            if herdado is None:
+                rep.err(f"contract.md: '## {t}' herda da fundação, e a spec da fundação não tem linha para {t} "
+                        f"em '{VERIFY_LABEL}'")
+            elif herdado[1] == "pendente de ADR":
+                rep.err(f"contract.md: '## {t}' herda da fundação uma superfície pendente de ADR; registre o "
+                        "ADR com /adr-writer antes")
         if t == "Serviço" and not re.search(r"^Consumidor: \S", body, re.MULTILINE):
             rep.err("contract.md: '## Serviço' sem 'Consumidor: ...'; só existe com consumidor fora da feature")
         for h in re.findall(r"^### (.+)$", body, re.MULTILINE):
@@ -350,6 +408,11 @@ def check_contract(rep, text, ctx, included):
             if cap is None:
                 rep.err(f"contract.md: {iid} fora de um '### Capacidade'")
             keys = re.findall(r"^- \*\*(Dado|Quando|Então|Notas):\*\*", chunk, re.MULTILINE)
+            for k, line in re.findall(r"^- \*\*(Dado|Quando):\*\*(.*)$", chunk, re.MULTILINE):
+                if NEEDS_REMOTE.search(line):
+                    rep.err(f"contract.md: {iid} exige PR, push ou run da CI no {k}; todo item roda no ambiente "
+                            "local, e a CI é conferida no Fechamento da /implement-and-evaluate")
+                    break
             base = [k for k in keys if k != "Notas"]
             if base != ["Dado", "Quando", "Então"]:
                 rep.err(f"contract.md: {iid} precisa de Dado, Quando e Então, uma vez cada e nessa ordem")
@@ -510,7 +573,13 @@ def check_folder(folder, root, prd, hld, adrs, status):
     if "plan.md" in texts:
         summary.update(check_plan(rep, texts["plan.md"], ctx, summary.get("complexity")))
     if "contract.md" in texts:
-        summary.update(check_contract(rep, texts["contract.md"], ctx, summary.get("included", [])))
+        fund_tools = None
+        fund_spec = root / "docs" / "features" / FUNDACAO / "spec.md"
+        if rid != FUNDACAO and fund_spec.is_file():
+            fund_tools = verification_table(dict(split_sections(fund_spec.read_text(encoding="utf-8")))
+                                            .get("Estratégia de testes", ""))
+        summary.update(check_contract(rep, texts["contract.md"], ctx, summary.get("included", []),
+                                      summary.get("tools", {}), fund_tools))
     return rep, summary
 
 
