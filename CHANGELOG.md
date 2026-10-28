@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.7.1...v0.8.0) (2026-10-28)
+
+
+### Adicionado
+
+* **skills:** aplica as lições da execução da fundação ([#40](https://github.com/maiconsouza89/ai-template-harness/issues/40)) ([33c06d7](https://github.com/maiconsouza89/ai-template-harness/commit/33c06d752a160890aa7c73327b42866a0f4ad584))
+
 ## [0.7.1](https://github.com/maiconsouza89/ai-template-harness/compare/v0.7.0...v0.7.1) (2026-10-28)
 
 
