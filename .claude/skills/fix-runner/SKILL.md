@@ -1,6 +1,6 @@
 ---
 name: fix-runner
-description: Correção dirigida de um RF-NNN (ou da fundação) em dois modos. Modo avaliação - lê `docs/features/<pasta>/avaliacao.md`, pega os itens que falharam ou ficaram bloqueados com o esperado, o observado e a evidência, corrige código, seed, fixture, configuração ou teste, valida pelo `Makefile` e faz um commit `fix(...)` com autorização. Modo conflito - resolve conflitos de merge no branch da feature (os que já estão no working tree, ou fazendo o merge da base de um PR), com spec e contrato decidindo o que vale. Não edita spec, plano nem contrato e não dá veredito: depois dela vem `/evaluator`. Use sempre que o usuário quiser corrigir o que a avaliação reprovou ("corrige o que falhou no RF-003", "o evaluator reprovou, conserta", "arruma os itens bloqueados"), resolver conflito de merge num branch de feature ("resolve os conflitos com a main", "o PR 42 tem conflito"), mesmo sem dizer fix-runner.
+description: Correção dirigida de um RF-NNN (ou da fundação) em três modos. Modo avaliação - lê `docs/features/<pasta>/avaliacao.md`, pega os itens que falharam ou ficaram bloqueados com o esperado, o observado e a evidência, corrige código, seed, fixture, configuração ou teste, valida pelo `Makefile` e faz um commit `fix(...)` com autorização. Modo conflito - resolve conflitos de merge no branch da feature (os que já estão no working tree, ou fazendo o merge da base de um PR), com spec e contrato decidindo o que vale. Modo achado - corrige um problema que o contrato não cobre (revisão de segurança, CI vermelha), reproduzindo antes e deixando um teste que falha no código antigo. Não edita spec, plano nem contrato e não dá veredito: depois dela vem `/evaluator`. Use sempre que o usuário quiser corrigir o que a avaliação reprovou ("corrige o que falhou no RF-003", "o evaluator reprovou, conserta", "arruma os itens bloqueados"), resolver conflito de merge num branch de feature ("resolve os conflitos com a main", "o PR 42 tem conflito") ou corrigir um achado fora do contrato ("a revisão de segurança apontou X", "a CI quebrou no PR"), mesmo sem dizer fix-runner.
 ---
 
 # Fix Runner
@@ -11,10 +11,11 @@ Uma passada de correção, curta e mirada, sobre uma feature que já foi impleme
 |---|---|
 | Alvo (`RF-003`, `fundação`, pasta) com `avaliacao.md` reprovado, opcionalmente os IDs ("só API-AUTH-03") | **Avaliação** |
 | Conflito de merge no working tree, ou um PR (`PR 42`, URL, nome do branch) | **Conflito** |
+| Um problema que nenhum item do contrato cobre, com a origem: revisão de segurança automática, log de CI vermelha, regressão vista por quem orquestra | **Achado** |
 
-Pedido que mistura os dois modos: pergunte qual primeiro.
+Pedido que mistura os modos: pergunte qual primeiro.
 
-Em ambos, a skill termina em **um** commit, feito só com autorização. Chamada pela `/implement-and-evaluate`, a autorização já veio no prompt. Chamada direto, pergunte uma vez no começo com `AskUserQuestion` ("Posso commitar a correção quando a validação passar?", sim recomendado): o `CLAUDE.md` não deixa agente commitar sem autorização explícita, e ela vale só para esta execução. Sem autorização, a correção fica no working tree.
+Em todos, a skill termina em **um** commit, feito só com autorização. Chamada pela `/implement-and-evaluate`, a autorização já veio no prompt. Chamada direto, pergunte uma vez no começo com `AskUserQuestion` ("Posso commitar a correção quando a validação passar?", sim recomendado): o `CLAUDE.md` não deixa agente commitar sem autorização explícita, e ela vale só para esta execução. Sem autorização, a correção fica no working tree.
 
 ## Modo avaliação
 
@@ -87,12 +88,23 @@ Fix-Cycle: <N>
 5. `git add` de cada arquivo resolvido e valide como no Modo avaliação, passo 4. Vermelho depois de 3 tentativas: `validação falhou`, merge ainda em andamento para a pessoa ver.
 6. **Commit** de merge com a mensagem padrão do git (`Merge remote-tracking branch 'origin/main' into feat/...`), que o hook aceita, e no corpo a lista de arquivos resolvidos e as escolhas da regra 3.
 
+## Modo achado
+
+Para o que a avaliação não pega porque o contrato não cobre: a revisão de segurança que aponta 401 sem limite por IP, o job da CI que falha num passo que só roda lá. Sem este modo, a correção sai de um subagente avulso, sem as regras desta skill e com o rodapé de outra coisa.
+
+1. **Carregar.** A entrada traz a origem, a descrição, os arquivos e, quando houver, a regra da spec que o achado viola (seção e linha). Log de CI vem cortado nas linhas do erro; peça o resto só se a causa não aparecer nelas. Leia a spec só nas seções que o achado toca e o contrato só nos itens da mesma superfície, para não quebrar o que já passa.
+2. **Confirmar.** Reproduza antes de corrigir: a requisição que escapa do limite, o comando que falha. Achado que não se reproduz e não tem evidência: status `abortado`, motivo "achado não reproduzido", com o que foi tentado.
+3. **Corrigir e validar** como no Modo avaliação, passos 3 e 4. Toda correção de achado vem com um teste que falha no código antigo, no nível que a Estratégia de testes da spec indica: o contrato não cobre o caso, então é esse teste que impede a volta.
+4. **Commit** no formato do Modo avaliação, com `Achado: <origem em uma linha>` no lugar de `Itens da avaliação:` e `Fix-Cycle: <N>` (0 quando a implementação ainda não passou por avaliação).
+5. **Lacuna do contrato.** Em Pendências, diga qual regra da spec ficou sem item, para a `/spec-writer` cobrir na próxima Revisão.
+
 ## Relatório
 
 ```
-Fix Runner: <RF-NNN | fundação>, ciclo <N>, modo <avaliação | conflito>
+Fix Runner: <RF-NNN | fundação>, ciclo <N>, modo <avaliação | conflito | achado>
 Status: corrigido | validação falhou | abortado
 Itens visados: <IDs>                 (avaliação)
+Achado: <origem: descrição curta>    (achado)
 PR: <ref> (<head> ← <base>)          (conflito com PR)
 Arquivos em conflito: <lista>        (conflito)
 Arquivos alterados: <lista>
