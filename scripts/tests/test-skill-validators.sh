@@ -60,14 +60,17 @@ fundacao() { # fundacao <decisão da UI>: spec da fundação só com a tabela de
     > "$tmp/raiz/docs/features/fundacao/spec.md"
 }
 
+validate() { # validate <spec|aval>: roda o validador sobre a pasta do RF
+  if [ "$1" = spec ]; then
+    python3 -I "$spec" "$f" --raiz "$tmp/raiz"
+  else
+    python3 -I "$aval" "docs/features/$rf" --raiz "$tmp/raiz"
+  fi
+}
+
 check() { # check <0 aceita|1 rejeita> <spec|aval> <descrição>
   expected=$1
-  if [ "$2" = spec ]; then
-    python3 -I "$spec" "$f" --raiz "$tmp/raiz" > "$tmp/saida" 2>&1
-  else
-    python3 -I "$aval" "docs/features/$rf" --raiz "$tmp/raiz" > "$tmp/saida" 2>&1
-  fi
-  if [ $? -eq 0 ]; then got=0; else got=1; fi
+  if validate "$2" > "$tmp/saida" 2>&1; then got=0; else got=1; fi
   if [ "$got" -eq "$expected" ]; then
     pass=$((pass + 1))
   else
@@ -102,7 +105,7 @@ edit contract.md 's/^- \*\*Dado:\*\* nenhuma conta com o documento 98765432100\.
 check 1 spec 'Dado que exige PR'
 
 reset
-edit contract.md 's/^- \*\*Quando:\*\* a conta acrescenta o papel anunciante\.$/- **Quando:** o workflow `ci.yml` roda./'
+edit contract.md 's/^- \*\*Quando:\*\* a conta acrescenta o papel anunciante\.$/- **Quando:** o workflow ci.yml roda./'
 check 1 spec 'Quando que exige run da CI'
 
 reset
