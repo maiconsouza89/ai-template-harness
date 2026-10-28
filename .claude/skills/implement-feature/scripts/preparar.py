@@ -237,7 +237,8 @@ def main(argv):
             superficies[titulo] = re.findall(r"^#### (\S+)", corpo, re.M)
 
     # spec
-    pendentes_adr = labeled(sections(spec, 2).get("Decisões e hipóteses", ""), "Pendentes de ADR")
+    pendentes_adr = [p for p in labeled(sections(spec, 2).get("Decisões e hipóteses", ""), "Pendentes de ADR")
+                     if p.strip(". ").lower() != "nenhuma"]
 
     # saída
     titulo = f"{alvo_id} {nome}".strip() if alvo_id != FUNDACAO else "fundação"
