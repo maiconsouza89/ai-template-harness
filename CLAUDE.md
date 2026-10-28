@@ -40,9 +40,13 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
   `docs/architecture/diagrams/`, desenhados do HLD e dos ADRs ou de um FDD, com a origem de cada
   elemento num `.md`). Antes do código, `/spec-writer` gera por RF a spec, o plano e o contrato
   testável em `docs/features/RF-NNN-nome/` (e a fundação em `docs/features/fundacao/`), sobre o
-  HLD e os ADRs. Cada skill valida a própria estrutura; `make check-prd`, `make check-hld`,
-  `make check-c4` e `make check-spec` rodam essas validações e cruzam HLD com PRD e ADRs,
-  diagramas com a fonte e contratos com os critérios de aceitação do PRD.
+  HLD e os ADRs. Do contrato ao código: `/implement-feature` executa o plano fase a fase,
+  `/evaluator` exercita cada item do contrato e grava `avaliacao.md` (limpo marca `feito` no
+  roadmap), `/fix-runner` corrige o que ela reprovou, e `/implement-and-evaluate` roda o laço
+  até o PR. Cada skill valida a própria estrutura; `make check-prd`, `make check-hld`,
+  `make check-c4`, `make check-spec` e `make check-eval` rodam essas validações e cruzam HLD com
+  PRD e ADRs, diagramas com a fonte, contratos com os critérios do PRD e avaliações com o
+  roadmap.
 
 ## Onde colocar o quê
 
@@ -61,6 +65,7 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
 | Desenho técnico do sistema | `docs/architecture/hld.md` | Liga requisitos do PRD aos ADRs |
 | Diagramas C4 (PlantUML) | `docs/architecture/diagrams/` (via `/c4-writer`) | Figura derivada do HLD; o HLD continua a fonte |
 | Spec, plano e contrato de um RF | `docs/features/RF-NNN-nome/` (via `/spec-writer`) | O contrato cobre os critérios do PRD; a spec não reabre HLD nem ADR |
+| Veredito de um RF contra o contrato | `docs/features/RF-NNN-nome/avaliacao.md` (via `/evaluator`) | Um por RF, versionado; `feito` no roadmap exige avaliação limpa |
 | Arquivo de comunidade (`CONTRIBUTING`, `SECURITY`, `CODE_OF_CONDUCT`) | Raiz | Reconhecido pelo GitHub; `LICENSE` só é detectado na raiz |
 
 ## Regras
@@ -68,6 +73,9 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
 - Branch `<tipo>/<descricao>` a partir de `main`; commits e título do PR em Conventional Commits,
   tipo e escopo em inglês e descrição em português (formato completo em `CONTRIBUTING.md`).
   `main` só recebe PR com squash.
+- Agente não faz `git add`, `git commit` nem `git push` sem autorização explícita da pessoa na
+  conversa; ao terminar uma alteração, deixa os arquivos no working tree e avisa. Autorização
+  vale para aquele pedido, não para os seguintes.
 - `make check` passa antes de cada commit e de abrir o PR. Verificação que falha se corrige, não
   se desativa.
 - Decisão de arquitetura ou tecnologia cara de reverter vira ADR; regra de negócio vai para o

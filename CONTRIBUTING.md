@@ -12,7 +12,7 @@ Como trabalhar neste repositório: ambiente, verificações, fluxo, commits e re
 | shellcheck | opcional | lint dos scripts em `make check-shell`; sem ele, só a sintaxe é validada |
 | actionlint | opcional | valida os workflows em `make check-actions`; sem ele, pula com aviso |
 | gitleaks | opcional | procura segredos em `make check-secrets`; sem ele, pula com aviso |
-| python3 | opcional | validação de ADRs, PRD, HLD, diagramas C4 e specs em `make check-adr`, `check-prd`, `check-hld`, `check-c4` e `check-spec`; sem ele, pulam com aviso |
+| python3 | opcional | validação de ADRs, PRD, HLD, diagramas C4, specs e avaliações em `make check-adr`, `check-prd`, `check-hld`, `check-c4`, `check-spec` e `check-eval`; sem ele, pulam com aviso |
 | plantuml | opcional | sintaxe dos diagramas C4 em `make check-c4` e SVG via skill `/c4-writer`; sem ele, só a estrutura é validada (não é exigido na CI) |
 
 As ferramentas opcionais são obrigatórias na CI (`CI=true make check` reproduz isso localmente).
@@ -144,5 +144,7 @@ tecnologia pendente que já tem ADR aceito). Diagramas C4 também: `make check-c
 `.puml` e o `.md` de origem em `docs/architecture/diagrams/`, gerados pela skill `/c4-writer`, e
 avisa quando o HLD subiu de versão depois deles. As specs por RF em `docs/features/`, geradas
 pela skill `/spec-writer`, passam por `make check-spec`: o contrato precisa cobrir cada critério de
-aceitação do RF pelo texto literal do PRD e não pode exigir RF fora do fecho de dependências. Os
-cinco rodam em `make check`.
+aceitação do RF pelo texto literal do PRD e não pode exigir RF fora do fecho de dependências. A
+avaliação de cada RF, gravada pela skill `/evaluator` em `docs/features/<pasta>/avaliacao.md` (e o
+diário `orquestracao.md` da `/implement-and-evaluate`), passa por `make check-eval`: falha quando
+o roadmap marca `feito` um RF cuja avaliação não está limpa. Os seis rodam em `make check`.
