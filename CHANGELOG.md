@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.6.0...v0.7.0) (2026-10-28)
+
+
+### Adicionado
+
+* **skills:** adiciona skills de implementação, avaliação e correção ([#36](https://github.com/maiconsouza89/ai-template-harness/issues/36)) ([b906aa6](https://github.com/maiconsouza89/ai-template-harness/commit/b906aa620f3d2f952f7e670f895477be7a8ab38d))
+
 ## [0.6.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.5.0...v0.6.0) (2026-10-25)
 
 
