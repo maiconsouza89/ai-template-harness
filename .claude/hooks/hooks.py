@@ -20,10 +20,11 @@ import sys
 OPERATORS = "();<>|&`\n"
 # Fallback para aspas desbalanceadas, quando o shlex desiste.
 SEGMENT = re.compile(r"&&|\|\||\$\(|[;|&\n()`]")
-# Comandos que executam o seguinte (`sudo git push`) e as opções deles que levam valor.
-WRAPPERS = {"command", "env", "exec", "nice", "nohup", "sudo", "time", "{"}
-WRAPPER_OPTS_WITH_VALUE = {"-u", "-g", "-C", "-n"}
+# Shells cujo `-c` executa uma string; o texto dela é conferido de novo.
 SHELLS = {"sh", "bash", "dash", "zsh", "ksh"}
+# Limite de reconferência de strings aninhadas (sh -c "bash -c '...'"); um shell real não
+# aninha mais que isso num comando de agente, e o limite impede recursão sem fim.
+MAX_DEPTH = 3
 # Opções globais do git que levam valor antes do subcomando (`git -C dir push`).
 GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 # Ferramentas que editam arquivo; edição por Bash (sed -i) não aparece aqui.
@@ -50,6 +51,7 @@ def segments(command):
         lex = shlex.shlex(command, posix=True, punctuation_chars=OPERATORS)
         lex.whitespace = " \t\r"  # linha nova é separador de comando, não espaço
         lex.whitespace_split = True
+        lex.commenters = ""  # `#` como comentário engoliria a linha nova e o comando seguinte
         tokens = list(lex)
     except ValueError:  # aspas desbalanceadas: corta pelos operadores e tira as aspas à mão
         return [[t.strip("\"'") for t in s.split()] for s in SEGMENT.split(command)]
@@ -64,43 +66,45 @@ def segments(command):
     return out
 
 
-def strip_prefix(tokens):
-    """Tira VAR=valor e comandos que executam o seguinte (`sudo -u x`, `env`, `command`)."""
-    i = 0
-    while i < len(tokens):
-        t = tokens[i]
-        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", t):
-            i += 1
-        elif os.path.basename(t) in WRAPPERS:
-            i += 1
-            while i < len(tokens) and tokens[i].startswith("-"):
-                i += 2 if tokens[i] in WRAPPER_OPTS_WITH_VALUE else 1
-        else:
-            break
-    return tokens[i:]
+def git_push(tokens, depth):
+    """True se `tokens` (começando no git) é um push forçado, direto ou por alias em `-c`."""
+    i = 1
+    while i < len(tokens) and tokens[i].startswith("-"):
+        if tokens[i] == "-c" and i + 1 < len(tokens):
+            # git -c alias.p='push -f' p: o alias define o comando; confere o que ele executa.
+            key, _, value = tokens[i + 1].partition("=")
+            if key.startswith("alias.") and push_command("git " + value, depth + 1):
+                return True
+        i += 2 if tokens[i] in GIT_OPTS_WITH_VALUE else 1
+    return i < len(tokens) and tokens[i] == "push" and forced(tokens[i + 1:])
 
 
 def push_command(command, depth=0):
+    """O comando simples que faz push forçado, ou None.
+
+    Procura o git em qualquer posição do comando, sem tabela de quem pode vir antes dele
+    (sudo, env, xargs, timeout...): lista de prefixos permitidos sempre esquece um, e cada
+    esquecido é uma brecha. O custo é bloquear também `echo git push -f`, que é raro e erra
+    para o lado seguro.
+    """
+    if depth > MAX_DEPTH:
+        return None
     for tokens in segments(command):
-        tokens = strip_prefix(tokens)
-        if not tokens:
-            continue
-        name = os.path.basename(tokens[0])
-        # `sh -c "git push -f"`: o push vem como string; confere o que ela executa.
-        if name in SHELLS and depth < 3:
-            for j, t in enumerate(tokens[1:-1], start=1):
-                if re.fullmatch(r"-[a-zA-Z]*c[a-zA-Z]*", t):
-                    found = push_command(tokens[j + 1], depth + 1)
-                    if found:
-                        return found
-            continue
-        if name != "git":  # git por caminho completo (/usr/bin/git) também conta
-            continue
-        i = 1
-        while i < len(tokens) and tokens[i].startswith("-"):
-            i += 2 if tokens[i] in GIT_OPTS_WITH_VALUE else 1
-        if i < len(tokens) and tokens[i] == "push" and forced(tokens[i + 1:]):
-            return " ".join(tokens)
+        for k, t in enumerate(tokens):
+            name = os.path.basename(t)
+            if name == "git" and git_push(tokens[k:], depth):
+                return " ".join(tokens)
+            if name == "eval" and push_command(" ".join(tokens[k + 1:]), depth + 1):
+                return " ".join(tokens)
+            if name in SHELLS:
+                # sh -c [--] "git push -f": a string depois do -c é um comando a conferir.
+                rest = tokens[k + 1:]
+                for j, opt in enumerate(rest):
+                    if re.fullmatch(r"-[a-zA-Z]*c[a-zA-Z]*", opt):
+                        script = [s for s in rest[j + 1:] if s != "--"][:1]
+                        if script and push_command(script[0], depth + 1):
+                            return " ".join(tokens)
+                        break
     return None
 
 

@@ -34,7 +34,8 @@ bash_event() { # bash_event <comando>: evento PreToolUse do Bash, com o comando 
   python3 -I -c 'import json, sys; print(json.dumps({"hook_event_name": "PreToolUse", "tool_name": "Bash", "tool_input": {"command": sys.argv[1]}}))' "$1" > "$tmp/evento"
 }
 
-# PreToolUse: push forçado. Aspas simples de propósito: o hook recebe o texto literal,
+# PreToolUse: push forçado. O git conta em qualquer posição, então `echo git push -f` também
+# bloqueia (erra para o lado seguro); entre aspas, como texto, passa. Aspas simples de propósito: o hook recebe o texto literal,
 # com $( e crase sem expandir.
 # shellcheck disable=SC2016
 for c in 'git push --force' 'git push -f origin feat/x' 'git push --force-with-lease' \
@@ -44,15 +45,20 @@ for c in 'git push --force' 'git push -f origin feat/x' 'git push --force-with-l
   'sh -c "git push -f"' 'bash -lc "cd x && git push --force"' '/usr/bin/git push -f' \
   '(git push -f)' 'echo $(git push -f)' 'echo `git push -f`' 'git push origin "+main"' \
   'command git push -f' 'env GIT_TRACE=1 git push -f' 'sudo -u root git push -f' \
-  'make check & git push -f' "git commit -m 'aspas abertas; git push -f"; do
+  'make check & git push -f' "git commit -m 'aspas abertas; git push -f" \
+  'echo x#; git push -f' "$(printf 'true #\ngit push -f')" 'xargs git push -f' \
+  'timeout 5 git push -f' "eval 'git push -f'" 'sudo -h host git push -f' \
+  'env -S x git push -f' 'time -o out git push -f' "sh -c -- 'git push -f'" \
+  "git -c alias.p='push -f' p" 'echo git push -f'; do
   bash_event "$c"
   check 2 push "bloqueia: $c"
 done
 
 for c in 'git push' 'git push -u origin feat/x' 'git push --follow-tags' \
-  'git commit -m "nunca use push --force"' 'echo git push -f' 'git fetch --force' \
+  'git commit -m "nunca use push --force"' 'git fetch --force' \
   'git pushx -f' 'make check' 'sh -c "git push"' 'bash -c "echo ok"' \
-  'git commit -m "evite (git push -f) sem pedido"' 'echo "git push -f"'; do
+  'git commit -m "evite (git push -f) sem pedido"' 'echo "git push -f"' \
+  "git -c alias.st='status' st" 'timeout 5 git push origin feat/x'; do
   bash_event "$c"
   check 0 push "aceita: $c"
 done
