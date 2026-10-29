@@ -11,11 +11,19 @@ Documentação: https://code.claude.com/docs/en/hooks
 import json
 import os
 import re
+import shlex
 import subprocess
 import sys
 
-# Separadores de comando no shell: o push pode vir depois de `cd x &&` ou numa linha nova.
-SEGMENT = re.compile(r"&&|\|\||[;|\n]")
+# Caracteres que o shell trata como operador: separam comandos (`;`, `&&`, `|`, linha nova),
+# abrem subshell ou substituição (`(`, `$(`, crase) e redirecionam. Viram tokens próprios.
+OPERATORS = "();<>|&`\n"
+# Fallback para aspas desbalanceadas, quando o shlex desiste.
+SEGMENT = re.compile(r"&&|\|\||\$\(|[;|&\n()`]")
+# Comandos que executam o seguinte (`sudo git push`) e as opções deles que levam valor.
+WRAPPERS = {"command", "env", "exec", "nice", "nohup", "sudo", "time", "{"}
+WRAPPER_OPTS_WITH_VALUE = {"-u", "-g", "-C", "-n"}
+SHELLS = {"sh", "bash", "dash", "zsh", "ksh"}
 # Opções globais do git que levam valor antes do subcomando (`git -C dir push`).
 GIT_OPTS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 # Ferramentas que editam arquivo; edição por Bash (sed -i) não aparece aqui.
@@ -36,18 +44,63 @@ def forced(tokens):
     return False
 
 
-def push_command(command):
-    for segment in SEGMENT.split(command):
-        tokens = segment.split()
-        while tokens and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", tokens[0]):
-            tokens.pop(0)  # VAR=valor git push ...
-        if not tokens or tokens[0] != "git":
+def segments(command):
+    """Comandos simples de `command`, cada um como lista de palavras já sem aspas."""
+    try:
+        lex = shlex.shlex(command, posix=True, punctuation_chars=OPERATORS)
+        lex.whitespace = " \t\r"  # linha nova é separador de comando, não espaço
+        lex.whitespace_split = True
+        tokens = list(lex)
+    except ValueError:  # aspas desbalanceadas: corta pelos operadores e tira as aspas à mão
+        return [[t.strip("\"'") for t in s.split()] for s in SEGMENT.split(command)]
+    out, current = [], []
+    for t in tokens:
+        if t == "$" or all(c in OPERATORS for c in t):
+            out.append(current)
+            current = []
+        else:
+            current.append(t)
+    out.append(current)
+    return out
+
+
+def strip_prefix(tokens):
+    """Tira VAR=valor e comandos que executam o seguinte (`sudo -u x`, `env`, `command`)."""
+    i = 0
+    while i < len(tokens):
+        t = tokens[i]
+        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", t):
+            i += 1
+        elif os.path.basename(t) in WRAPPERS:
+            i += 1
+            while i < len(tokens) and tokens[i].startswith("-"):
+                i += 2 if tokens[i] in WRAPPER_OPTS_WITH_VALUE else 1
+        else:
+            break
+    return tokens[i:]
+
+
+def push_command(command, depth=0):
+    for tokens in segments(command):
+        tokens = strip_prefix(tokens)
+        if not tokens:
+            continue
+        name = os.path.basename(tokens[0])
+        # `sh -c "git push -f"`: o push vem como string; confere o que ela executa.
+        if name in SHELLS and depth < 3:
+            for j, t in enumerate(tokens[1:-1], start=1):
+                if re.fullmatch(r"-[a-zA-Z]*c[a-zA-Z]*", t):
+                    found = push_command(tokens[j + 1], depth + 1)
+                    if found:
+                        return found
+            continue
+        if name != "git":  # git por caminho completo (/usr/bin/git) também conta
             continue
         i = 1
         while i < len(tokens) and tokens[i].startswith("-"):
             i += 2 if tokens[i] in GIT_OPTS_WITH_VALUE else 1
         if i < len(tokens) and tokens[i] == "push" and forced(tokens[i + 1:]):
-            return segment.strip()
+            return " ".join(tokens)
     return None
 
 
