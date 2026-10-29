@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.9.0...v0.10.0) (2026-10-29)
+
+
+### Adicionado
+
+* **hooks:** bloqueia push forçado e valida edições de subagentes ([#46](https://github.com/maiconsouza89/ai-template-harness/issues/46)) ([42a1877](https://github.com/maiconsouza89/ai-template-harness/commit/42a1877eade4b7e1b058ecb3a5e77a2fe3841bf8))
+
 ## [0.9.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.8.1...v0.9.0) (2026-10-29)
 
 
