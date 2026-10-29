@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.1](https://github.com/maiconsouza89/ai-template-harness/compare/v0.10.0...v0.10.1) (2026-10-29)
+
+
+### Corrigido
+
+* **hooks:** fecha brechas do bloqueio de push forçado ([#48](https://github.com/maiconsouza89/ai-template-harness/issues/48)) ([91fb409](https://github.com/maiconsouza89/ai-template-harness/commit/91fb409b42c9dfaf0f725615105a836d49d6ffa6))
+
 ## [0.10.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.9.0...v0.10.0) (2026-10-29)
 
 
