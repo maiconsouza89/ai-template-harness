@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.2](https://github.com/maiconsouza89/ai-template-harness/compare/v0.10.1...v0.10.2) (2026-10-29)
+
+
+### Corrigido
+
+* **hooks:** procura o git em qualquer posição do comando ([#50](https://github.com/maiconsouza89/ai-template-harness/issues/50)) ([9ad440e](https://github.com/maiconsouza89/ai-template-harness/commit/9ad440e1b1a09147d12145744f796f2c48a8f042))
+
 ## [0.10.1](https://github.com/maiconsouza89/ai-template-harness/compare/v0.10.0...v0.10.1) (2026-10-29)
 
 
