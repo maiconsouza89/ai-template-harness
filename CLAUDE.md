@@ -46,7 +46,8 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
   até o PR. Cada skill valida a própria estrutura; `make check-prd`, `make check-hld`,
   `make check-c4`, `make check-spec` e `make check-eval` rodam essas validações e cruzam HLD com
   PRD e ADRs, diagramas com a fonte, contratos com os critérios do PRD e avaliações com o
-  roadmap.
+  roadmap. `make check-skills` audita o formato das próprias skills contra a doc oficial
+  (frontmatter, tamanho da `description` e do corpo, sumário nas referências longas).
 
 ## Onde colocar o quê
 

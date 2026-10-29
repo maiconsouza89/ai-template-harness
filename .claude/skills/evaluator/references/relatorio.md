@@ -4,6 +4,12 @@ Forma fixa de `docs/features/<pasta>/avaliacao.md`. Um arquivo por feature, sobr
 
 Seção sem conteúdo fica com a linha `Nenhum.`, para o arquivo ter sempre as mesmas seções. Sem travessão "—" e sem comentário HTML.
 
+## Sumário
+
+1. Modelo
+2. Notas para quem escreve
+3. Projeção no chat
+
 ## Modelo
 
 ````markdown

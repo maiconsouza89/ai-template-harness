@@ -2,6 +2,17 @@
 
 Só com avaliação limpa e com o fechamento autorizado no Passo 0. O trabalho já está feito quando isto roda; falha aqui vira aviso no relatório e o status continua sucesso, exceto conflito sem solução e CI vermelha sem orçamento (pr bloqueado). Registre cada passo na seção Fechamento do diário.
 
+## Sumário
+
+1. Branch
+2. Merge da main
+3. Reavaliar depois do merge
+4. Commit de registro
+5. Push
+6. PR existente
+7. PR novo
+8. CI do PR
+
 ## 1. Branch
 
 `git branch --show-current` igual à `main` (ou ao branch padrão de `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`): não abra PR. O status continua sucesso, com o aviso "PR não aberto: o trabalho está no branch padrão; mova os commits para um branch `feat/...`". Pelo Passo 0 isso não deveria acontecer.

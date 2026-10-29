@@ -21,11 +21,11 @@ e o `!pragma charset UTF-8` vem logo em seguida, porque sem ele acento e cedilha
 parte dos renderizadores.
 
 ```plantuml
-@startuml viewstore-c1
+@startuml agenda-c1
 !pragma charset UTF-8
 !include <C4/C4_Context>
 
-title C1 • System Context - viewstore
+title C1 • System Context - agenda
 LAYOUT_LEFT_RIGHT()
 
 ' elementos, relações, notas
@@ -173,5 +173,5 @@ end note
 - Alias usado em `Rel` que não foi declarado: o PlantUML cria um elemento genérico solto, sem erro.
 - Alias com hífen ou acento: use só letras sem acento, dígitos e `_` (`painel_web`, não `painel-web`).
 - `SHOW_LEGEND()` no C4 Code Level: quebra, porque a macro é da biblioteca C4.
-- Fronteira com chave na linha seguinte: escreva `System_Boundary(vs, "viewstore") {` na mesma
+- Fronteira com chave na linha seguinte: escreva `System_Boundary(ag, "agenda") {` na mesma
   linha e feche com `}` sozinho.

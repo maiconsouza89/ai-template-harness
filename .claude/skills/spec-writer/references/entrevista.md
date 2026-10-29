@@ -91,6 +91,6 @@ O `validate.py` confere a forma. Antes dele, confira o conteúdo:
 - O plano não tem fase de testes, estimativa de tempo, nem detalhe de implementação (tipo, coluna, método): isso é da spec.
 - A spec não tem código, só estrutura; JSON de exemplo e descrição de migração são estrutura.
 - Cada item do contrato observa comportamento da superfície, e cada handle tem declaração e uso.
-- Toda regra com número em Regras e fluxos (limite, prazo, tamanho, contagem) tem item no contrato que a exercita, inclusive no caso de borda que a regra menciona ("requisição anônima", "token inválido"). Na fundação do viewstore, o limite por IP para requisição anônima não tinha item, e uma falha nele só foi pega por uma revisão de segurança.
+- Toda regra com número em Regras e fluxos (limite, prazo, tamanho, contagem) tem item no contrato que a exercita, inclusive no caso de borda que a regra menciona ("requisição anônima", "token inválido"). Regra sem item fica fora da avaliação: um limite por IP sem item só aparece quando uma revisão de segurança o pega.
 - Toda seção de superfície do contrato tem linha em `Verificação por superfície`, e todo `Então` sobre ferramenta externa foi conferido (`references/contrato.md` seção 7).
 - Nenhum pré-requisito exige algo fora do fecho de dependências; onde exigiria, o padrão de preparação foi aplicado.
