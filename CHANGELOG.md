@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/maiconsouza89/ai-template-harness/compare/v0.8.0...v0.8.1) (2026-10-29)
+
+
+### Corrigido
+
+* **skills:** alinha skills à documentação oficial ([#42](https://github.com/maiconsouza89/ai-template-harness/issues/42)) ([b6146b0](https://github.com/maiconsouza89/ai-template-harness/commit/b6146b05a92f6d01be711bf2ab12e0c9a55bc807))
+
 ## [0.8.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.7.1...v0.8.0) (2026-10-28)
 
 
