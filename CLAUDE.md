@@ -27,8 +27,7 @@ make lint|format|test|build   # contrato da stack: roda scripts/<alvo>.sh se exi
 - **Hook `commit-msg`.** Vive em `.githooks/` e é testado por `scripts/tests/test-commit-msg.sh`
   (`make check-hooks`). Antes de mudar o hook, acrescente um caso aceito e um rejeitado.
 - **Hooks do Claude Code.** `.claude/settings.json` liga os hooks de `.claude/hooks/`: o
-  PreToolUse bloqueia `git push` forçado e o SubagentStop roda `make lint` e `make test` quando
-  o subagente editou código fora de `docs/`. Testados por `scripts/tests/test-claude-hooks.sh`
+  SubagentStop roda `make lint` e `make test` quando o subagente editou código fora de `docs/`. Testados por `scripts/tests/test-claude-hooks.sh`
   (`make check-claude-hooks`), com a mesma regra de um caso aceito e um rejeitado.
 - **Stack por contrato.** `scripts/contract.sh` despacha `lint`, `format`, `test` e `build` para
   `scripts/<alvo>.sh`. O projeto gerado cria esses scripts e registra a stack em um ADR;

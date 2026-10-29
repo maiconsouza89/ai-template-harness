@@ -1,7 +1,7 @@
 #!/bin/sh
-# Testa os hooks do Claude Code em .claude/hooks/ com casos aceitos e rejeitados: o PreToolUse que
-# bloqueia git push forçado e o SubagentStop que roda make lint e make test quando o subagente
-# editou código. Cada caso monta o JSON do evento e confere o código de saída (2 bloqueia).
+# Testa os hooks do Claude Code em .claude/hooks/ com casos aceitos e rejeitados: o SubagentStop
+# que roda make lint e make test quando o subagente editou código. Cada caso monta o JSON do
+# evento e confere o código de saída (2 bloqueia).
 set -u
 cd "$(git rev-parse --show-toplevel)" || exit 1
 if ! command -v python3 >/dev/null 2>&1; then
@@ -30,41 +30,8 @@ check() { # check <código esperado> <hook> <descrição>; o JSON do evento vem 
   fi
 }
 
-bash_event() { # bash_event <comando>: evento PreToolUse do Bash, com o comando escapado em JSON
-  python3 -I -c 'import json, sys; print(json.dumps({"hook_event_name": "PreToolUse", "tool_name": "Bash", "tool_input": {"command": sys.argv[1]}}))' "$1" > "$tmp/evento"
-}
-
-# PreToolUse: push forçado. O git conta em qualquer posição, então `echo git push -f` também
-# bloqueia (erra para o lado seguro); entre aspas, como texto, passa. Aspas simples de propósito: o hook recebe o texto literal,
-# com $( e crase sem expandir.
-# shellcheck disable=SC2016
-for c in 'git push --force' 'git push -f origin feat/x' 'git push --force-with-lease' \
-  'git push --force-with-lease=main origin main' 'git push -uf origin feat/x' \
-  'git push origin +feat/x' 'cd /tmp && git push --force' 'GIT_TRACE=1 git push -f' \
-  'git -C repo push --force' "$(printf 'make check\ngit push -f')" \
-  'sh -c "git push -f"' 'bash -lc "cd x && git push --force"' '/usr/bin/git push -f' \
-  '(git push -f)' 'echo $(git push -f)' 'echo `git push -f`' 'git push origin "+main"' \
-  'command git push -f' 'env GIT_TRACE=1 git push -f' 'sudo -u root git push -f' \
-  'make check & git push -f' "git commit -m 'aspas abertas; git push -f" \
-  'echo x#; git push -f' "$(printf 'true #\ngit push -f')" 'xargs git push -f' \
-  'timeout 5 git push -f' "eval 'git push -f'" 'sudo -h host git push -f' \
-  'env -S x git push -f' 'time -o out git push -f' "sh -c -- 'git push -f'" \
-  "git -c alias.p='push -f' p" 'echo git push -f'; do
-  bash_event "$c"
-  check 2 push "bloqueia: $c"
-done
-
-for c in 'git push' 'git push -u origin feat/x' 'git push --follow-tags' \
-  'git commit -m "nunca use push --force"' 'git fetch --force' \
-  'git pushx -f' 'make check' 'sh -c "git push"' 'bash -c "echo ok"' \
-  'git commit -m "evite (git push -f) sem pedido"' 'echo "git push -f"' \
-  "git -c alias.st='status' st" 'timeout 5 git push origin feat/x'; do
-  bash_event "$c"
-  check 0 push "aceita: $c"
-done
-
 echo 'isso não é json' > "$tmp/evento"
-check 0 push 'entrada que não é JSON passa'
+check 0 subagent 'entrada que não é JSON passa'
 
 # SubagentStop: repositório descartável com Makefile cujo lint passa ou falha
 repo="$tmp/repo"
