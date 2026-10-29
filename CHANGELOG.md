@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/maiconsouza89/ai-template-harness/compare/v0.8.1...v0.9.0) (2026-10-29)
+
+
+### Adicionado
+
+* **skills:** audita o formato das skills com make check-skills ([#44](https://github.com/maiconsouza89/ai-template-harness/issues/44)) ([2526739](https://github.com/maiconsouza89/ai-template-harness/commit/2526739d6961b924d16c05464abf03b1dc70f53b))
+
 ## [0.8.1](https://github.com/maiconsouza89/ai-template-harness/compare/v0.8.0...v0.8.1) (2026-10-29)
 
 
