@@ -12,7 +12,7 @@ Como trabalhar neste repositório: ambiente, verificações, fluxo, commits e re
 | shellcheck | opcional | lint dos scripts em `make check-shell`; sem ele, só a sintaxe é validada |
 | actionlint | opcional | valida os workflows em `make check-actions`; sem ele, pula com aviso |
 | gitleaks | opcional | procura segredos em `make check-secrets`; sem ele, pula com aviso |
-| python3 | opcional | validação de ADRs, PRD, HLD, diagramas C4, specs e avaliações em `make check-adr`, `check-prd`, `check-hld`, `check-c4`, `check-spec`, `check-eval`, `check-validators` e `check-skills`; sem ele, pulam com aviso |
+| python3 | opcional | validação de ADRs, PRD, HLD, diagramas C4, specs e avaliações em `make check-adr`, `check-prd`, `check-hld`, `check-c4`, `check-spec`, `check-eval`, `check-validators`, `check-skills` e `check-claude-hooks`, e nos hooks do Claude Code; sem ele, pulam com aviso |
 | plantuml | opcional | sintaxe dos diagramas C4 em `make check-c4` e SVG via skill `/c4-writer`; sem ele, só a estrutura é validada (não é exigido na CI) |
 
 As ferramentas opcionais são obrigatórias na CI (`CI=true make check` reproduz isso localmente).
@@ -56,6 +56,15 @@ vale para os validadores das skills (`validate.py` da `/spec-writer` e da `/eval
 `scripts/checks/check-skills.py`): cada
 regra nova ganha os dois casos em `scripts/tests/test-skill-validators.sh`, que `make
 check-validators` roda sobre os fixtures de `scripts/tests/fixtures/skill-validators/`.
+
+Os hooks do Claude Code ficam em `.claude/hooks/` e são ligados por `.claude/settings.json`
+([referência](https://code.claude.com/docs/en/hooks)): exit 2 bloqueia, e o stderr volta ao
+Claude como motivo. O PreToolUse do Bash bloqueia `git push` com `--force`, `-f`,
+`--force-with-lease` ou refspec com `+`. O SubagentStop roda `make lint` e `make test` quando o
+subagente editou código fora de `docs/` e devolve a falha a ele uma vez; na segunda parada
+(`stop_hook_active`) deixa encerrar, para falha anterior não virar laço. Edição feita por Bash
+(`sed -i`) não aparece no transcript e escapa dele. Cada regra nova ganha um caso aceito e um
+rejeitado em `scripts/tests/test-claude-hooks.sh` (`make check-claude-hooks`).
 
 Actions em `.github/workflows/` ficam fixadas por SHA completo com comentário da versão
 ([por quê](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions));
