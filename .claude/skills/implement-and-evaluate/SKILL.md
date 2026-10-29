@@ -1,6 +1,6 @@
 ---
 name: implement-and-evaluate
-description: Leva um RF-NNN (ou a fundação) de `spec.md`, `plan.md` e `contract.md` até uma avaliação limpa sem a pessoa intervir entre os ciclos - roda `/implement-feature`, depois alterna `/evaluator` (veredito) e `/fix-runner` (correção) até o contrato passar, o orçamento de ciclos acabar ou o laço travar. Com autorização dada no início, fecha o trabalho - merge da `main` no branch, reavaliação, push e PR no formato do repositório, com `Closes #N` da issue do RF. Mantém o diário `docs/features/<pasta>/orquestracao.md`, atualizado a cada ciclo. Use sempre que o usuário quiser implementar e validar de ponta a ponta, "do contrato ao PR", "implementa e avalia o RF-003", "roda o ciclo completo da fundação", "faz até passar", "entrega o RF-002", mesmo sem dizer implement-and-evaluate.
+description: Leva um RF-NNN (ou a fundação) de `spec.md`, `plan.md` e `contract.md` até uma avaliação limpa sem a pessoa intervir entre os ciclos - roda `/implement-feature`, depois alterna `/evaluator` (veredito) e `/fix-runner` (correção) até o contrato passar, o orçamento de ciclos acabar ou o laço travar. Com autorização dada no início, fecha o trabalho - merge da `main` no branch, reavaliação, push e PR no formato do repositório, fechando a issue do RF com `Closes`. Mantém o diário `docs/features/<pasta>/orquestracao.md`, atualizado a cada ciclo. Use sempre que o usuário quiser implementar e validar de ponta a ponta, "do contrato ao PR", "implementa e avalia o RF-003", "roda o ciclo completo da fundação", "faz até passar", "entrega o RF-002", mesmo sem dizer implement-and-evaluate.
 ---
 
 # Implement and Evaluate
@@ -13,7 +13,7 @@ Orquestra três skills num laço de verificar e corrigir, para que um RF especif
 
 Você, aqui, só orquestra: não edita código, contrato, spec nem plano. Escreve o diário, o status do roadmap nos casos da seção "Roadmap" e os commits de registro, e fecha o trabalho com push e PR quando autorizado.
 
-**Onde cada skill roda.** A `/implement-feature` roda **nesta conversa**, pela ferramenta Skill: ela já despacha um subagente por fase, e subagente não pode criar subagente ([documentação do Claude Code](https://code.claude.com/docs/en/sub-agents)). `/evaluator` e `/fix-runner` rodam cada uma num subagente `general-purpose` novo, com os modelos de `references/subagentes.md`: assim cada veredito começa sem a memória de quem implementou, e o contexto daqui continua pequeno ao longo dos ciclos.
+**Onde cada skill roda.** A `/implement-feature` roda **nesta conversa**, pela ferramenta Skill, porque no meio da execução ela pergunta à pessoa (dependência sem cobertura, divergência do contrato, ambiente que caiu), e subagente não recebe `AskUserQuestion` ([documentação do Claude Code](https://code.claude.com/docs/en/sub-agents), seção "Available tools"). O contexto daqui não incha com isso: quem escreve código são os subagentes de fase que ela despacha. `/evaluator` e `/fix-runner` rodam cada uma num subagente `general-purpose` novo, com os modelos de `references/subagentes.md`: assim cada veredito começa sem a memória de quem implementou, e o contexto daqui continua pequeno ao longo dos ciclos.
 
 ## Entrada
 
@@ -30,7 +30,7 @@ O resto do pedido ("só as fases 1 e 2", "pausa entre fases") vai para a `/imple
 ## Passo 0: preparar e autorizar
 
 1. **Preparar.** Rode `python3 .claude/skills/implement-feature/scripts/preparar.py <alvo>` e aplique os bloqueios da `/implement-feature` (Passo 0 dela). Bloqueio para tudo aqui: nada de laço sobre uma base que não pode ser implementada.
-2. **Trava.** Arquivo `<tmp do sistema>/implement-and-evaluate-<alvo>.lock` com `<PID> <execução>`. PID vivo (`kill -0`): pare, "outra execução de <alvo> em andamento, PID <N>". PID morto: sobrescreva e registre em Avisos. Apague a trava em qualquer saída.
+2. **Trava.** Arquivo `<tmp do sistema>/implement-and-evaluate-<alvo>.lock` com o branch, o `HEAD` e a hora de início. Se ele já existe, outra execução está em andamento ou morreu sem apagá-lo, e só a pessoa sabe qual: pergunte na mesma chamada do passo 3, com parar (recomendado quando há outra sessão aberta neste alvo) ou sobrescrever, registrando em Avisos. Não use PID: cada comando roda num shell novo que termina em seguida, então o PID gravado nunca estaria vivo e a trava não seguraria nada. Apague a trava em qualquer saída.
 3. **Autorizar**, numa chamada de `AskUserQuestion`, cobrindo a execução inteira (o `CLAUDE.md` exige autorização explícita, e ela vale só para esta execução):
    - **Branch**: na `main`, criar o que a ficha sugere; fora dela, seguir no atual.
    - **Commits**: das fases, das correções e do registro (`avaliacao.md`, `orquestracao.md`, roadmap). Recomendado sim; sem commits o laço não funciona, porque a `/evaluator` avalia o HEAD e a retomada se perde. Com não, pare e sugira rodar as skills uma a uma.
