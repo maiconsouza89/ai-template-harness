@@ -5,7 +5,7 @@ SHELL := /bin/sh
 .DEFAULT_GOAL := help
 
 .PHONY: help setup check check-branch check-hooks check-eol check-shell check-actions check-secrets check-adr \
-	check-prd check-hld check-c4 check-spec check-eval check-validators lint format test build
+	check-prd check-hld check-c4 check-spec check-eval check-validators check-skills lint format test build
 
 help: ## Lista os alvos disponíveis
 	@grep -E '^[a-zA-Z_ -]+:.*## ' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*## "}; {printf "  %-14s %s\n", $$1, $$2}'
@@ -13,7 +13,7 @@ help: ## Lista os alvos disponíveis
 setup: ## Ativa os hooks versionados (uma vez após o clone)
 	@sh scripts/setup.sh
 
-check: check-branch check-hooks check-eol check-shell check-actions check-secrets check-adr check-prd check-hld check-c4 check-spec check-eval check-validators lint test ## Roda todas as verificações
+check: check-branch check-hooks check-eol check-shell check-actions check-secrets check-adr check-prd check-hld check-c4 check-spec check-eval check-validators check-skills lint test ## Roda todas as verificações
 	@echo "ok: todas as verificações passaram"
 
 check-branch: ## Valida o nome do branch (<tipo>/<descricao>)
@@ -54,6 +54,9 @@ check-eval: ## Valida avaliacao.md e orquestracao.md em docs/features contra o r
 
 check-validators: ## Testa os validadores das skills com casos aceitos e rejeitados
 	@sh scripts/tests/test-skill-validators.sh
+
+check-skills: ## Audita o formato das skills em .claude/skills contra a doc oficial
+	@sh scripts/checks/check-skills.sh
 
 # Contrato de alvos, igual em qualquer stack. Cada projeto gerado implementa scripts/<alvo>.sh;
 # sem o script, contract.sh avisa e passa. check inclui lint e test; format e build são manuais.

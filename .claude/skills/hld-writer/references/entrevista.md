@@ -12,6 +12,22 @@ As perguntas abaixo são o assunto, não o formato. Toda pergunta sai como em "C
 
 Antes da etapa 1, leia `docs/product/prd.md` e o front-matter dos ADRs em `docs/architecture/adr/*.md` se existirem (não o `index.md`, que é gerado e pode faltar). Metade das perguntas abaixo já tem resposta lá: use isso como alternativa recomendada em vez de perguntar do zero, citando a origem na própria pergunta ("Que disponibilidade a API externa precisa entregar? 99.9 por cento mensal, como pede o PRD (Recomendado) / 99.5 por cento, mais barato, exige rever o PRD / ..."). ADR `accepted` não vira pergunta: é cenário dado, e só se cita. ADR `proposed` vira pergunta com o que ele propõe como alternativa recomendada ("O ADR-0009 propõe Redis para cache; segue com ele (Recomendado) / espera a decisão e deixa cache como pendente / ..."). ADR `superseded` só entra pelo sucessor; `rejected` e `deprecated` não entram.
 
+## Sumário
+
+1. Etapa 1: contexto e objetivo técnico
+2. Etapa 2: arquitetura geral
+3. Etapa 3: componentes e responsabilidades
+4. Etapa 4: fluxos de requisição e de dados
+5. Etapa 5: modelo de dados
+6. Etapa 6: interfaces públicas
+7. Etapa 7: escalabilidade e disponibilidade
+8. Etapa 8: segurança
+9. Etapa 9: observabilidade
+10. Etapa 10: riscos arquiteturais
+11. Etapa 11: ADRs e próximos passos
+12. Rastreabilidade
+13. Antes de gerar
+
 ## Etapa 1: contexto e objetivo técnico
 
 Perguntas

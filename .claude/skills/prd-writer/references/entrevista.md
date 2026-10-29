@@ -4,6 +4,19 @@ Perguntas por etapa, alternativas para oferecer, defaults e checagens antes de g
 
 As perguntas abaixo são o assunto, não o formato. Toda pergunta sai como em "Como perguntar" no `SKILL.md`: 2 a 4 alternativas concretas, a recomendada primeiro com o porquê, e o contexto dentro da própria pergunta. As alternativas e os defaults de cada etapa são a matéria-prima dessas opções; o default é a recomendação quando nada no que o usuário disse aponta para outra. Default só vira `(hipótese)` quando o usuário não decidiu (respondeu "não sei" e aceitou seguir, ou modo Direto).
 
+## Sumário
+
+1. Etapa 1: contexto e problema
+2. Etapa 2: objetivos e métricas
+3. Etapa 3: escopo
+4. Etapa 4: requisitos funcionais
+5. Etapa 5: requisitos não funcionais
+6. Etapa 6: decisões de produto e dependências
+7. Etapa 7: riscos
+8. Etapa 8: aceitação transversal e validação
+9. Dependências entre requisitos
+10. Antes de gerar
+
 ## Etapa 1: contexto e problema
 
 Perguntas

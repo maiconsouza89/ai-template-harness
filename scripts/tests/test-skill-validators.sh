@@ -1,5 +1,5 @@
 #!/bin/sh
-# Testa os validadores das skills (spec-writer e evaluator) com casos aceitos e rejeitados.
+# Testa os validadores das skills (spec-writer, evaluator e check-skills) com casos aceitos e rejeitados.
 # Cada caso monta uma árvore nova: PRD, HLD e ADRs do fixture de evals da spec-writer, mais o
 # RF-001 de scripts/tests/fixtures/skill-validators, com uma mutação aplicada.
 set -u
@@ -15,6 +15,7 @@ fi
 
 spec=.claude/skills/spec-writer/scripts/validate.py
 aval=.claude/skills/evaluator/scripts/validate.py
+skills=scripts/checks/check-skills.py
 docs=.claude/skills/spec-writer/evals/files/viewstore/docs
 rf=RF-001-criar-conta-de-exibidor-ou-anunciante
 tmp=$(mktemp -d)
@@ -60,9 +61,22 @@ fundacao() { # fundacao <decisão da UI>: spec da fundação só com a tabela de
     > "$tmp/raiz/docs/features/fundacao/spec.md"
 }
 
-validate() { # validate <spec|aval>: roda o validador sobre a pasta do RF
+skreset() { # recria uma árvore só com a skill evaluator; $s é a pasta dela
+  rm -rf "$tmp/sk"
+  mkdir -p "$tmp/sk/.claude/skills"
+  cp -R .claude/skills/evaluator "$tmp/sk/.claude/skills/"
+  s="$tmp/sk/.claude/skills/evaluator"
+}
+
+skedit() { # skedit <arquivo da skill> <expressão sed>
+  sed "$2" "$s/$1" > "$tmp/editado" && mv "$tmp/editado" "$s/$1"
+}
+
+validate() { # validate <spec|aval|skill>: roda o validador sobre a pasta do RF ou a árvore da skill
   if [ "$1" = spec ]; then
     python3 -I "$spec" "$f" --raiz "$tmp/raiz"
+  elif [ "$1" = skill ]; then
+    python3 -I "$skills" --raiz "$tmp/sk"
   else
     python3 -I "$aval" "docs/features/$rf" --raiz "$tmp/raiz"
   fi
@@ -180,6 +194,47 @@ reset
 edit avaliacao.md 's/^- Veredito: falhou$/- Veredito: bloqueado: sem ferramenta de navegador no projeto/'
 edit avaliacao.md 's/^- Dono: código$/- Dono: decisão/'
 check 0 aval 'item bloqueado com Dono decisão'
+
+# check-skills
+skreset
+check 0 skill 'skill base'
+
+skreset
+skedit SKILL.md '3s/$/ Fecha a issue com Closes #N./'
+check 1 skill 'description com " #" vira comentário'
+
+skreset
+skedit SKILL.md '3s/$/ Nota: corta aqui./'
+check 1 skill 'description com ": " vira chave'
+
+skreset
+skedit SKILL.md "3s/^description: \(.*\)\$/description: '\1 Nota: entre aspas.'/"
+check 0 skill 'description entre aspas simples aceita ": "'
+
+skreset
+skedit SKILL.md '3s/^description: \(.*\)$/description: "\1"/'
+check 1 skill 'description entre aspas duplas com " interno sem escape'
+
+skreset
+skedit SKILL.md '3s/$/ Grava em <pasta>./'
+check 1 skill 'description com tag XML'
+
+skreset
+skedit SKILL.md "3s/\$/ $(printf '%0200d' 0)/"
+check 1 skill 'description acima de 1024 caracteres'
+
+skreset
+skedit SKILL.md '2s/^name: evaluator$/name: avaliador/'
+check 1 skill 'name diferente da pasta'
+
+skreset
+i=0
+while [ "$i" -lt 500 ]; do echo "linha $i"; i=$((i + 1)); done >> "$s/SKILL.md"
+check 1 skill 'corpo com 500 linhas ou mais'
+
+skreset
+skedit references/relatorio.md '/^## Sumário$/d'
+check 1 skill 'referência longa sem sumário'
 
 total=$((pass + fail))
 if [ "$fail" -gt 0 ]; then

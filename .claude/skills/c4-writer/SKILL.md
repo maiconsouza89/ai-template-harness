@@ -17,13 +17,13 @@ Além da fonte, leia o que dá contexto a ela:
 - **ADRs** em `docs/architecture/adr/*.md`, pelo front-matter (`status`, `title`), não pelo `index.md`. ADR `accepted` diz a tecnologia do container; `proposed` entra com a tecnologia proposta, a tag de hipótese e uma linha em Conflitos e lacunas; `superseded`, `rejected` e `deprecated` não entram (o sucessor, se houver, sim).
 - **PRD** em `docs/product/prd.md`, só para os atores do C1 (públicos e papéis) quando a fonte não os nomeia.
 
-**Destino.** `docs/architecture/diagrams/`, com um prefixo `<nome>` em minúsculas e hífen: o nome do sistema do título do HLD (`# HLD: viewstore` → `viewstore`) ou o nome do arquivo do FDD (`docs/fdd/rate-limiter.md` → `rate-limiter`). Arquivos:
+**Destino.** `docs/architecture/diagrams/`, com um prefixo `<nome>` em minúsculas e hífen: o nome do sistema do título do HLD (`# HLD: agenda` → `agenda`) ou o nome do arquivo do FDD (`docs/fdd/rate-limiter.md` → `rate-limiter`). Arquivos:
 
 | Arquivo | Conteúdo |
 |---|---|
 | `<nome>-c1.puml` | System Context |
 | `<nome>-c2.puml` | Container |
-| `<nome>-c3-<container>.puml` | Component, um por container decomposto (`viewstore-c3-api.puml`); `<nome>-c3.puml` se só houver um |
+| `<nome>-c3-<container>.puml` | Component, um por container decomposto (`agenda-c3-api.puml`); `<nome>-c3.puml` se só houver um |
 | `<nome>-c4-<componente>.puml` | Code Level, um por componente detalhado; `<nome>-c4.puml` se só houver um |
 | `<nome>.md` | Origem de cada elemento, hipóteses, o que ficou de fora e por quê; sem código PlantUML |
 
