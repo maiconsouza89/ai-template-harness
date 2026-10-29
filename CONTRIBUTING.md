@@ -60,7 +60,9 @@ check-validators` roda sobre os fixtures de `scripts/tests/fixtures/skill-valida
 Os hooks do Claude Code ficam em `.claude/hooks/` e são ligados por `.claude/settings.json`
 ([referência](https://code.claude.com/docs/en/hooks)): exit 2 bloqueia, e o stderr volta ao
 Claude como motivo. O PreToolUse do Bash bloqueia `git push` com `--force`, `-f`,
-`--force-with-lease` ou refspec com `+`. O SubagentStop roda `make lint` e `make test` quando o
+`--force-with-lease` ou refspec com `+`, lendo o comando com as aspas resolvidas: pega também
+o push dentro de `sh -c`, de subshell e de `$(...)`, por caminho completo e depois de `sudo`,
+`env` ou `command`. Ele evita engano do agente; quem protege a `main` é o ruleset. O SubagentStop roda `make lint` e `make test` quando o
 subagente editou código fora de `docs/` e devolve a falha a ele uma vez; na segunda parada
 (`stop_hook_active`) deixa encerrar, para falha anterior não virar laço. Edição feita por Bash
 (`sed -i`) não aparece no transcript e escapa dele. Cada regra nova ganha um caso aceito e um
